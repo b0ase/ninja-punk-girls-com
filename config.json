@@ -1,0 +1,9 @@
+{
+    "assets_dir": "assets",
+    "output_dir": "output",
+    "layers": [
+        "BODIES",
+        "WEAPONS",
+        "HAIR"
+    ]
+}

@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add custom font */
+@font-face {
+  font-family: 'Cyberpunks';
+  src: url('/fonts/Cyberpunks.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cyberpunks Italic';
+  src: url('/fonts/Cyberpunks Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+/* Ensure html and body cover the full viewport height */
+html,
+body {
+  @apply min-h-screen;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  @apply text-gray-100;
+  font-family: sans-serif; /* Default fallback font */
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+  
+  h1 {
+    @apply text-4xl;
+  }
+  
+  h2 {
+    @apply text-3xl;
+  }
+  
+  h3 {
+    @apply text-2xl;
+  }
+
+  :root {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  @keyframes pulsate-glow-color {
+    0%, 100% {
+      transform: scale(1);
+      /* Purple Glow */
+      box-shadow: 0 0 8px rgba(192, 132, 252, 0.7), /* purple-400 */
+                  0 0 16px rgba(168, 85, 247, 0.5);  /* purple-500 */
+    }
+    50% {
+      transform: scale(1.03);
+      /* Pink/Fuchsia Glow */
+      box-shadow: 0 0 12px rgba(236, 72, 153, 0.9),  /* pink-500 */
+                  0 0 24px rgba(219, 39, 119, 0.7);  /* pink-600 */
+    }
+  }
+  /* Class to apply the animation */
+  .animate-pulsate-glow-color {
+    animation: pulsate-glow-color 2.5s infinite ease-in-out;
+  }
+
+  /* New animation for background color rotation */
+  @keyframes rotate-bg-color {
+    0%, 100% { background-color: #a855f7; } /* purple-500 */
+    25% { background-color: #ec4899; } /* pink-500 */
+    50% { background-color: #14b8a6; } /* teal-500 */
+    75% { background-color: #f97316; } /* orange-500 */
+  }
+  .animate-rotate-bg-color {
+    animation: rotate-bg-color 6s infinite linear; /* Adjust 6s duration if needed */
+  }
+
+  /* Add other custom utilities or keyframes below if needed */
+}
+
+/* === Custom Scrollbar (Optional) === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #2d3748; /* gray-700 */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #718096; /* gray-500 */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0; /* gray-400 */
+}
+
+.font-cyberpunk {
+  font-family: 'Cyberpunks', sans-serif;
+}
+
+.font-cyberpunk-italic {
+  font-family: 'Cyberpunks Italic', sans-serif;
+}

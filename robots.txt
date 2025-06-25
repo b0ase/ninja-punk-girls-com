@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /
+
+# This prevents search engines from indexing the site during development.
+# Once the site is ready for production, update this file to allow indexing. 

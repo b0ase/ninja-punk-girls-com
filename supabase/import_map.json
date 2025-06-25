@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@handcash/handcash-connect": "https://esm.sh/@handcash/handcash-connect@1.10.0",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "djwt": "https://deno.land/x/djwt@v2.8/mod.ts"
+  }
+}

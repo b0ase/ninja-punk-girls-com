@@ -1,0 +1,27 @@
+import json
+import os
+from image_processor import scan_folders, assign_rarity
+from html_generator import generate_html
+
+def load_config():
+    with open('config.json', 'r') as f:
+        return json.load(f)
+
+def main():
+    config = load_config()
+    base_path = config['assets_dir']
+    layers = config['layers']
+
+    catalog = scan_folders(base_path, layers)
+    rarity_catalog = assign_rarity(catalog)
+
+    html_content = generate_html(catalog, rarity_catalog)
+
+    output_path = os.path.join(config['output_dir'], 'nft_studio.html')
+    with open(output_path, 'w') as f:
+        f.write(html_content)
+
+    print(f"NFT Studio HTML generated successfully at {output_path}!")
+
+if __name__ == "__main__":
+    main()

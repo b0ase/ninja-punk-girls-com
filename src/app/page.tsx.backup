@@ -1,0 +1,175 @@
+'use client';
+
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useChain } from '@/context/ChainContext';
+import { useHandCash } from '@/context/HandCashContext';
+import Image from 'next/image';
+import { FaTwitter, FaYoutube, FaTelegramPlane, FaEnvelope } from 'react-icons/fa';
+
+export default function Home() {
+  const { selectChain } = useChain();
+  const { connect: connectHandCash } = useHandCash();
+  const router = useRouter();
+
+  const handleConnect = () => {
+    selectChain('bsv');
+    connectHandCash();
+  };
+
+  const socialLinks = [
+    { name: 'Twitter', icon: FaTwitter, href: '#X_PROFILE_URL' },
+    { name: 'YouTube', icon: FaYoutube, href: '#YOUTUBE_CHANNEL_URL' },
+    { name: 'Telegram', icon: FaTelegramPlane, href: '#TELEGRAM_GROUP_URL' },
+    { name: 'Email', icon: FaEnvelope, href: 'mailto:ninjapunkgirls@gmail.com' },
+  ];
+
+  // Selected flying weapons - just a few for visual interest
+  const floatingWeapons = [
+    { src: '/assets/07-Right-Weapon/07_009_Right-Weapon_Katana_Nao_NPG_x_Mythical_Strength_1_Speed_2_Skill_0_Stamina_0_Stealth_2_Style_2_.png', x: 10, y: 20, size: 80 },
+    { src: '/assets/07-Right-Weapon/07_037_Right-Weapon_Guitar_x_x_x_Epic_Strength_0_Speed_2_Skill_2_Stamina_0_Stealth_2_Style_2_.png', x: 85, y: 15, size: 75 },
+    { src: '/assets/08-Left-Weapon/08_019_Left-Weapon_Chainsaw_x_x_x_Legendary_Strength_0_Speed_2_Skill_1_Stamina_1_Stealth_2_Style_1_.png', x: 15, y: 75, size: 70 },
+    { src: '/assets/07-Right-Weapon/07_033_Right-Weapon_Golden-Uzi_x_x_x_Epic_Strength_2_Speed_0_Skill_1_Stamina_1_Stealth_0_Style_1_.png', x: 80, y: 80, size: 65 },
+    { src: '/assets/10-Hair/10_002_Hair_Sonic-Flash_Yamarashii_Erobot_x_Mythical_Strength_2_Speed_0_Skill_2_Stamina_1_Stealth_2_Style_0_.png', x: 5, y: 50, size: 60 },
+    { src: '/assets/11-Mask/11_006_Mask_Spiked_x_x_x_Mythical_Strength_2_Speed_1_Skill_0_Stamina_1_Stealth_1_Style_0_.png', x: 90, y: 45, size: 50 },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-pink-800 to-blue-900 relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 opacity-30">
+        <Image
+          src="/assets/29-Background/29_006_Background_Neon-Street_x_x_RGB_Legendary__x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png"
+          alt="Neon Street Background"
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
+
+      {/* Floating Weapons */}
+      {floatingWeapons.map((weapon, index) => (
+        <div
+          key={index}
+          className="absolute animate-bounce opacity-70 hover:opacity-100 transition-opacity duration-300"
+          style={{
+            left: `${weapon.x}%`,
+            top: `${weapon.y}%`,
+            animationDelay: `${index * 0.5}s`,
+            animationDuration: '3s',
+          }}
+        >
+          <Image
+            src={weapon.src}
+            alt={`Weapon ${index + 1}`}
+            width={weapon.size}
+            height={weapon.size}
+            className="object-contain drop-shadow-lg"
+          />
+        </div>
+      ))}
+
+      {/* Main Content */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 text-center">
+        {/* Logo */}
+        <div className="mb-8">
+          <Image
+            src="/assets/01-Logo/01_001_logo_NPG-logo_x_NPG_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png"
+            alt="Ninja Punk Girls Logo"
+            width={400}
+            height={120}
+            className="mx-auto drop-shadow-2xl"
+            priority
+          />
+        </div>
+
+        {/* Character Card */}
+        <div className="mb-8">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500/50 to-cyan-500/50 rounded-2xl blur-xl"></div>
+            <Image
+              src="/assets/00_Character_Card.png"
+              alt="Ninja Punk Girls Character"
+              width={300}
+              height={400}
+              className="relative rounded-2xl border-4 border-pink-500/50 drop-shadow-2xl"
+              priority
+            />
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="mb-8">
+          <h1 className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-lg mb-4">
+            NINJA PUNK GIRLS
+          </h1>
+          <p className="text-xl md:text-2xl font-bold text-white/90 max-w-2xl mx-auto leading-relaxed">
+            🔥 Collectible NFT Warriors 🔥<br />
+            ⚔️ Mint • Trade • Battle ⚔️<br />
+            💎 On Bitcoin SV 💎
+          </p>
+        </div>
+
+        {/* Connect Button */}
+        <div className="mb-8">
+          <button
+            onClick={handleConnect}
+            className="group relative px-12 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold text-xl rounded-full shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 hover:scale-105 border-2 border-pink-400/50"
+          >
+            <span className="relative z-10">
+              🚀 CONNECT WITH HANDCASH 🚀
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </button>
+        </div>
+
+        {/* Social Links */}
+        <div className="flex justify-center space-x-6">
+          {socialLinks.map((social, index) => {
+            const IconComponent = social.icon;
+            return (
+              <a
+                key={social.name}
+                href={social.href}
+                className="group p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-all duration-300 hover:scale-110 border border-white/20"
+                title={social.name}
+              >
+                <IconComponent 
+                  size={24} 
+                  className="text-white group-hover:text-pink-300 transition-colors duration-300" 
+                />
+              </a>
+            );
+          })}
+        </div>
+
+        {/* Collection Info */}
+        <div className="mt-8 text-center">
+          <p className="text-lg font-bold text-white/80">
+            🎮 20+ Weapon Categories • 1000+ Combinations 🎮
+          </p>
+          <p className="text-md font-semibold text-white/70 mt-2">
+            ✨ Rare • Epic • Legendary • Mythical ✨
+          </p>
+        </div>
+      </div>
+
+      {/* Subtle animated particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-pink-400/30 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 2}s`,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
