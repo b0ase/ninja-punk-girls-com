@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { LAYER_DETAILS, LAYER_ORDER } from '@/data/layer-config';
 
 // Cache configuration
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
@@ -127,41 +126,32 @@ function parseFilename(filename: string): Partial<AssetDetail> {
 
 // Function to build asset data from filesystem
 function buildAssetData(): AssetDetail[] {
-  const assetsDir = path.join(process.cwd(), 'public', 'assets');
+  const landingDir = path.join(process.cwd(), 'public', 'landing');
   const assetData: AssetDetail[] = [];
 
   try {
-    // Process each layer in order
-    LAYER_ORDER.forEach(layerKey => {
-      const layerDetail = LAYER_DETAILS[layerKey];
-      if (!layerDetail) {
-        console.warn(`No layer detail found for ${layerKey}`);
-        return;
-      }
+    // Check if landing directory exists
+    if (!fs.existsSync(landingDir)) {
+      console.warn(`Landing directory not found: ${landingDir}`);
+      return [];
+    }
 
-      const layerDir = path.join(assetsDir, layerDetail.folderName);
-      
-      if (!fs.existsSync(layerDir)) {
-        console.warn(`Directory not found: ${layerDir}`);
-        return;
-      }
+    // Process all PNG files directly in the landing directory
+    const files = fs.readdirSync(landingDir)
+      .filter(file => file.endsWith('.png'));
 
-      const files = fs.readdirSync(layerDir)
-        .filter(file => file.endsWith('.png'));
-
-      files.forEach(filename => {
-        const metadata = parseFilename(filename);
-        assetData.push({
-          layer: layerKey,
-          filename,
-          name: metadata.name || filename.replace(/\.png$/i, ''), // Ensure name is always string
-          assetNumber: metadata.assetNumber,
-          rarity: metadata.rarity,
-          type: metadata.type, // <<< CORRECT: Use parsed type for layer
-          character: metadata.character,
-          genes: metadata.genes,
-          stats: metadata.stats
-        });
+    files.forEach(filename => {
+      const metadata = parseFilename(filename);
+      assetData.push({
+        layer: 'LANDING', // Generic landing layer since we don't distinguish left/right anymore
+        filename,
+        name: metadata.name || filename.replace(/\.png$/i, ''), // Ensure name is always string
+        assetNumber: metadata.assetNumber,
+        rarity: metadata.rarity,
+        type: metadata.type,
+        character: metadata.character,
+        genes: metadata.genes,
+        stats: metadata.stats
       });
     });
 

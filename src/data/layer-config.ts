@@ -35,36 +35,36 @@ export const LAYER_ORDER = [
   'LOGO',          // 01
 ];
 
-// Updated LAYER_DETAILS reflecting actual folder structure and adding new layers
+// Updated LAYER_DETAILS reflecting actual folder structure with dashes instead of spaces
 export const LAYER_DETAILS: Record<string, { number: string; folderName: string }> = {
-  LOGO: { number: '01', folderName: '01 Logo' },
-  COPYRIGHT: { number: '02', folderName: '02 Copyright' }, // Added
-  SCORES: { number: '03', folderName: '03 Scores' },       // Added
-  TEAM: { number: '04', folderName: '04 Team' },
-  INTERFACE: { number: '05', folderName: '05 Interface' },
-  EFFECTS: { number: '06', folderName: '06 Effects' },     // Added
-  RIGHT_WEAPON: { number: '07', folderName: '07 Right-Weapon' }, // Added
-  LEFT_WEAPON: { number: '08', folderName: '08 Left-Weapon' }, // Added
-  HORNS: { number: '09', folderName: '09 Horns' },         // Added
-  HAIR: { number: '10', folderName: '10 Hair' },           // Updated number/folder
-  MASK: { number: '11', folderName: '11 Mask' },           // Added (Maps to HEADWEAR concept)
-  TOP: { number: '12', folderName: '12 Top' },             // Added (Part of CLOTHING concept)
-  BOOTS: { number: '13', folderName: '13 Boots' },         // Added (Part of CLOTHING concept)
-  JEWELLERY: { number: '14', folderName: '14 Jewellery' },   // Added (Maps to EARRINGS concept)
-  ACCESSORIES: { number: '15', folderName: '15 Accessories' }, // Added
-  BRA: { number: '16', folderName: '16 Bra' },             // Added (Part of CLOTHING concept)
-  BOTTOM: { number: '17', folderName: '17 Bottom' },       // Added (Part of CLOTHING concept)
-  FACE: { number: '18', folderName: '18 Face' },           // Updated number/folder
-  UNDERWEAR: { number: '19', folderName: '19 Underwear' },   // Added (Part of CLOTHING concept)
-  ARMS: { number: '20', folderName: '20 Arms' },           // Added
-  BODY_SKIN: { number: '21', folderName: '21 Body' },       // Renamed Key, Updated number/folder (Maps to SKIN concept)
-  BACK: { number: '22', folderName: '22 Back' },           // Added
-  REAR_HORNS: { number: '23', folderName: '23 Rear-Horns' }, // Added
-  REAR_HAIR: { number: '24', folderName: '24 Rear-Hair' },   // Added
-  DECALS: { number: '26', folderName: '26 Decals' },       // Added
-  BANNER: { number: '27', folderName: '27 Banner' },       // Added
-  GLOW: { number: '28', folderName: '28 Glow' },           // Added
-  BACKGROUND: { number: '29', folderName: '29 Background' }, // Updated number/folder
+  LOGO: { number: '01', folderName: '01-Logo' },
+  COPYRIGHT: { number: '02', folderName: '02-Copyright' },
+  SCORES: { number: '03', folderName: '03-Scores' },       // Note: This directory doesn't exist
+  TEAM: { number: '04', folderName: '04-Team' },
+  INTERFACE: { number: '05', folderName: '05-Interface' },
+  EFFECTS: { number: '06', folderName: '06-Effects' },
+  RIGHT_WEAPON: { number: '07', folderName: '07-Right-Weapon' },
+  LEFT_WEAPON: { number: '08', folderName: '08-Left-Weapon' },
+  HORNS: { number: '09', folderName: '09-Horns' },
+  HAIR: { number: '10', folderName: '10-Hair' },
+  MASK: { number: '11', folderName: '11-Mask' },
+  TOP: { number: '12', folderName: '12-Top' },
+  BOOTS: { number: '13', folderName: '13-Boots' },
+  JEWELLERY: { number: '14', folderName: '14-Jewellery' },
+  ACCESSORIES: { number: '15', folderName: '15-Accessories' },
+  BRA: { number: '16', folderName: '16-Bra' },
+  BOTTOM: { number: '17', folderName: '17-Bottom' },
+  FACE: { number: '18', folderName: '18-Face' },
+  UNDERWEAR: { number: '19', folderName: '19-Underwear' },
+  ARMS: { number: '20', folderName: '20-Arms' },
+  BODY_SKIN: { number: '21', folderName: '21-Body' },
+  BACK: { number: '22', folderName: '22-Back' },
+  REAR_HORNS: { number: '23', folderName: '23-Rear-Horns' },
+  REAR_HAIR: { number: '24', folderName: '24-Rear-Hair' },
+  DECALS: { number: '26', folderName: '26-Decals' },
+  BANNER: { number: '27', folderName: '27-Banner' },
+  GLOW: { number: '28', folderName: '28-Glow' },
+  BACKGROUND: { number: '29', folderName: '29-Background' },
 
   // Removed layers from previous config that don't match folders:
   // SKIN: { number: '01', folderName: '01 Skin' },          // Replaced by BODY_SKIN
