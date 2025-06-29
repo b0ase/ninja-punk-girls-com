@@ -93,34 +93,21 @@ export const AssetProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // Process the flat array into a Record grouped by layer
       const processedAssets: Record<string, AssetDetail[]> = {};
 
-      result.data.forEach((asset: any) => { // Use 'any' temporarily for flexibility
+      result.data.forEach((asset: AssetDetail) => {
         const layerKey = asset.layer; // API already provides canonical key
 
         if (!processedAssets[layerKey]) {
           processedAssets[layerKey] = [];
         }
 
-        // *** Create AssetDetail object - Map based on likely API structure ***
-        const detailData: AssetDetail = {
-          // Map potentially nested fields from API response to flat AssetDetail structure
-          filename: asset.fullFilename || asset.filename, // Prefer fullFilename if exists
-          name: asset.metadata?.elementName ?? asset.name ?? 'Unknown Element',
-          assetNumber: asset.assetNumber,
-          rarity: asset.metadata?.rarity ?? asset.rarity, 
-          character: asset.metadata?.characterName ?? asset.character,
-          genes: asset.metadata?.genes ?? asset.genes,
-          series: asset.series, // Assuming series is top-level
-          stats: asset.stats ?? createEmptyStats(), 
-          layerKey: layerKey, 
-        };
-
+        // API already returns properly structured AssetDetail objects
         // Basic validation: Ensure at least filename and name exist
-        if (!detailData.filename || !detailData.name) {
+        if (!asset.filename || !asset.name) {
           console.warn(`[AssetProvider] Skipping asset due to missing filename or name:`, asset);
           return; // Skip adding this asset if essential info is missing
         }
 
-        processedAssets[layerKey].push(detailData); // Push AssetDetail
+        processedAssets[layerKey].push(asset); // Push AssetDetail directly
       });
 
       console.log("[AssetProvider] Processed assets:", Object.keys(processedAssets).length, "layers");

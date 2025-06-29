@@ -2,8 +2,8 @@
 
 import React, { useRef, useEffect } from 'react';
 
-// Define the structure for AssetDetail, mirroring its use in CharactersPage and API
-interface AssetDetail {
+// Define the structure for AssetDetail, matching the characters page
+interface CharacterAssetDetail {
   layer: string;
   name: string;
   filename: string;
@@ -12,6 +12,14 @@ interface AssetDetail {
   type?: string;
   character?: string;
   genes?: string;
+  stats?: {
+    strength?: number;
+    speed?: number;
+    skill?: number;
+    stamina?: number;
+    stealth?: number;
+    style?: number;
+  };
 }
 
 // Define structure for LayerDetails needed by this component
@@ -21,7 +29,7 @@ interface LayerDetailInfo {
 }
 
 interface CharacterPreviewCanvasProps {
-  assets: AssetDetail[]; // Assets specifically for the character to preview
+  assets: CharacterAssetDetail[]; // Assets specifically for the character to preview
   layerOrder: string[]; // The order in which to draw layers
   layerDetails: Record<string, LayerDetailInfo>; // Map layer keys to folder names etc.
   width: number;
@@ -101,9 +109,9 @@ const CharacterPreviewCanvas: React.FC<CharacterPreviewCanvasProps> = ({
         let logoPath: string | null = null;
 
         if (originGene === 'npg') {
-          logoPath = '/assets/01 Logo/01_01_logo_NPG-logo_x_NPG.png';
+          logoPath = '/assets/01-Logo/01_001_logo_NPG-logo_x_NPG_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png';
         } else if (originGene === 'erobot' || originGene === 'erobotz') { // Handle variations
-          logoPath = '/assets/01 Logo/01_02_logo_Erobotz-logo_x_erobot.png';
+          logoPath = '/assets/01-Logo/01_002_logo_Erobot-logo_x_Erobot_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png';
         }
 
         if (logoPath) {

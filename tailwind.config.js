@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      gridTemplateColumns: {
+        // For the periodic table layout
+        '18': 'repeat(18, minmax(0, 1fr))',
+      },
       colors: {
         primary: {
           DEFAULT: '#9c27b0',

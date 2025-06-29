@@ -19,10 +19,11 @@ if (!appSecret) {
 console.log(`[Debug] Reading HANDCASH_ENVIRONMENT: ${process.env.HANDCASH_ENVIRONMENT}`); 
 
 // Determine the correct environment object from the SDK's Environments export
+// Default to production environment instead of IAE
 const envString = process.env.HANDCASH_ENVIRONMENT;
-const environment = envString === 'prod'
-  ? Environments.prod // Use the predefined production environment object
-  : Environments.iae;  // Use the predefined IAE (testing) environment object
+const environment = envString === 'iae'
+  ? Environments.iae // Use IAE only if explicitly set
+  : Environments.prod;  // Default to production environment
 
 // Initialize HandCashConnect
 const handCashConnect = new HandCashConnect({
@@ -32,7 +33,7 @@ const handCashConnect = new HandCashConnect({
   env: environment // Pass the environment object
 });
 
-console.log(`HandCash Service Initialized for Env: ${envString === 'prod' ? 'Production' : 'IAE'}`);
+console.log(`HandCash Service Initialized for Env: ${envString === 'iae' ? 'IAE' : 'Production'}`);
 
 export { handCashConnect };
 

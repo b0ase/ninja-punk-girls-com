@@ -12,7 +12,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 const supabaseJwtSecret = process.env.SUPABASE_JWT_SECRET;
 const handcashAppId = process.env.NEXT_PUBLIC_HANDCASH_APP_ID;
 const handcashAppSecret = process.env.HANDCASH_APP_SECRET;
-const handcashEnv = process.env.HANDCASH_ENVIRONMENT ?? 'iae'; // Default to iae
+const handcashEnv = process.env.HANDCASH_ENVIRONMENT ?? 'prod'; // Default to production
 
 // Basic check for required variables
 if (!supabaseUrl || !supabaseServiceKey || !supabaseJwtSecret || !handcashAppId || !handcashAppSecret) {
@@ -28,10 +28,10 @@ const supabaseAdmin = createClient(
   supabaseServiceKey || 'placeholder-service-key'
 );
 
-// Determine HandCash environment
-const hcEnvironment = handcashEnv.toLowerCase() === 'prod'
-  ? Environments.prod
-  : Environments.iae;
+// Determine HandCash environment - default to production
+const hcEnvironment = handcashEnv.toLowerCase() === 'iae'
+  ? Environments.iae
+  : Environments.prod;
 
 // Initialize HandCash Connect SDK
 const handCashConnect = new HandCashConnect({

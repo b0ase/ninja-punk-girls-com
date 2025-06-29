@@ -1,15 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useChain } from '@/context/ChainContext';
-import { useHandCash } from '@/context/HandCashContext';
-import HandCashConnectButton from '@/components/HandCashConnectButton';
 import { FaTwitter, FaYoutube, FaTelegramPlane, FaEnvelope } from 'react-icons/fa';
+import HandCashConnectButton from './HandCashConnectButton';
 
 // Solana Imports - Commented out
+// import { useWallet } from '@solana/wallet-adapter-react';
 // import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 // Ethereum Imports - Commented out
@@ -20,10 +19,24 @@ import { FaTwitter, FaYoutube, FaTelegramPlane, FaEnvelope } from 'react-icons/f
 // const truncateId = (id: string, startChars = 4, endChars = 4) => {...}
 
 export default function Navbar() {
-  const { selectedChain, isChainReady } = useChain();
-  const { isConnected: isHandCashConnected } = useHandCash();
-  const isConnected = selectedChain === 'bsv' && isHandCashConnected;
   const pathname = usePathname();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Handle clicks outside the dropdown to close it
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   // Define links with color classes
   const navLinks = [
@@ -33,6 +46,7 @@ export default function Navbar() {
     { href: '/market', label: 'Market', colorClass: 'text-green-400' },
     { href: '/elements', label: 'Elements', colorClass: 'text-teal-400' },
     { href: '/characters', label: 'Characters', colorClass: 'text-cyan-400' },
+    { href: '/periodic-table', label: 'Table', colorClass: 'text-emerald-400' },
     { href: '/token', label: 'Token', colorClass: 'text-blue-400' },
     { href: '/game', label: 'Game', colorClass: 'text-indigo-400' },
     { href: '/build', label: 'Build', colorClass: 'text-purple-400' },
@@ -45,68 +59,53 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
            {/* Left side: Logo */}
            <div className="flex items-center gap-2 order-1">
-            <Link href="/" className="flex-shrink-0">
+            <Link href="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
               <Image
                 src="/assets/01-Logo/01_001_logo_NPG-logo_x_NPG_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png"
                 alt="Ninja Punk Girls Logo"
-                width={150}
-                height={40}
-                className="object-contain"
+                width={240}
+                height={70}
+                className="object-contain h-12 sm:h-14 w-auto"
                 priority
+                onError={(e) => {
+                  console.error('Logo failed to load:', e);
+                  // Fallback to text if image fails
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
               />
+              {/* Fallback text logo */}
+              <span className="text-lg sm:text-xl font-bold text-pink-500 hidden" id="fallback-logo">
+                NPG
+              </span>
             </Link>
           </div>
 
-          {/* Center: Navigation Links */}
-          <div className="flex items-center justify-center flex-1 order-3 sm:order-2 w-full sm:w-auto">
-           {isChainReady ? (
-             selectedChain ? (
-               <>
-                  {navLinks.map(link => {
-                    const isActive = pathname === link.href;
-                    return (
-                      <Link 
-                        key={link.label} 
-                        href={link.href} 
-                        className={`px-2 py-1 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${link.colorClass} hover:text-white relative ${isActive ? 'pb-2' : ''}`}
-                      >
-                        {link.label}
-                        {isActive && (
-                          <div 
-                            className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full" 
-                            style={{ backgroundColor: `currentColor` }}
-                          />
-                        )}
-                      </Link>
-                    );
-                  })}
-               </>
-             ) : (
-               <Link href="/" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium border border-pink-500">
-                 Choose Blockchain
-               </Link>
-             )
-           ) : (
-             <div className="h-[34px] w-3/4 bg-gray-800/50 rounded-md animate-pulse"></div>
-           )}
-        </div>
+          {/* Center: Navigation Links - Always visible */}
+          <div className="hidden md:flex items-center justify-center flex-1 order-3 sm:order-2 w-full sm:w-auto">
+            {navLinks.map(link => {
+              const isActive = pathname === link.href;
+              return (
+                <Link 
+                  key={link.label} 
+                  href={link.href} 
+                  className={`px-2 py-1 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${link.colorClass} hover:text-white relative ${isActive ? 'pb-2' : ''}`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <div 
+                      className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full" 
+                      style={{ backgroundColor: `currentColor` }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
 
-        {/* Right side: Connect and Social */}
-        <div className="flex items-center gap-4 order-2 sm:order-3 flex-shrink-0"> 
-           <>
-              {isChainReady && selectedChain === 'bsv' && <HandCashConnectButton />}
-              {isChainReady && (selectedChain === 'solana' || selectedChain === 'ethereum') && (
-                  <button 
-                    className="bg-gray-700 text-gray-400 font-medium py-2 px-4 rounded-md text-sm opacity-50 cursor-not-allowed"
-                    disabled
-                  >
-                      {selectedChain === 'solana' ? 'Solana (Soon)' : 'Ethereum (Soon)'}
-                  </button>
-              )}
-              {!isChainReady && (
-                   <div className="h-[38px] w-[150px] bg-gray-700 rounded-md animate-pulse"></div>
-              )}
-           </>
+          {/* Right side: Connect Wallet and Social Links */}
+          <div className="flex items-center gap-4 order-2 sm:order-3 flex-shrink-0"> 
+            {/* Connect Wallet Button */}
+            <HandCashConnectButton />
 
             {/* Social Links */}
             <div className="hidden sm:flex items-center gap-4 pl-4 border-l border-gray-700/50">
@@ -124,6 +123,24 @@ export default function Navbar() {
               </a>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className="md:hidden border-t border-gray-700/50">
+        <div className="px-4 py-2 space-y-1">
+          {navLinks.map(link => {
+            const isActive = pathname === link.href;
+            return (
+              <Link 
+                key={link.label} 
+                href={link.href} 
+                className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${link.colorClass} hover:text-white ${isActive ? 'bg-gray-800' : ''}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>

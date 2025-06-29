@@ -26,7 +26,7 @@ const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 const supabaseJwtSecret = Deno.env.get('SUPABASE_JWT_SECRET');
 const handcashAppId = Deno.env.get('NEXT_PUBLIC_HANDCASH_APP_ID');
 const handcashAppSecret = Deno.env.get('HANDCASH_APP_SECRET');
-const handcashEnv = Deno.env.get('HANDCASH_ENVIRONMENT') ?? 'iae'; // Default to iae
+const handcashEnv = Deno.env.get('HANDCASH_ENVIRONMENT') ?? 'prod'; // Default to production
 
 if (!supabaseUrl || !supabaseServiceRoleKey || !supabaseJwtSecret || !handcashAppId || !handcashAppSecret) {
   console.error("Missing required environment variables.");
@@ -37,10 +37,10 @@ if (!supabaseUrl || !supabaseServiceRoleKey || !supabaseJwtSecret || !handcashAp
 // --- Initialize Clients (only once) ---
 const supabaseAdmin = createClient(supabaseUrl ?? '', supabaseServiceRoleKey ?? '');
 
-// Determine HandCash environment
-const hcEnvironment = handcashEnv.toLowerCase() === 'prod'
-  ? Environments.prod
-  : Environments.iae;
+// Determine HandCash environment - default to production
+const hcEnvironment = handcashEnv.toLowerCase() === 'iae'
+  ? Environments.iae
+  : Environments.prod;
 
 const handCashConnect = new HandCashConnect({
   appId: handcashAppId ?? '',

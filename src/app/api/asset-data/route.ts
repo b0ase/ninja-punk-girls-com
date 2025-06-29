@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { FOLDER_MAPPING } from '@/data/layer-config';
 
 // Cache configuration
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
@@ -126,35 +127,61 @@ function parseFilename(filename: string): Partial<AssetDetail> {
 
 // Function to build asset data from filesystem
 function buildAssetData(): AssetDetail[] {
-  const landingDir = path.join(process.cwd(), 'public', 'landing');
+  const assetsDir = path.join(process.cwd(), 'public', 'assets');
   const assetData: AssetDetail[] = [];
 
   try {
-    // Check if landing directory exists
-    if (!fs.existsSync(landingDir)) {
-      console.warn(`Landing directory not found: ${landingDir}`);
+    // Check if assets directory exists
+    if (!fs.existsSync(assetsDir)) {
+      console.warn(`Assets directory not found: ${assetsDir}`);
       return [];
     }
 
-    // Process all PNG files directly in the landing directory
-    const files = fs.readdirSync(landingDir)
-      .filter(file => file.endsWith('.png'));
+    // Get all subdirectories in the assets folder
+    const folders = fs.readdirSync(assetsDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
 
-    files.forEach(filename => {
-      const metadata = parseFilename(filename);
-      assetData.push({
-        layer: 'LANDING', // Generic landing layer since we don't distinguish left/right anymore
-        filename,
-        name: metadata.name || filename.replace(/\.png$/i, ''), // Ensure name is always string
-        assetNumber: metadata.assetNumber,
-        rarity: metadata.rarity,
-        type: metadata.type,
-        character: metadata.character,
-        genes: metadata.genes,
-        stats: metadata.stats
-      });
+    console.log(`[API] Found asset folders:`, folders);
+
+    folders.forEach(folderName => {
+      const folderPath = path.join(assetsDir, folderName);
+      
+      // Map folder name to layer key using FOLDER_MAPPING
+      const layerKey = FOLDER_MAPPING[folderName];
+      
+      if (!layerKey) {
+        console.warn(`[API] No layer mapping found for folder: ${folderName}`);
+        return;
+      }
+
+      // Process all PNG files in this folder
+      try {
+        const files = fs.readdirSync(folderPath)
+          .filter(file => file.endsWith('.png'));
+
+        console.log(`[API] Processing ${files.length} files in ${folderName} -> ${layerKey}`);
+
+        files.forEach(filename => {
+          const metadata = parseFilename(filename);
+          assetData.push({
+            layer: layerKey, // Use the mapped layer key
+            filename,
+            name: metadata.name || filename.replace(/\.png$/i, ''), // Ensure name is always string
+            assetNumber: metadata.assetNumber,
+            rarity: metadata.rarity,
+            type: metadata.type,
+            character: metadata.character,
+            genes: metadata.genes,
+            stats: metadata.stats
+          });
+        });
+      } catch (error) {
+        console.error(`[API] Error reading folder ${folderName}:`, error);
+      }
     });
 
+    console.log(`[API] Built asset data for ${assetData.length} assets across ${folders.length} folders`);
     return assetData;
   } catch (error) {
     console.error('Error building asset data:', error);
@@ -169,6 +196,7 @@ export async function GET() {
     
     // Check if cache needs to be refreshed
     if (!cachedAssetData || currentTime - lastCacheTime > CACHE_DURATION) {
+      console.log('[API] Refreshing asset cache...');
       cachedAssetData = buildAssetData();
       lastCacheTime = currentTime;
     }
