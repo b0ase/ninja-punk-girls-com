@@ -1,0 +1,20 @@
+{
+  "folder_number": "20",
+  "asset_number": "010",
+  "category": "Arms",
+  "item_name": "Leather-Gloves",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 0,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "20_010_Arms_Leather-Gloves_x_x_x_Mythical_Strength_0_Speed_2_Skill_2_Stamina_2_Stealth_2_Style_1_.png",
+  "simplified_filename": "20_010_Arms_Leather-Gloves.png"
+}

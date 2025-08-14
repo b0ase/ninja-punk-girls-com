@@ -18,7 +18,7 @@ import { ChainProvider } from '@/context/ChainContext';
 // import { injected } from 'wagmi/connectors';
 // import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// HandCash Context
+// === ADDED HandCash Context Import ===
 import { HandCashProvider } from '@/context/HandCashContext';
 
 // === ADDED AuthContext Import ===
@@ -56,19 +56,19 @@ export function AppProviders({ children }: AppProvidersProps) {
     //   <QueryClientProvider client={queryClient}>
         <ChainProvider>
           <AuthProvider>
-            <LayerManagerProvider>
-              {/* <ConnectionProvider endpoint={endpoint}> */}
-              {/*   <WalletProvider wallets={wallets} autoConnect> */}
-              {/*     <WalletModalProvider> */}
-                    <HandCashProvider>
+            <HandCashProvider>
+              <LayerManagerProvider>
+                {/* <ConnectionProvider endpoint={endpoint}> */}
+                {/*   <WalletProvider wallets={wallets} autoConnect> */}
+                {/*     <WalletModalProvider> */}
                       <NFTStoreProvider>
                         {children}
                       </NFTStoreProvider>
-                    </HandCashProvider>
-              {/*     </WalletModalProvider> */}
-              {/*   </WalletProvider> */}
-              {/* </ConnectionProvider> */}
-            </LayerManagerProvider>
+                {/*     </WalletModalProvider> */}
+                {/*   </WalletProvider> */}
+                {/* </ConnectionProvider> */}
+              </LayerManagerProvider>
+            </HandCashProvider>
           </AuthProvider>
         </ChainProvider>
     //   </QueryClientProvider>

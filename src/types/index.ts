@@ -76,14 +76,28 @@ export interface LayerConfig {
 
 export interface AssetDetail {
   layer: string;
-  name: string;
   filename: string;
-  rarity?: string;
-  type?: string;
+  name: string;
+  assetNumber: string;
+  folder_number: string;
+  category: string;
+  item_name: string;
   character?: string;
+  team?: string;
   genes?: string;
-  stats?: Partial<StatsType>;
-  assetNumber?: string;
+  rarity?: string;
+  stats: {
+    strength: number;
+    speed: number;
+    skill: number;
+    stamina: number;
+    stealth: number;
+    style: number;
+  };
+  original_filename?: string;
+  simplified_filename?: string;
+  // Legacy fields for backward compatibility
+  type?: string;
   series?: string;
 }
 

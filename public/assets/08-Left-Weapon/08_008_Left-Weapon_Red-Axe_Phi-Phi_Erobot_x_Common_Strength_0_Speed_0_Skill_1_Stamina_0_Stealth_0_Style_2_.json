@@ -1,0 +1,20 @@
+{
+  "folder_number": "08",
+  "asset_number": "008",
+  "category": "Left-Weapon",
+  "item_name": "Red-Axe",
+  "character": "Phi-Phi",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "08_008_Left-Weapon_Red-Axe_Phi-Phi_Erobot_x_Common_Strength_0_Speed_0_Skill_1_Stamina_0_Stealth_0_Style_2_.png",
+  "simplified_filename": "08_008_Left-Weapon_Red-Axe.png"
+}

@@ -96,7 +96,7 @@ function CharactersPageContent() {
         filename: asset.filename,
         assetNumber: asset.assetNumber?.toString() || undefined,
         rarity: asset.rarity || undefined,
-        type: asset.layerKey || undefined, // Use layerKey as type if available
+        type: layerKey, // Use the layerKey from the Object.entries destructuring
         character: asset.character || undefined,
         genes: asset.genes || undefined,
         stats: asset.stats || undefined

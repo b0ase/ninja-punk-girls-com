@@ -1,0 +1,20 @@
+{
+  "folder_number": "24",
+  "asset_number": "011",
+  "category": "Rear-Hair",
+  "item_name": "Scraps",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 1,
+    "speed": 1,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "24_011_Rear-Hair_Scraps_x_x_x_Mythical_Strength_1_Speed_1_Skill_1_Stamina_2_Stealth_2_Style_2_.png",
+  "simplified_filename": "24_011_Rear-Hair_Scraps.png"
+}

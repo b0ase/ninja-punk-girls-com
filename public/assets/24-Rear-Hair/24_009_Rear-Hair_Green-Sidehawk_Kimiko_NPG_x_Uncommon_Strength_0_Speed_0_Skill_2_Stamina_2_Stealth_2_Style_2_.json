@@ -1,0 +1,20 @@
+{
+  "folder_number": "24",
+  "asset_number": "009",
+  "category": "Rear-Hair",
+  "item_name": "Green-Sidehawk",
+  "character": "Kimiko",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "24_009_Rear-Hair_Green-Sidehawk_Kimiko_NPG_x_Uncommon_Strength_0_Speed_0_Skill_2_Stamina_2_Stealth_2_Style_2_.png",
+  "simplified_filename": "24_009_Rear-Hair_Green-Sidehawk.png"
+}

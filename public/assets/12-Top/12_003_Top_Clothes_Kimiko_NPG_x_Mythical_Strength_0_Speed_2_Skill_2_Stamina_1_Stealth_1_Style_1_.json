@@ -1,0 +1,20 @@
+{
+  "folder_number": "12",
+  "asset_number": "003",
+  "category": "Top",
+  "item_name": "Clothes",
+  "character": "Kimiko",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 0,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 1,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "12_003_Top_Clothes_Kimiko_NPG_x_Mythical_Strength_0_Speed_2_Skill_2_Stamina_1_Stealth_1_Style_1_.png",
+  "simplified_filename": "12_003_Top_Clothes.png"
+}

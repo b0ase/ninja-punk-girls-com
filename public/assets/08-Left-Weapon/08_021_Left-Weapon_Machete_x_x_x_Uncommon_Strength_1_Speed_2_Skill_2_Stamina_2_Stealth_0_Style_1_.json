@@ -1,0 +1,20 @@
+{
+  "folder_number": "08",
+  "asset_number": "021",
+  "category": "Left-Weapon",
+  "item_name": "Machete",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 1,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 1
+  },
+  "original_filename": "08_021_Left-Weapon_Machete_x_x_x_Uncommon_Strength_1_Speed_2_Skill_2_Stamina_2_Stealth_0_Style_1_.png",
+  "simplified_filename": "08_021_Left-Weapon_Machete.png"
+}

@@ -62,8 +62,40 @@ export default function HandCashCallback() {
           throw new Error(result.error || `API route failed with status ${response.status}`);
         }
 
-        setStatus('Authentication successful! Redirecting to mint page...');
-        console.log('[HandCashCallback] Authentication successful, redirecting to /mint');
+        setStatus('Authentication successful! Setting up session...');
+        console.log('[HandCashCallback] Authentication successful, setting up HandCash context');
+        
+        // Store the HandCash auth token for the context
+        localStorage.setItem('handcash_auth_token', handcashAuthToken);
+        
+        // Get the profile data and emit success event
+        try {
+          const profileResponse = await fetch('/api/handcash/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ authToken: handcashAuthToken })
+          });
+          
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            if (profileData.success && profileData.profile) {
+              // Emit success event for HandCashContext
+              const event = new CustomEvent('handcash-auth-success', {
+                detail: {
+                  authToken: handcashAuthToken,
+                  profile: profileData.profile
+                }
+              });
+              window.dispatchEvent(event);
+              console.log('[HandCashCallback] HandCash context event dispatched');
+            }
+          }
+        } catch (profileError) {
+          console.warn('[HandCashCallback] Could not fetch profile for context:', profileError);
+          // Continue anyway since Supabase session is set
+        }
+        
+        setStatus('Redirecting to mint page...');
         
         // Add a small delay to show the success message
         setTimeout(() => {

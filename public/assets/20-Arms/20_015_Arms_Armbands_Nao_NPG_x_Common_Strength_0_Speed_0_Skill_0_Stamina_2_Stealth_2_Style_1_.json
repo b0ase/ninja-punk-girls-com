@@ -1,0 +1,20 @@
+{
+  "folder_number": "20",
+  "asset_number": "015",
+  "category": "Arms",
+  "item_name": "Armbands",
+  "character": "Nao",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "20_015_Arms_Armbands_Nao_NPG_x_Common_Strength_0_Speed_0_Skill_0_Stamina_2_Stealth_2_Style_1_.png",
+  "simplified_filename": "20_015_Arms_Armbands.png"
+}

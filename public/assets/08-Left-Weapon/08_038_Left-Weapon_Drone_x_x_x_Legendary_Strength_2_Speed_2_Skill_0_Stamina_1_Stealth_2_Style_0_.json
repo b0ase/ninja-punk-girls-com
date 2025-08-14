@@ -1,0 +1,20 @@
+{
+  "folder_number": "08",
+  "asset_number": "038",
+  "category": "Left-Weapon",
+  "item_name": "Drone",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "08_038_Left-Weapon_Drone_x_x_x_Legendary_Strength_2_Speed_2_Skill_0_Stamina_1_Stealth_2_Style_0_.png",
+  "simplified_filename": "08_038_Left-Weapon_Drone.png"
+}

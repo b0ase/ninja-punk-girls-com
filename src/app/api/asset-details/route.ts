@@ -6,22 +6,40 @@ import path from 'path';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams;
-    const layer = searchParams.get('layer');
-    const variant = searchParams.get('variant');
+  const { searchParams } = new URL(request.url);
+  const layer = searchParams.get('layer');
+  const variant = searchParams.get('variant');
 
-    if (!layer || !variant) {
-      return NextResponse.json(
-        { success: false, error: 'Missing layer or variant parameter' },
-        { status: 400 }
-      );
+  if (!layer || !variant) {
+    return NextResponse.json({
+      success: false,
+      error: 'Missing layer or variant parameter'
+    }, {
+      status: 400
+    });
+  }
+
+  try {
+    // Map layer number to folder name
+    const folderName = `${layer.padStart(2, '0')}-${getFolderNameFromLayer(layer)}`;
+    
+    if (!folderName) {
+      console.error(`Unknown layer: ${layer}`);
+      return NextResponse.json({
+        success: true,
+        element: `Element ${variant}`,
+        character: '',
+        genes: '',
+        color: '',
+        rarity: 'Common'
+      });
     }
 
-    // Determine folder name based on layer number
-    const folderName = getDirectoryByLayerNumber(layer);
-    if (!folderName) {
-      // Return a basic successful response anyway to avoid blocking the UI
+    const folderPath = path.join(process.cwd(), 'public', 'assets', folderName);
+    
+    // If directory doesn't exist, return a basic response
+    if (!fs.existsSync(folderPath)) {
+      console.error(`Directory not found: ${folderPath}`);
       return NextResponse.json({
         success: true,
         element: `Element ${variant}`,
@@ -32,121 +50,72 @@ export async function GET(request: NextRequest) {
       });
     }
     
-    // Try to find a matching file to extract details from
-    try {
-      const folderPath = path.join(process.cwd(), 'public', 'assets', folderName);
-      
-      // If directory doesn't exist, just return a basic response
-      if (!fs.existsSync(folderPath)) {
-        console.error(`Directory not found: ${folderPath}`);
-        return NextResponse.json({
-          success: true,
-          element: `Element ${variant}`,
-          character: '',
-          genes: '',
-          color: '',
-          rarity: 'Common'
-        });
-      }
-      
-      // Try to find a matching file
-      const files = fs.readdirSync(folderPath);
-      const matchPattern = `${layer}_${variant}`;
-      const matchingFile = files.find(file => file.startsWith(matchPattern));
-      
-      if (!matchingFile) {
-        // Return a simple response if no matching file
-        console.warn(`No matching file found for pattern ${matchPattern} in ${folderName}`);
-        return NextResponse.json({
-          success: true,
-          element: `Element ${variant}`,
-          character: '',
-          genes: '',
-          color: '',
-          rarity: 'Common'
-        });
-      }
-      
-      console.log(`Found matching file: ${matchingFile}`);
-      
-      // Found a matching file - extract information using the structure:
-      // XX_YYY_LayerName_ElementName_Character_Genes_Color_Rarity_Stats...
-      const parts = matchingFile.split('_');
-      
-      // Extract element name (typically part 3, index 2) - but only if not 'x'
-      let elementName = '';
-      if (parts.length > 2 && parts[2] !== 'x') {
-        elementName = parts[2].replace(/-/g, ' ');
-      }
-      
-      // If we have a proper element name in part 3 (index 3), use that instead
-      if (parts.length > 3 && parts[3] !== 'x') {
-        elementName = parts[3].replace(/-/g, ' ');
-      }
-      
-      // Extract character name (typically part 4, index 4)
-      let characterName = '';
-      if (parts.length > 4 && parts[4] !== 'x') {
-        characterName = parts[4];
-      }
-      
-      // Extract genes (typically part 5, index 5)
-      let genes = '';
-      if (parts.length > 5 && parts[5] !== 'x') {
-        genes = parts[5];
-      }
-      
-      // Extract color (check for RGB tag anywhere in the filename)
-      let color = '';
-      if (matchingFile.includes('RGB') || matchingFile.includes('rgb')) {
-        color = 'x';
-      }
-      
-      // Extract rarity (typically comes after character and genes, or as a specific part)
-      let rarity = 'Common';
-      if (parts.length > 6) {
-        const rarityKeywords = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythical'];
-        const potentialRarity = parts.slice(6).find(part => 
-          rarityKeywords.includes(part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-        );
-        
-        if (potentialRarity) {
-          rarity = potentialRarity.charAt(0).toUpperCase() + potentialRarity.slice(1).toLowerCase();
-        }
-      }
-      
-      // Layer name is derived from the folder
-      const layerName = folderName.split(' ').slice(1).join(' '); // Remove the number prefix
-      
-      return NextResponse.json({
-        success: true,
-        element: elementName || `${layerName} ${variant}`,
-        character: characterName,
-        genes: genes,
-        color: color,
-        rarity: rarity,
-        filename: matchingFile, // Include the filename for debugging
-        layerName: layerName
-      });
-    } catch (error) {
-      // Return a simple response if anything goes wrong
-      console.error(`Error processing ${folderName}:`, error);
+    // Look for JSON file with matching pattern
+    const files = fs.readdirSync(folderPath);
+    const matchPattern = `${layer}_${variant.padStart(3, '0')}`;
+    const matchingJsonFile = files.find(file => file.startsWith(matchPattern) && file.endsWith('.json'));
+    
+    if (!matchingJsonFile) {
+      console.warn(`No matching JSON file found for pattern ${matchPattern} in ${folderName}`);
       return NextResponse.json({
         success: true,
         element: `Element ${variant}`,
         character: '',
         genes: '',
         color: '',
-        rarity: 'Common',
-        error: String(error)
+        rarity: 'Common'
       });
     }
-  } catch (error) {
-    // Return a simple success response even on error to prevent UI blocking
-    console.error('Global error in asset-details API:', error);
+
+    console.log(`Found matching JSON file: ${matchingJsonFile}`);
+    
+    // Load JSON data
+    const jsonPath = path.join(folderPath, matchingJsonFile);
+    const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    
+    // Extract data from JSON
+    const elementName = jsonData.item_name || jsonData.category || `Element ${variant}`;
+    const characterName = jsonData.character || '';
+    const genes = jsonData.genes || '';
+    const rarity = jsonData.rarity || 'Common';
+    const team = jsonData.team || '';
+    
+    // Color handling (placeholder for now)
+    let color = '';
+    if (jsonData.original_filename && (jsonData.original_filename.includes('RGB') || jsonData.original_filename.includes('rgb'))) {
+      color = 'RGB';
+    }
+    
+    // PNG filename (use simplified name)
+    const pngFilename = jsonData.simplified_filename || jsonData.original_filename;
+    
     return NextResponse.json({
       success: true,
-      element: 'Element',
+      element: elementName,
+      character: characterName,
+      team: team,
+      genes: genes,
+      color: color,
+      rarity: rarity,
+      filename: pngFilename,
+      stats: jsonData.stats || {
+        strength: 0,
+        speed: 0,
+        skill: 0,
+        stamina: 0,
+        stealth: 0,
+        style: 0
+      },
+      assetNumber: jsonData.asset_number,
+      folderNumber: jsonData.folder_number,
+      category: jsonData.category
+    });
+    
+  } catch (error) {
+    console.error(`Error processing asset details for ${layer}-${variant}:`, error);
+    return NextResponse.json({
+      success: true,
+      element: `Element ${variant}`,
       character: '',
       genes: '',
       color: '',
@@ -156,38 +125,37 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Simple mapping function to get folder name from layer number
-function getDirectoryByLayerNumber(layerNum: string): string | null {
-  const layerMap: Record<string, string> = {
-    '29': '29 Background',
-    '28': '28 Glow',
-    '27': '27 Banner',
-    '26': '26 Decals',
-    '24': '24 Rear-Hair',
-    '23': '23 Rear-Horns',
-    '22': '22 Back',
-    '21': '21 Body',
-    '20': '20 Arms',
-    '19': '19 Underwear',
-    '18': '18 Face',
-    '17': '17 Bottom',
-    '16': '16 Bra',
-    '15': '15 Accessories',
-    '14': '14 Jewellery',
-    '13': '13 Boots',
-    '12': '12 Top',
-    '11': '11 Mask',
-    '10': '10 Hair',
-    '09': '09 Horns',
-    '08': '08 Left-Weapon',
-    '07': '07 Right-Weapon',
-    '06': '06 Effects',
-    '05': '05 Interface',
-    '04': '04 Team',
-    '03': '03 Scores',
-    '02': '02 Copyright',
-    '01': '01 Logo'
+// Helper function to map layer numbers to folder names
+function getFolderNameFromLayer(layer: string): string {
+  const layerMap: { [key: string]: string } = {
+    '01': 'Logo',
+    '02': 'Copyright',
+    '04': 'Team',
+    '05': 'Interface',
+    '06': 'Effects',
+    '07': 'Right-Weapon',
+    '08': 'Left-Weapon',
+    '09': 'Horns',
+    '10': 'Hair',
+    '11': 'Mask',
+    '12': 'Top',
+    '13': 'Boots',
+    '14': 'Jewellery',
+    '15': 'Accessories',
+    '16': 'Bra',
+    '17': 'Bottom',
+    '18': 'Face',
+    '19': 'Underwear',
+    '20': 'Arms',
+    '21': 'Body',
+    '22': 'Back',
+    '23': 'Rear-Horns',
+    '24': 'Rear-Hair',
+    '26': 'Decals',
+    '27': 'Banner',
+    '28': 'Glow',
+    '29': 'Background'
   };
   
-  return layerMap[layerNum] || null;
+  return layerMap[layer] || '';
 } 

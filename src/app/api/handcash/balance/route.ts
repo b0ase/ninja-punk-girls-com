@@ -1,34 +1,66 @@
-import { NextResponse } from 'next/server';
-import { handCashConnect } from '@/services/handcash';
+import { NextResponse, type NextRequest } from 'next/server';
+import { HandCashConnect, Environments } from '@handcash/handcash-connect';
 
-export async function POST(request: Request) {
+// Environment variables
+const handcashAppId = process.env.NEXT_PUBLIC_HANDCASH_APP_ID;
+const handcashAppSecret = process.env.HANDCASH_APP_SECRET;
+const handcashEnv = process.env.HANDCASH_ENVIRONMENT ?? 'prod';
+
+// Basic check for required variables
+if (!handcashAppId || !handcashAppSecret) {
+    console.error("HandCash Balance API: Missing required environment variables.");
+}
+
+// Determine HandCash environment
+const hcEnvironment = handcashEnv.toLowerCase() === 'iae'
+  ? Environments.iae
+  : Environments.prod;
+
+// Initialize HandCash Connect SDK
+const handCashConnect = new HandCashConnect({
+    appId: handcashAppId || 'placeholder-app-id',
+    appSecret: handcashAppSecret || 'placeholder-app-secret',
+    env: hcEnvironment
+});
+
+export async function POST(request: NextRequest) {
+  console.log("--- API Route /api/handcash/balance POST request received ---");
+
   try {
-    const { authToken } = await request.json();
+    const body = await request.json();
+    const { authToken } = body;
 
-    if (!authToken || typeof authToken !== 'string') {
-      return NextResponse.json({ error: 'Auth token is required.' }, { status: 400 });
+    if (!authToken) {
+      console.error("HandCash Balance API: authToken missing in request body.");
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Missing authToken' 
+      }, { status: 400 });
     }
 
+    console.log(`HandCash Balance API: Getting balance for token prefix: ${authToken.substring(0,6)}...`);
+
+    // Get account and wallet balance
     const account = handCashConnect.getAccountFromAuthToken(authToken);
+    const wallet = account.wallet;
     
-    // Get total balance
-    const totalBalance = await account.wallet.getTotalBalance();
-    
-    // Get spendable balance (defaults to sats)
-    const spendableBalance = await account.wallet.getSpendableBalance();
-    
-    return NextResponse.json({ 
+    // Get spendable balance
+    const spendableBalance = await wallet.getSpendableBalance();
+    console.log(`HandCash Balance API: Retrieved balance:`, spendableBalance);
+
+    // Return the balance data in expected format
+    return NextResponse.json({
       success: true,
-      totalBalance,
-      spendableBalance
+      totalBalance: spendableBalance
     });
 
   } catch (error: any) {
-    console.error("[API/HandCash/Balance] Error fetching balance:", error);
+    console.error("HandCash Balance API Error:", error);
+    const message = error.message || 'Failed to get wallet balance';
     
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to fetch wallet balance." },
-      { status: error.httpStatusCode || 500 }
-    );
+    return NextResponse.json({ 
+      success: false, 
+      error: message 
+    }, { status: 500 });
   }
-} 
+}

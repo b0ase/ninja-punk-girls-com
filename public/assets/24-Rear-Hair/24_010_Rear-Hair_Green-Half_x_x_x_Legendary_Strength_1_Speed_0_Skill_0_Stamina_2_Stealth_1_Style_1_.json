@@ -1,0 +1,20 @@
+{
+  "folder_number": "24",
+  "asset_number": "010",
+  "category": "Rear-Hair",
+  "item_name": "Green-Half",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "24_010_Rear-Hair_Green-Half_x_x_x_Legendary_Strength_1_Speed_0_Skill_0_Stamina_2_Stealth_1_Style_1_.png",
+  "simplified_filename": "24_010_Rear-Hair_Green-Half.png"
+}

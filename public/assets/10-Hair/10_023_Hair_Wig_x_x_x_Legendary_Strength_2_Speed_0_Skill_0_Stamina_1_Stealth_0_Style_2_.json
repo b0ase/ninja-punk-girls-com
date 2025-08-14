@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "023",
+  "category": "Hair",
+  "item_name": "Wig",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "10_023_Hair_Wig_x_x_x_Legendary_Strength_2_Speed_0_Skill_0_Stamina_1_Stealth_0_Style_2_.png",
+  "simplified_filename": "10_023_Hair_Wig.png"
+}

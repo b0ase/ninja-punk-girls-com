@@ -1,0 +1,20 @@
+{
+  "folder_number": "07",
+  "asset_number": "016",
+  "category": "Right-Weapon",
+  "item_name": "Little-Thrasher",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Epic",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "07_016_Right-Weapon_Little-Thrasher_x_x_x_Epic_Strength_2_Speed_1_Skill_0_Stamina_0_Stealth_2_Style_0_.png",
+  "simplified_filename": "07_016_Right-Weapon_Little-Thrasher.png"
+}

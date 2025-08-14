@@ -1,0 +1,20 @@
+{
+  "folder_number": "20",
+  "asset_number": "008",
+  "category": "Arms",
+  "item_name": "Gloves",
+  "character": "Kazuyo",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Epic",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "20_008_Arms_Gloves_Kazuyo_NPG_x_Epic_Strength_1_Speed_0_Skill_2_Stamina_2_Stealth_2_Style_2_.png",
+  "simplified_filename": "20_008_Arms_Gloves.png"
+}

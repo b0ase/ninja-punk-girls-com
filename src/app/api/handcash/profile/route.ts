@@ -1,31 +1,72 @@
-import { NextResponse } from 'next/server';
-import { handCashConnect } from '@/services/handcash';
+import { NextResponse, type NextRequest } from 'next/server';
+import { HandCashConnect, Environments } from '@handcash/handcash-connect';
 
-// Expects the authToken to be passed in the request body
-export async function POST(request: Request) {
+// Environment variables
+const handcashAppId = process.env.NEXT_PUBLIC_HANDCASH_APP_ID;
+const handcashAppSecret = process.env.HANDCASH_APP_SECRET;
+const handcashEnv = process.env.HANDCASH_ENVIRONMENT ?? 'prod';
+
+// Basic check for required variables
+if (!handcashAppId || !handcashAppSecret) {
+    console.error("HandCash Profile API: Missing required environment variables.");
+}
+
+// Determine HandCash environment
+const hcEnvironment = handcashEnv.toLowerCase() === 'iae'
+  ? Environments.iae
+  : Environments.prod;
+
+// Initialize HandCash Connect SDK
+const handCashConnect = new HandCashConnect({
+    appId: handcashAppId || 'placeholder-app-id',
+    appSecret: handcashAppSecret || 'placeholder-app-secret',
+    env: hcEnvironment
+});
+
+export async function POST(request: NextRequest) {
+  console.log("--- API Route /api/handcash/profile POST request received ---");
+
   try {
-    const { authToken } = await request.json();
+    const body = await request.json();
+    const { authToken } = body;
 
-    if (!authToken || typeof authToken !== 'string') {
-      return NextResponse.json({ error: 'Auth token is required.' }, { status: 400 });
+    if (!authToken) {
+      console.error("HandCash Profile API: authToken missing in request body.");
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Missing authToken' 
+      }, { status: 400 });
     }
 
-    // Get account using the provided token (server-side)
-    const account = handCashConnect.getAccountFromAuthToken(authToken);
-    // Fetch profile using the account instance
-    const profile = await account.profile.getCurrentProfile();
+    console.log(`HandCash Profile API: Validating token prefix: ${authToken.substring(0,6)}...`);
 
-    return NextResponse.json({ profile });
+    // Verify token and get HandCash profile
+    const account = handCashConnect.getAccountFromAuthToken(authToken);
+    const { publicProfile } = await account.profile.getCurrentProfile();
+    
+    console.log(`HandCash Profile API: Profile retrieved for handle: ${publicProfile.handle}`);
+
+    // Return the profile data
+    return NextResponse.json({
+      success: true,
+      profile: {
+        publicProfile: {
+          handle: publicProfile.handle,
+          displayName: publicProfile.displayName,
+          avatarUrl: publicProfile.avatarUrl,
+          // publicKey might not be available in the profile, try to access it safely
+          publicKey: (publicProfile as any).publicKey || undefined
+        }
+      }
+    });
 
   } catch (error: any) {
-    console.error("[API/HandCash/Profile] Error fetching profile:", error);
-    // Provide more specific error feedback if possible
-    let errorMessage = "Failed to fetch HandCash profile.";
-    let status = 500;
-    if (error.message && error.message.includes('invalid')) { // Basic check for invalid token
-        errorMessage = "Invalid or expired auth token.";
-        status = 401; // Unauthorized
-    }
-    return NextResponse.json({ error: errorMessage }, { status });
+    console.error("HandCash Profile API Error:", error);
+    const message = error.message || 'Profile validation failed';
+    
+    return NextResponse.json({ 
+      success: false, 
+      error: message 
+    }, { status: 401 }); // 401 for invalid/expired token
   }
-} 
+}

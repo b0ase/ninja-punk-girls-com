@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import VectorElementCard from './VectorElementCard';
+import { AssetDetail } from '../app/api/asset-data/route';
 
 // Asset interface to match API response
 interface Asset {
@@ -65,6 +66,42 @@ const LAYER_COLORS: { [key: string]: string } = {
   'ARMS': '#FF8C00',          // 20-Arms
   'BODY_SKIN': '#FFA500',     // 21-Body
   'BACK': '#FF7F50'           // 22-Back
+};
+
+// Layer to folder mapping - matches the actual folder structure
+const LAYER_TO_FOLDER: { [key: string]: string } = {
+  'LOGO': '01-Logo',
+  'COPYRIGHT': '02-Copyright', 
+  'TEAM': '04-Team',
+  'INTERFACE': '05-Interface',
+  'EFFECTS': '06-Effects',
+  'RIGHT_WEAPON': '07-Right-Weapon',
+  'LEFT_WEAPON': '08-Left-Weapon', 
+  'HORNS': '09-Horns',
+  'HAIR': '10-Hair',
+  'MASK': '11-Mask',
+  'TOP': '12-Top',
+  'BOOTS': '13-Boots',
+  'JEWELLERY': '14-Jewellery',
+  'ACCESSORIES': '15-Accessories',
+  'BRA': '16-Bra',
+  'BOTTOM': '17-Bottom',
+  'FACE': '18-Face',
+  'UNDERWEAR': '19-Underwear',
+  'ARMS': '20-Arms',
+  'BODY_SKIN': '21-Body',
+  'BACK': '22-Back',
+  'REAR_HORNS': '23-Rear-Horns',
+  'REAR_HAIR': '24-Rear-Hair',
+  'DECALS': '26-Decals',
+  'BANNER': '27-Banner',
+  'GLOW': '28-Glow',
+  'BACKGROUND': '29-Background'
+};
+
+// Helper function to get correct folder name from layer
+const getLayerFolder = (layer: string): string => {
+  return LAYER_TO_FOLDER[layer] || layer.toLowerCase().replace(/_/g, '-');
 };
 
 // Organized structure with each asset class on its own row
@@ -173,7 +210,19 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
         const response = await fetch('/api/asset-data');
         const data = await response.json();
         if (data.success && Array.isArray(data.data)) {
-          setAssets(data.data);
+          // Map AssetDetail objects from API to Asset objects expected by component
+          const mappedAssets: Asset[] = data.data.map((apiAsset: AssetDetail) => ({
+            layer: apiAsset.layer,
+            filename: apiAsset.filename,
+            name: apiAsset.name || apiAsset.item_name || 'Unknown',
+            assetNumber: apiAsset.assetNumber,
+            type: apiAsset.category,
+            character: apiAsset.character,
+            genes: apiAsset.genes,
+            rarity: apiAsset.rarity,
+            stats: apiAsset.stats
+          }));
+          setAssets(mappedAssets);
         }
       } catch (error) {
         console.error('Failed to fetch assets:', error);
@@ -299,8 +348,8 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
         ))}
       </div>
 
-      {/* Single Row Structure */}
-      <div className="space-y-6">
+      {/* Compact Row Structure */}
+      <div className="space-y-2">
         {PYRAMID_STRUCTURE.map((row, rowIndex) => {
           // Get all assets for this row
           const rowAssets = row.elements.flatMap(layer => assetsByLayer[layer] || []);
@@ -308,14 +357,19 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
           if (rowAssets.length === 0) return null;
 
           return (
-            <div key={rowIndex} className="text-center">
-              {/* Row Title */}
-              <h3 className="text-lg font-semibold text-gray-300 mb-3">
-                {row.title} ({rowAssets.length} elements)
-              </h3>
+            <div key={rowIndex} className="flex items-center gap-4">
+              {/* Class Title on Left */}
+              <div className="w-48 text-right flex-shrink-0">
+                <h3 className="text-sm font-semibold text-gray-300">
+                  {row.title.replace(/^\d+\s-\s/, '')} 
+                </h3>
+                <div className="text-xs text-gray-500">
+                  ({rowAssets.length} elements)
+                </div>
+              </div>
               
-              {/* All elements in center layout */}
-              <div className="mx-auto flex flex-wrap justify-center gap-1 max-w-full">
+              {/* Elements on Right */}
+              <div className="flex flex-wrap gap-1 flex-1">
                 {rowAssets.map((asset, index) => {
                   const color = getCategoryColor(asset.layer);
                   const atomicNumber = assets.indexOf(asset) + 1;
@@ -325,7 +379,7 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
                     <div
                       key={`${asset.layer}-${index}`}
                       onClick={() => handleAssetClick(asset)}
-                      className="relative cursor-pointer transition-all duration-200 hover:scale-110 hover:z-10 w-12 h-14 flex flex-col justify-center items-center text-center rounded shadow-lg hover:shadow-xl text-white text-[10px] leading-tight"
+                      className="relative cursor-pointer transition-all duration-200 hover:scale-110 hover:z-10 w-10 h-12 flex flex-col justify-center items-center text-center rounded shadow-lg hover:shadow-xl text-white text-[9px] leading-tight"
                       style={{
                         backgroundColor: color,
                         borderColor: color,
@@ -341,22 +395,22 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
                       title={`${asset.name} (${asset.layer})`}
                     >
                       {/* Atomic Number */}
-                      <div className="absolute top-0 left-0 text-[8px] opacity-75 px-1">
+                      <div className="absolute top-0 left-0 text-[7px] opacity-75 px-0.5">
                         {atomicNumber}
                       </div>
                       
                       {/* Element Symbol */}
-                      <div className="font-bold text-sm">
+                      <div className="font-bold text-xs">
                         {elementSymbol}
                       </div>
                       
                       {/* Asset Number */}
-                      <div className="text-[8px] opacity-90">
+                      <div className="text-[7px] opacity-90">
                         {asset.assetNumber}
                       </div>
                       
                       {/* Layer indicator */}
-                      <div className="absolute bottom-0 right-0 text-[6px] opacity-60 px-1">
+                      <div className="absolute bottom-0 right-0 text-[6px] opacity-60 px-0.5">
                         {asset.layer.substring(0, 3)}
                       </div>
                     </div>
@@ -472,46 +526,51 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
                   </div>
 
                   {/* Actual Asset Image */}
-                  <div>
-                    <h4 className="text-md font-semibold text-gray-300 mb-2">Actual Asset</h4>
-                    <div 
-                      className="rounded p-4 inline-block max-w-md border-2"
-                      style={{
-                        backgroundColor: getCategoryColor(selectedAsset.layer),
-                        borderColor: getCategoryColor(selectedAsset.layer),
-                        filter: 'brightness(0.3)', // Darker background to make image pop
-                      }}
-                    >
-                      {selectedAsset.filename ? (
-                        <>
-                          <img 
-                            src={`/assets/${selectedAsset.layer.toLowerCase().replace(/_/g, '-')}/${selectedAsset.filename}`}
-                            alt={selectedAsset.name}
-                            className="max-w-full h-auto max-h-96 object-contain rounded bg-white bg-opacity-20 p-2"
-                            onError={(e) => {
-                              console.error('Failed to load asset image:', e.currentTarget.src);
-                              const fallbackDiv = document.createElement('div');
-                              fallbackDiv.className = 'text-white text-center p-4';
-                              fallbackDiv.innerHTML = `
-                                <div class="text-red-400 mb-2">❌ Image failed to load</div>
-                                <div class="text-xs opacity-75">Path: ${e.currentTarget.src}</div>
-                              `;
-                              e.currentTarget.parentNode?.replaceChild(fallbackDiv, e.currentTarget);
+                  <div className="mb-4">
+                    <h4 className="text-md font-semibold text-gray-300 mb-2">Asset Image (961×1441)</h4>
+                    <div className="flex justify-center">
+                      <div 
+                        className="rounded-lg p-3 relative" 
+                        style={{ 
+                          backgroundColor: `${getCategoryColor(selectedAsset.layer)}40`,
+                          maxWidth: '320px'
+                        }}
+                      >
+                        <div className="bg-white bg-opacity-10 rounded p-2">
+                          {/* Asset container with correct 961:1441 aspect ratio */}
+                          <div 
+                            className="relative w-full rounded overflow-hidden"
+                            style={{ 
+                              aspectRatio: '961 / 1441',
+                              maxWidth: '280px',
+                              maxHeight: '420px'
                             }}
-                            onLoad={(e) => {
-                              console.log('Asset image loaded successfully:', e.currentTarget.src);
-                            }}
-                          />
-                          <div className="text-white text-sm mt-2 opacity-90">
-                            📁 {selectedAsset.filename}
+                          >
+                            <img
+                              src={`/assets/${getLayerFolder(selectedAsset.layer)}/${selectedAsset.filename}`}
+                              alt={selectedAsset.name}
+                              className="w-full h-full object-contain"
+                              style={{
+                                imageRendering: 'crisp-edges'
+                              }}
+                              onError={(e) => {
+                                console.error(`Failed to load image: /assets/${getLayerFolder(selectedAsset.layer)}/${selectedAsset.filename}`);
+                                e.currentTarget.style.display = 'none';
+                                const errorDiv = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (errorDiv) errorDiv.style.display = 'block';
+                              }}
+                            />
+                            <div className="text-red-400 text-sm mt-2 hidden">
+                              Failed to load: /assets/{getLayerFolder(selectedAsset.layer)}/{selectedAsset.filename}
+                            </div>
                           </div>
-                        </>
-                      ) : (
-                        <div className="text-white text-sm p-8">
-                          <div className="text-red-400 mb-2">❌ No filename available</div>
-                          <div className="text-xs opacity-75">Asset: {selectedAsset.name}</div>
+                          
+                          {/* Image info */}
+                          <div className="mt-2 text-xs text-gray-400 text-center">
+                            Original: 961×1441 pixels • Aspect ratio: 2:3
+                          </div>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>

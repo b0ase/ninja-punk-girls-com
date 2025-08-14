@@ -6,6 +6,7 @@ import { AssetDetail } from '@/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import PeriodicTable from '@/components/PeriodicTable';
 // Import the shared layer configuration
 import { LAYER_ORDER, LAYER_DETAILS } from '@/data/layer-config'; 
 // import AssetGrid from '@/components/AssetGrid'; // Removed potentially incorrect import
@@ -338,7 +339,7 @@ function ElementsIndexPageContent() {
   console.log("[Elements Index] Initialized (from context):", isInitialized);
   console.log("[Elements Index] Available Assets Keys (from context):", Object.keys(availableAssets));
 
-  const [currentView, setCurrentView] = useState<'grid' | 'catalogue'>('grid'); // Keep state for view
+  const [currentView, setCurrentView] = useState<'grid' | 'catalogue' | 'table'>('grid'); // Keep state for view
 
   // Filter layers (Needed for Grid view)
   const filteredLayers = LAYER_ORDER.filter(key => 
@@ -385,7 +386,7 @@ function ElementsIndexPageContent() {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-pink-500 mb-4 text-center">Character Elements Library</h1>
 
-        {/* Tab Buttons UI ... (keep as is) */}
+        {/* Tab Buttons UI */}
         <div className="flex justify-center mb-6 border-b border-gray-700">
           <button
             onClick={() => setCurrentView('grid')}
@@ -406,6 +407,16 @@ function ElementsIndexPageContent() {
             `}
           >
             List View
+          </button>
+          <button
+            onClick={() => setCurrentView('table')}
+            className={`px-4 py-2 -mb-px text-sm font-medium border-b-2 transition-colors
+              ${currentView === 'table'
+                ? 'border-pink-500 text-pink-400'
+                : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-500'}
+            `}
+          >
+            Table View
           </button>
         </div>
         
@@ -481,6 +492,9 @@ function ElementsIndexPageContent() {
         )}
         {currentView === 'catalogue' && (
           <ElementsCatalogueTable assets={availableAssets} />
+        )}
+        {currentView === 'table' && (
+          <PeriodicTable />
         )}
 
       </div>

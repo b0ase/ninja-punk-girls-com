@@ -1,0 +1,20 @@
+{
+  "folder_number": "18",
+  "asset_number": "015",
+  "category": "Face",
+  "item_name": "Erobot-2",
+  "character": null,
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 1
+  },
+  "original_filename": "18_015_Face_Erobot-2_x_Erobot_x_Rare_Strength_2_Speed_1_Skill_2_Stamina_2_Stealth_0_Style_1_.png",
+  "simplified_filename": "18_015_Face_Erobot-2.png"
+}

@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { useHandCash } from '@/context/HandCashContext'
-import HandCashConnectButton from '@/components/HandCashConnectButton'
+// import { useHandCash } from '@/context/HandCashContext' // TODO: Restore HandCash when ready
+// import HandCashConnectButton from '@/components/HandCashConnectButton' // TODO: Restore HandCash when ready
 
 export default function LandingPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [currentTime, setCurrentTime] = useState(0)
-  const { isConnected, connect, profile } = useHandCash()
+// const { isConnected, connect, profile } = useHandCash() // TODO: Restore HandCash when ready
 
   useEffect(() => {
     // Simulate loading time
@@ -419,7 +419,8 @@ export default function LandingPage() {
             </p>
             
             <div className="flex gap-6 justify-center">
-              {isConnected ? (
+              {/* HandCash connect logic temporarily disabled - TODO: Restore when HandCashContext is back */}
+              {/* {isConnected ? (
                 <div className="flex flex-col items-center gap-4">
                   <button 
                     className="bg-pink-400 text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-pink-300 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 hover:rotate-1 relative overflow-hidden group"
@@ -441,7 +442,7 @@ export default function LandingPage() {
                 <div className="flex flex-col items-center gap-4">
                   <p className="text-sm text-gray-400">Connect your HandCash wallet in the navbar to enter the game</p>
                 </div>
-              )}
+              )} */}
               
               <button 
                 className="border-2 border-pink-400 text-pink-400 px-8 py-4 rounded-lg font-bold text-lg hover:bg-pink-400 hover:text-black transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 hover:-rotate-1 relative overflow-hidden group"

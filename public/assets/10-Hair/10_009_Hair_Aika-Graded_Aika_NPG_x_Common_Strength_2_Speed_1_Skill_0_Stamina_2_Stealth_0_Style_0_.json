@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "009",
+  "category": "Hair",
+  "item_name": "Aika-Graded",
+  "character": "Aika",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "10_009_Hair_Aika-Graded_Aika_NPG_x_Common_Strength_2_Speed_1_Skill_0_Stamina_2_Stealth_0_Style_0_.png",
+  "simplified_filename": "10_009_Hair_Aika-Graded.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "23",
+  "asset_number": "002",
+  "category": "Rear-Horns",
+  "item_name": "Hikaru-Horns",
+  "character": "Hikaru",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "23_002_Rear-Horns_Hikaru-Horns_Hikaru_Erobot_x_Rare_Strength_2_Speed_2_Skill_2_Stamina_2_Stealth_0_Style_2_.png",
+  "simplified_filename": "23_002_Rear-Horns_Hikaru-Horns.png"
+}

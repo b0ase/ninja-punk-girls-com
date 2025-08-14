@@ -109,7 +109,7 @@ export default function NFTSummary({ nft }: NFTSummaryProps) {
               <div className="flex items-center space-x-2 mt-1">
                 <span className="font-mono text-xs break-all">{profile.publicProfile.publicKey}</span>
                 <button 
-                  onClick={() => copyToClipboard(profile.publicProfile.publicKey)} 
+                  onClick={() => copyToClipboard(profile.publicProfile.publicKey || '')} 
                   className="p-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 transition-colors"
                   title="Copy Public Key"
                 >

@@ -1,0 +1,20 @@
+{
+  "folder_number": "11",
+  "asset_number": "006",
+  "category": "Mask",
+  "item_name": "Spiked",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "11_006_Mask_Spiked_x_x_x_Mythical_Strength_2_Speed_1_Skill_0_Stamina_1_Stealth_1_Style_0_.png",
+  "simplified_filename": "11_006_Mask_Spiked.png"
+}

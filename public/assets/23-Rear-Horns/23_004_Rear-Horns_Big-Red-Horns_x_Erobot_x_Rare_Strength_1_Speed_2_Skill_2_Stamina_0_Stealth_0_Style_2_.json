@@ -1,0 +1,20 @@
+{
+  "folder_number": "23",
+  "asset_number": "004",
+  "category": "Rear-Horns",
+  "item_name": "Big-Red-Horns",
+  "character": null,
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 1,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "23_004_Rear-Horns_Big-Red-Horns_x_Erobot_x_Rare_Strength_1_Speed_2_Skill_2_Stamina_0_Stealth_0_Style_2_.png",
+  "simplified_filename": "23_004_Rear-Horns_Big-Red-Horns.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "004",
+  "category": "Body",
+  "item_name": "Phi-Phi-Bod",
+  "character": "Phi-Phi",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Epic",
+  "stats": {
+    "strength": 1,
+    "speed": 2,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "21_004_Body_Phi-Phi-Bod_Phi-Phi_Erobot_x_Epic_Strength_1_Speed_2_Skill_0_Stamina_0_Stealth_1_Style_1_.png",
+  "simplified_filename": "21_004_Body_Phi-Phi-Bod.png"
+}

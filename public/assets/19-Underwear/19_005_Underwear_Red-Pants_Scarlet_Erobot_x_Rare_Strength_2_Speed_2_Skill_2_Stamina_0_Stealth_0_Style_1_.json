@@ -1,0 +1,20 @@
+{
+  "folder_number": "19",
+  "asset_number": "005",
+  "category": "Underwear",
+  "item_name": "Red-Pants",
+  "character": "Scarlet",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 1
+  },
+  "original_filename": "19_005_Underwear_Red-Pants_Scarlet_Erobot_x_Rare_Strength_2_Speed_2_Skill_2_Stamina_0_Stealth_0_Style_1_.png",
+  "simplified_filename": "19_005_Underwear_Red-Pants.png"
+}

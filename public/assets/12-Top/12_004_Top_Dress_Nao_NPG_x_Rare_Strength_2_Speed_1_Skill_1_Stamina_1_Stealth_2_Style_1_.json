@@ -1,0 +1,20 @@
+{
+  "folder_number": "12",
+  "asset_number": "004",
+  "category": "Top",
+  "item_name": "Dress",
+  "character": "Nao",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 1,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "12_004_Top_Dress_Nao_NPG_x_Rare_Strength_2_Speed_1_Skill_1_Stamina_1_Stealth_2_Style_1_.png",
+  "simplified_filename": "12_004_Top_Dress.png"
+}

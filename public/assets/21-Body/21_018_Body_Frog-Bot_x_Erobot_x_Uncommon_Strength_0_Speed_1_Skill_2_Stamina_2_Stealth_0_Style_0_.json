@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "018",
+  "category": "Body",
+  "item_name": "Frog-Bot",
+  "character": null,
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 0,
+    "speed": 1,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "21_018_Body_Frog-Bot_x_Erobot_x_Uncommon_Strength_0_Speed_1_Skill_2_Stamina_2_Stealth_0_Style_0_.png",
+  "simplified_filename": "21_018_Body_Frog-Bot.png"
+}

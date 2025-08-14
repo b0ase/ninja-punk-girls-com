@@ -1,0 +1,20 @@
+{
+  "folder_number": "08",
+  "asset_number": "028",
+  "category": "Left-Weapon",
+  "item_name": "Boombox",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Epic",
+  "stats": {
+    "strength": 0,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "08_028_Left-Weapon_Boombox_x_x_x_Epic_Strength_0_Speed_2_Skill_1_Stamina_0_Stealth_2_Style_2_.png",
+  "simplified_filename": "08_028_Left-Weapon_Boombox.png"
+}

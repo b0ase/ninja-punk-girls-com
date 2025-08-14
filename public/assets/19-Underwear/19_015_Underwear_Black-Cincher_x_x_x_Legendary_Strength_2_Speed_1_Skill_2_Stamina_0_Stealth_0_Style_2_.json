@@ -1,0 +1,20 @@
+{
+  "folder_number": "19",
+  "asset_number": "015",
+  "category": "Underwear",
+  "item_name": "Black-Cincher",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "19_015_Underwear_Black-Cincher_x_x_x_Legendary_Strength_2_Speed_1_Skill_2_Stamina_0_Stealth_0_Style_2_.png",
+  "simplified_filename": "19_015_Underwear_Black-Cincher.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "14",
+  "asset_number": "007",
+  "category": "Jewellery",
+  "item_name": "Hearts-Birthmark",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 1,
+    "style": 2
+  },
+  "original_filename": "14_007_Jewellery_Hearts-Birthmark_x_x_x_Rare_Strength_1_Speed_0_Skill_0_Stamina_1_Stealth_1_Style_2_.png",
+  "simplified_filename": "14_007_Jewellery_Hearts-Birthmark.png"
+}

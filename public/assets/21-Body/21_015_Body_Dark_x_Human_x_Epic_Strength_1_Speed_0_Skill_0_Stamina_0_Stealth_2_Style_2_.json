@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "015",
+  "category": "Body",
+  "item_name": "Dark",
+  "character": null,
+  "team": "Human",
+  "genes": null,
+  "rarity": "Epic",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "21_015_Body_Dark_x_Human_x_Epic_Strength_1_Speed_0_Skill_0_Stamina_0_Stealth_2_Style_2_.png",
+  "simplified_filename": "21_015_Body_Dark.png"
+}

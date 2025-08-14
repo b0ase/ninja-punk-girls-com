@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaTwitter, FaYoutube, FaTelegramPlane, FaEnvelope } from 'react-icons/fa';
-import HandCashConnectButton from './HandCashConnectButton';
+// HandCashConnectButton removed
 
 // Solana Imports - Commented out
 // import { useWallet } from '@solana/wallet-adapter-react';
@@ -46,7 +46,6 @@ export default function Navbar() {
     { href: '/market', label: 'Market', colorClass: 'text-green-400' },
     { href: '/elements', label: 'Elements', colorClass: 'text-teal-400' },
     { href: '/characters', label: 'Characters', colorClass: 'text-cyan-400' },
-    { href: '/periodic-table', label: 'Table', colorClass: 'text-emerald-400' },
     { href: '/token', label: 'Token', colorClass: 'text-blue-400' },
     { href: '/game', label: 'Game', colorClass: 'text-indigo-400' },
     { href: '/build', label: 'Build', colorClass: 'text-purple-400' },
@@ -61,11 +60,11 @@ export default function Navbar() {
            <div className="flex items-center gap-2 order-1">
             <Link href="/" className="flex-shrink-0 hover:opacity-80 transition-opacity">
               <Image
-                src="/assets/01-Logo/01_001_logo_NPG-logo_x_NPG_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png"
+                src="/npg_navbar_logo.png"
                 alt="Ninja Punk Girls Logo"
-                width={240}
-                height={70}
-                className="object-contain h-12 sm:h-14 w-auto"
+                width={180}
+                height={50}
+                className="object-contain h-10 sm:h-12 w-auto"
                 priority
                 onError={(e) => {
                   console.error('Logo failed to load:', e);
@@ -104,8 +103,10 @@ export default function Navbar() {
 
           {/* Right side: Connect Wallet and Social Links */}
           <div className="flex items-center gap-4 order-2 sm:order-3 flex-shrink-0"> 
-            {/* Connect Wallet Button */}
-            <HandCashConnectButton />
+            {/* Connect Wallet Button - Temporarily removed */}
+            <div className="px-4 py-2 bg-gray-800 rounded-md text-sm text-gray-400">
+              Wallet Coming Soon
+            </div>
 
             {/* Social Links */}
             <div className="hidden sm:flex items-center gap-4 pl-4 border-l border-gray-700/50">

@@ -2,19 +2,50 @@ import { NextResponse } from 'next/server';
 import { createCanvas, loadImage, registerFont, CanvasRenderingContext2D as NodeCanvasRenderingContext2D } from 'canvas';
 import { put } from '@vercel/blob';
 import path from 'path';
-import qrcode from 'qrcode'; // Import qrcode library
-import { LAYER_ORDER, LAYER_DETAILS } from '@/data/layer-config'; // Assuming layer config is needed
-import { NFTType } from '@/types'; // Assuming types are defined
-import { INTERFACE_CONFIG } from '@/data/interface-config'; // Need this for name placement
-type Attribute = NFTType['attributes'][number]; // Use indexed access type
+import qrcode from 'qrcode';
+import { LAYER_ORDER, LAYER_DETAILS } from '@/data/layer-config';
+import { NFTType, NFTAttribute } from '@/types';
+import { INTERFACE_CONFIG } from '@/data/interface-config';
+import { AssetDetail } from '@/app/api/asset-data/route';
 
 // --- Configuration --- 
 const CANVAS_WIDTH = 961;
 const CANVAS_HEIGHT = 1441;
-const FONT_PATH = path.join(process.cwd(), 'public', 'fonts', 'Cyberpunks Italic.ttf'); // Replace with your actual font file
-const FONT_FAMILY = 'Cyberpunks Italic'; // The name you want to refer to the font as
+const FONT_PATH = path.join(process.cwd(), 'public', 'fonts', 'Cyberpunks Italic.ttf');
+const FONT_FAMILY = 'Cyberpunks Italic';
 
-// --- <<< Apply NEW Coordinates from Positioning Tool >>> ---
+// Layer to folder mapping for new structure
+const LAYER_TO_FOLDER: Record<string, string> = {
+  'LOGO': '01-Logo',
+  'COPYRIGHT': '02-Copyright', 
+  'TEAM': '04-Team',
+  'INTERFACE': '05-Interface',
+  'EFFECTS': '06-Effects',
+  'RIGHT_WEAPON': '07-Right-Weapon',
+  'LEFT_WEAPON': '08-Left-Weapon',
+  'HORNS': '09-Horns',
+  'HAIR': '10-Hair',
+  'MASK': '11-Mask',
+  'TOP': '12-Top',
+  'BOOTS': '13-Boots',
+  'JEWELLERY': '14-Jewellery',
+  'ACCESSORIES': '15-Accessories',
+  'BRA': '16-Bra',
+  'BOTTOM': '17-Bottom',
+  'FACE': '18-Face',
+  'UNDERWEAR': '19-Underwear',
+  'ARMS': '20-Arms',
+  'BODY_SKIN': '21-Body',
+  'BACK': '22-Back',
+  'REAR_HORNS': '23-Rear-Horns',
+  'REAR_HAIR': '24-Rear-Hair',
+  'DECALS': '26-Decals',
+  'BANNER': '27-Banner',
+  'GLOW': '28-Glow',
+  'BACKGROUND': '29-Background'
+};
+
+// --- Apply NEW Coordinates from Positioning Tool ---
 const coordMap: { 
     [key: string]: { 
         x: number; 
@@ -141,7 +172,6 @@ const coordMap: {
     "textBaseline": "middle"
   }
 };
-// ------------------------------------------
 
 // Register the font
 try {
@@ -149,26 +179,16 @@ try {
     console.log(`[API/Generate] Font registered: ${FONT_FAMILY}`);
 } catch (error) {
     console.error("[API/Generate] Failed to register font:", error);
-    // Handle font loading error appropriately - maybe use a default system font?
 }
 
-// Updated drawText function - Always use textBaseline = 'top'
+// Updated drawText function
 function drawText(ctx: NodeCanvasRenderingContext2D, text: string | number, box: typeof coordMap[string]) {
     ctx.font = `${box.fontSize}px "${box.fontFamily || FONT_FAMILY}"`; 
     ctx.fillStyle = box.fillStyle || '#FFFFFF';
-    // Use horizontal alignment from coordMap entry, fallback to left
     ctx.textAlign = box.textAlign || 'left'; 
-    // <<< FORCE textBaseline to 'top' for consistency with visual tool >>>
     ctx.textBaseline = 'top'; 
-
-    // Draw text using the provided x, y as the top-left (or top-center/top-right based on textAlign)
     ctx.fillText(String(text).toUpperCase(), box.x, box.y);
 }
-
-// Helper to get layer folder name
-const getLayerFolderName = (layerKey: string): string | null => {
-  return LAYER_DETAILS[layerKey]?.folderName || null;
-};
 
 export async function POST(request: Request) {
   try {
@@ -179,14 +199,12 @@ export async function POST(request: Request) {
       stats, 
       qrData, 
       series,
-      interfaceFilename, // <<< ADDED: Receive interface filename
-      // --- ADDED: Receive genes --- 
-      genes // Add genes to destructuring
+      interfaceFilename,
+      genes
     } = await request.json();
 
     // Validate required data
-    // --- MODIFIED: Add validation for genes (optional, but good practice) --- 
-    if (!selectedAttributes || !Array.isArray(selectedAttributes) || !name || !number || !stats || !qrData || !series || !interfaceFilename /*|| !genes <- gene could be null/undefined if not applicable */ ) { 
+    if (!selectedAttributes || !Array.isArray(selectedAttributes) || !name || !number || !stats || !qrData || !series || !interfaceFilename) { 
       return NextResponse.json({ success: false, error: 'Missing required parameters for image generation.' }, { status: 400 });
     }
 
@@ -194,65 +212,58 @@ export async function POST(request: Request) {
     const ctx: NodeCanvasRenderingContext2D = canvas.getContext('2d');
     const assetsPath = path.join(process.cwd(), 'public', 'assets');
 
-    // --- NEW Drawing Logic --- 
+    // NEW Drawing Logic using simplified filenames
     console.log('[API/Generate] Starting layer draw based on LAYER_ORDER...');
     for (const layerKey of LAYER_ORDER) {
-        const layerDetail = LAYER_DETAILS[layerKey];
-        if (!layerDetail) {
-            console.warn(`[API/Generate] Skipping layer key ${layerKey} not found in LAYER_DETAILS.`);
+        const folderName = LAYER_TO_FOLDER[layerKey];
+        if (!folderName) {
+            console.warn(`[API/Generate] Skipping layer ${layerKey}: No folder mapping found.`);
             continue; 
         }
 
-        // --- REVISED: Handle Special Layers First --- 
+        // Handle special layers
         if (layerKey === 'LOGO') {
-            // Calculate originGene directly here now
             const originGene = typeof genes === 'string' ? genes.toLowerCase() : null; 
             let logoFilename: string | null = null;
 
-            // <<< Use the correct, full filenames from the directory listing >>>
             if (originGene === 'npg') {
-                logoFilename = '01_001_logo_NPG-logo_x_NPG_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png';
-            } else if (originGene === 'erobot' || originGene === 'erobotz') { // Allow erobotz as well
-                logoFilename = '01_002_logo_Erobot-logo_x_Erobot_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png';
+                logoFilename = '01_001_logo_NPG-logo.png';
+            } else if (originGene === 'erobot' || originGene === 'erobotz') {
+                logoFilename = '01_002_logo_Erobot-logo.png';
             }
 
             if (logoFilename) {
-                const logoPath = path.join(assetsPath, '01 Logo', logoFilename); // Construct path here
+                const logoPath = path.join(assetsPath, folderName, logoFilename);
                 try {
-                    console.log(`[API/Generate] Attempting to load LOGO image: ${logoPath}`); // Added log
+                    console.log(`[API/Generate] Drawing LOGO layer from: ${logoPath}`);
                     const logoImg = await loadImage(logoPath);
-                    console.log(`[API/Generate] LOGO image loaded successfully. Dimensions: ${logoImg.width}x${logoImg.height}`); // Added log
                     ctx.drawImage(logoImg, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-                    console.log(`[API/Generate] LOGO image drawn onto canvas.`); // Added log
                 } catch (imgErr) {
-                    // <<< Enhanced Error Logging >>>
-                    console.error(`[API/Generate] FAILED to load or draw logo image ${logoPath}. Error details:`, imgErr);
+                    console.error(`[API/Generate] Error loading or drawing logo ${logoFilename}:`, imgErr);
                 }
             } else {
                  console.log(`[API/Generate] Skipping LOGO layer: No specific logo for origin '${originGene}'.`);
             }
-            continue; // Done with LOGO, move to next layerKey
+            continue;
             
         } else if (layerKey === 'INTERFACE') {
-             // Draw the specific interface passed in request
             try {
-                const interfacePath = path.join(assetsPath, layerDetail.folderName, interfaceFilename);
+                // Use simplified filename for interface
+                const interfacePath = path.join(assetsPath, folderName, '05_001_interface_x.png');
                 console.log(`[API/Generate] Drawing INTERFACE layer from: ${interfacePath}`);
                 const interfaceImage = await loadImage(interfacePath);
                 ctx.drawImage(interfaceImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             } catch (err) {
-                 console.error(`[API/Generate] Error loading or drawing interface ${interfaceFilename}:`, err);
-                 // Decide if this is fatal - returning error for now
-                 return NextResponse.json({ success: false, error: `Failed to load interface: ${interfaceFilename}` }, { status: 500 });
+                 console.error(`[API/Generate] Error loading or drawing interface:`, err);
+                 return NextResponse.json({ success: false, error: `Failed to load interface` }, { status: 500 });
             }
-            continue; // Done with INTERFACE, move to next layerKey
+            continue;
         }
-        // --- END REVISED Special Layer Handling ---
 
-        // --- Default handling for CHARACTER layers --- 
-        const attribute = selectedAttributes.find((attr: Attribute) => attr.layer === layerKey);
+        // Handle character layers with new simplified filename structure
+        const attribute = selectedAttributes.find((attr: NFTAttribute) => attr.layer === layerKey);
         if (attribute && attribute.fullFilename) { 
-            const imagePath = path.join(assetsPath, layerDetail.folderName, attribute.fullFilename);
+            const imagePath = path.join(assetsPath, folderName, attribute.fullFilename);
             try {
                 console.log(`[API/Generate] Drawing layer ${layerKey} from: ${imagePath}`);
                 const img = await loadImage(imagePath);
@@ -263,19 +274,16 @@ export async function POST(request: Request) {
         } else {
             console.log(`[API/Generate] Skipping layer ${layerKey}: No corresponding attribute found or fullFilename missing.`);
         }
-        // --- End CHARACTER layer handling ---
     }
     console.log('[API/Generate] Finished drawing layers.');
-    // --- END NEW Drawing Logic ---
 
-    // 2. Draw Text Data uses the new coordMap
+    // Draw Text Data
     if (coordMap.nameBox)    drawText(ctx, name, coordMap.nameBox);
     if (coordMap.numberBox)  drawText(ctx, String(number), coordMap.numberBox);
-    // Extract number from series string (e.g., "Series 1" -> "1")
-    const seriesNumber = String(series).replace(/\D/g, '') || '1'; // Remove non-digits, fallback to 1
+    const seriesNumber = String(series).replace(/\D/g, '') || '1';
     if (coordMap.seriesBox)  drawText(ctx, seriesNumber, coordMap.seriesBox);
     
-    // Draw Stats Labels (using the label key from coordMap)
+    // Draw Stats Labels
     if (coordMap.strengthLabel) drawText(ctx, 'Strength', coordMap.strengthLabel);
     if (coordMap.speedLabel)    drawText(ctx, 'Speed', coordMap.speedLabel);
     if (coordMap.skillLabel)    drawText(ctx, 'Skill', coordMap.skillLabel);
@@ -283,7 +291,7 @@ export async function POST(request: Request) {
     if (coordMap.stealthLabel)  drawText(ctx, 'Stealth', coordMap.stealthLabel);
     if (coordMap.styleLabel)    drawText(ctx, 'Style', coordMap.styleLabel);
     
-    // Draw Stats Values (using the value key from coordMap)
+    // Draw Stats Values
     if (coordMap.strengthValue) drawText(ctx, stats.strength, coordMap.strengthValue);
     if (coordMap.speedValue)    drawText(ctx, stats.speed, coordMap.speedValue);
     if (coordMap.skillValue)    drawText(ctx, stats.skill, coordMap.skillValue);
@@ -291,7 +299,7 @@ export async function POST(request: Request) {
     if (coordMap.stealthValue)  drawText(ctx, stats.stealth, coordMap.stealthValue);
     if (coordMap.styleValue)    drawText(ctx, stats.style, coordMap.styleValue);
 
-    // 4. Draw QR Code 
+    // Draw QR Code 
     if (qrData && coordMap.qrCodeBox) {
         const qrX = coordMap.qrCodeBox.x;
         const qrY = coordMap.qrCodeBox.y;
@@ -307,7 +315,6 @@ export async function POST(request: Request) {
             });
             
             const qrImage = await loadImage(qrCodeDataURL);
-            
             ctx.drawImage(qrImage, qrX, qrY, qrWidth, qrHeight);
             console.log(`[API/Generate] Drawn QR Code at x:${qrX}, y:${qrY}`);
         } catch (qrErr) {
@@ -317,35 +324,34 @@ export async function POST(request: Request) {
         console.warn("[API/Generate] QR Data or qrCodeBox coordinates missing, skipping QR draw.");
     }
 
-    // 5. Convert canvas to PNG buffer
+    // Convert canvas to PNG buffer
     const buffer = canvas.toBuffer('image/png');
     console.log('[API/Generate] Canvas buffer created.');
 
-    // 6. Upload buffer to Vercel Blob using correct signature
-    const blobFilename = `nfts/npg-${number}-${Date.now()}.png`; // Use a subfolder like 'nfts/'
+    // Upload buffer to Vercel Blob
+    const blobFilename = `nfts/npg-${number}-${Date.now()}.png`;
     const blob = await put(
-        blobFilename, // Use the generated filename/path
-        buffer,       // The image buffer
+        blobFilename,
+        buffer,       
         { 
             access: 'public', 
-            contentType: 'image/png' // Ensure correct content type
+            contentType: 'image/png'
         }
     );
     console.log('[API/Generate] Image uploaded to Vercel Blob:', blob.url);
 
-    // 7. Return success response with ONLY the image URL
+    // Return success response
     return NextResponse.json({ 
         success: true, 
         message: 'NFT Image Generated Successfully', 
-        imageUrl: blob.url // Only return the URL
-        // metadata: finalMetadata // Do NOT return metadata from here
+        imageUrl: blob.url
     });
 
-  } catch (error: any) {
-    console.error("[API/Generate] Error generating NFT image:", error);
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to generate NFT image." },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error('[API/Generate] Error in POST handler:', error);
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Internal server error during image generation' 
+    }, { status: 500 });
   }
 } 

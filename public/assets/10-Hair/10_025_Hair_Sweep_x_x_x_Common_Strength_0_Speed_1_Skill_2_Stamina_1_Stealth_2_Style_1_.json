@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "025",
+  "category": "Hair",
+  "item_name": "Sweep",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 1,
+    "skill": 2,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "10_025_Hair_Sweep_x_x_x_Common_Strength_0_Speed_1_Skill_2_Stamina_1_Stealth_2_Style_1_.png",
+  "simplified_filename": "10_025_Hair_Sweep.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "16",
+  "asset_number": "016",
+  "category": "Bra",
+  "item_name": "Cyber-Cincher",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "16_016_Bra_Cyber-Cincher_x_x_x_Common_Strength_1_Speed_0_Skill_1_Stamina_2_Stealth_0_Style_2_.png",
+  "simplified_filename": "16_016_Bra_Cyber-Cincher.png"
+}

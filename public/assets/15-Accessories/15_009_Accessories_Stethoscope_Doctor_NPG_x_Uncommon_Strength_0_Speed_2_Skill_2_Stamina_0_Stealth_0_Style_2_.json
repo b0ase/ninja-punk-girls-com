@@ -1,0 +1,20 @@
+{
+  "folder_number": "15",
+  "asset_number": "009",
+  "category": "Accessories",
+  "item_name": "Stethoscope",
+  "character": "Doctor",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 0,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "15_009_Accessories_Stethoscope_Doctor_NPG_x_Uncommon_Strength_0_Speed_2_Skill_2_Stamina_0_Stealth_0_Style_2_.png",
+  "simplified_filename": "15_009_Accessories_Stethoscope.png"
+}

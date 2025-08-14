@@ -1,0 +1,20 @@
+{
+  "folder_number": "07",
+  "asset_number": "028",
+  "category": "Right-Weapon",
+  "item_name": "Boombox",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 1,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "07_028_Right-Weapon_Boombox_x_x_x_Rare_Strength_1_Speed_1_Skill_0_Stamina_2_Stealth_0_Style_2_.png",
+  "simplified_filename": "07_028_Right-Weapon_Boombox.png"
+}

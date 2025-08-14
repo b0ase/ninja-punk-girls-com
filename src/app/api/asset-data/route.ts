@@ -1,131 +1,124 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { FOLDER_MAPPING } from '@/data/layer-config';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// Cache configuration
-const CACHE_DURATION = 3600000; // 1 hour in milliseconds
-let lastCacheTime = 0;
-let cachedAssetData: AssetDetail[] | null = null;
-
-// Interface for asset details
-interface AssetDetail {
+// === TYPES ===
+export interface AssetDetail {
   layer: string;
-  name: string;
   filename: string;
-  assetNumber?: string;
-  rarity?: string;
-  type?: string; // e.g., Body, Hair, Left-Weapon
+  name: string;
+  assetNumber: string;
+  folder_number: string;
+  category: string;
+  item_name: string;
   character?: string;
-  genes?: string; // Renamed from creator
-  stats?: {
-    strength?: number;
-    speed?: number;
-    skill?: number;
-    stamina?: number;
-    stealth?: number;
-    style?: number;
+  team?: string;
+  genes?: string;
+  rarity?: string;
+  stats: {
+    strength: number;
+    speed: number;
+    skill: number;
+    stamina: number;
+    stealth: number;
+    style: number;
   };
+  original_filename?: string;
+  simplified_filename?: string;
 }
 
-// Function to parse filename and extract metadata
-function parseFilename(filename: string): Partial<AssetDetail> {
-  // Remove .png and split by underscore, filter out empty strings from trailing/multiple underscores
-  const parts = filename.replace(/\.png$/i, '').split('_').filter(part => part !== '');
-  const metadata: Partial<AssetDetail> = {
-    stats: {
-      strength: 0,
-      speed: 0,
-      skill: 0,
-      stamina: 0,
-      stealth: 0,
-      style: 0
+// === FOLDER MAPPING ===
+// Maps folder names to API layer keys
+const FOLDER_MAPPING: { [key: string]: string } = {
+  '01-Logo': 'LOGO',
+  '02-Copyright': 'COPYRIGHT', 
+  '04-Team': 'TEAM',
+  '05-Interface': 'INTERFACE',
+  '06-Effects': 'EFFECTS',
+  '07-Right-Weapon': 'RIGHT_WEAPON',
+  '08-Left-Weapon': 'LEFT_WEAPON', 
+  '09-Horns': 'HORNS',
+  '10-Hair': 'HAIR',
+  '11-Mask': 'MASK',
+  '12-Top': 'TOP',
+  '13-Boots': 'BOOTS',
+  '14-Jewellery': 'JEWELLERY',
+  '15-Accessories': 'ACCESSORIES',
+  '16-Bra': 'BRA',
+  '17-Bottom': 'BOTTOM', 
+  '18-Face': 'FACE',
+  '19-Underwear': 'UNDERWEAR',
+  '20-Arms': 'ARMS',
+  '21-Body': 'BODY_SKIN',
+  '22-Back': 'BACK',
+  '23-Rear-Horns': 'REAR_HORNS',
+  '24-Rear-Hair': 'REAR_HAIR',
+  '26-Decals': 'DECALS',
+  '27-Banner': 'BANNER',
+  '28-Glow': 'GLOW',
+  '29-Background': 'BACKGROUND'
+};
+
+// Function to load asset data from JSON file
+function loadAssetFromJSON(folderPath: string, jsonFilename: string, layerKey: string): AssetDetail | null {
+  try {
+    const jsonPath = path.join(folderPath, jsonFilename);
+    
+    if (!fs.existsSync(jsonPath)) {
+      console.warn(`[API] JSON file not found: ${jsonPath}`);
+      return null;
     }
-  };
 
-  // console.log(`[API Parse] Filename: ${filename}, Parts (${parts.length}):`, parts);
-
-  // Basic structure: LayerNum_AssetNum_Type_ElementName_Character_Gene...
-  if (parts.length >= 4) { // Need at least 4 parts for Type and ElementName
-    metadata.type = parts[2]; // e.g., Hair, Underwear
-    metadata.name = parts[3]; // <<< CORRECT: Element Name (e.g., G-String)
-
-    const assetNum = parts[1];
-    metadata.assetNumber = assetNum; // Assign asset number
-
-    // Handle Character (parts[4]) - Set undefined if 'x'
-    if (parts.length > 4) {
-      metadata.character = parts[4] !== 'x' ? parts[4] : undefined;
-    }
-    // <<< Handle Genes (parts[5]) - Use 'genes', set undefined if 'x' >>>
-    if (parts.length > 5) {
-      metadata.genes = parts[5] !== 'x' ? parts[5] : undefined;
+    const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    
+    // Find corresponding PNG file (should have simplified filename)
+    const pngFilename = jsonData.simplified_filename || jsonData.original_filename;
+    
+    if (!pngFilename) {
+      console.warn(`[API] No PNG filename found in JSON: ${jsonFilename}`);
+      return null;
     }
 
-    // Find Rarity
-    const rarityIndex = parts.findIndex(part =>
-      ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythical'].includes(part)
-    );
-    if (rarityIndex !== -1) {
-      metadata.rarity = parts[rarityIndex];
+    // Verify PNG file exists
+    const pngPath = path.join(folderPath, pngFilename);
+    if (!fs.existsSync(pngPath)) {
+      console.warn(`[API] PNG file not found: ${pngPath}`);
+      return null;
     }
 
-    // *** ADDED: Check for potential RGB in parts[6] ***
-    if (parts.length > 6 && parts[6] !== 'x') {
-      console.log(`[API Parse Potential RGB] Found: ${parts[6]} in ${filename}`);
-      // Potential future logic to parse/store RGB if needed
-    }
-    // *****************************************************
+    // Create AssetDetail object from JSON data
+    const asset: AssetDetail = {
+      layer: layerKey,
+      filename: pngFilename,
+      name: jsonData.item_name || jsonData.name || 'Unknown',
+      assetNumber: jsonData.asset_number || 'N/A',
+      folder_number: jsonData.folder_number || '00',
+      category: jsonData.category || 'Unknown',
+      item_name: jsonData.item_name || 'Unknown',
+      character: jsonData.character || undefined,
+      team: jsonData.team || undefined,
+      genes: jsonData.genes || undefined,
+      rarity: jsonData.rarity || undefined,
+      stats: {
+        strength: jsonData.stats?.strength || 0,
+        speed: jsonData.stats?.speed || 0,
+        skill: jsonData.stats?.skill || 0,
+        stamina: jsonData.stats?.stamina || 0,
+        stealth: jsonData.stats?.stealth || 0,
+        style: jsonData.stats?.style || 0
+      },
+      original_filename: jsonData.original_filename,
+      simplified_filename: jsonData.simplified_filename
+    };
 
-    // Parse stats by looking for StatName and then the next part for the value
-    for (let i = 0; i < parts.length - 1; i++) { // Iterate up to the second-to-last part
-      const currentPart = parts[i];
-      const nextPart = parts[i + 1];
-      const value = parseInt(nextPart);
-
-      if (!isNaN(value)) { // Check if the next part is a valid number
-        switch (currentPart) {
-          case 'Strength':
-            metadata.stats!.strength = value;
-            i++; // Skip the value part in the next iteration
-            break;
-          case 'Speed':
-            metadata.stats!.speed = value;
-            i++;
-            break;
-          case 'Skill':
-            metadata.stats!.skill = value;
-            i++;
-            break;
-          case 'Stamina':
-            metadata.stats!.stamina = value;
-            i++;
-            break;
-          case 'Stealth':
-            metadata.stats!.stealth = value;
-            i++;
-            break;
-          case 'Style':
-            metadata.stats!.style = value;
-            i++;
-            break;
-        }
-      }
-    }
-  } else {
-    // console.log(`[API Parse Warning] Skipping metadata for ${filename}, parts.length is ${parts.length} (< 3)`);
-    // Fallback name if parsing fails early
-    metadata.name = filename.replace(/\.png$/i, ''); // Fallback name
-    metadata.assetNumber = parts.length > 1 ? parts[1] : 'N/A'; // Fallback asset number
-    metadata.type = metadata.type || 'Unknown'; // Add fallback for type
+    return asset;
+  } catch (error) {
+    console.error(`[API] Error loading asset from JSON ${jsonFilename}:`, error);
+    return null;
   }
-
-  // console.log(`[API Parse] Returning metadata for ${filename}:`, JSON.stringify(metadata));
-
-  return metadata;
 }
 
-// Function to build asset data from filesystem
+// Function to build asset data from JSON files
 function buildAssetData(): AssetDetail[] {
   const assetsDir = path.join(process.cwd(), 'public', 'assets');
   const assetData: AssetDetail[] = [];
@@ -155,26 +148,18 @@ function buildAssetData(): AssetDetail[] {
         return;
       }
 
-      // Process all PNG files in this folder
+      // Process all JSON files in this folder
       try {
-        const files = fs.readdirSync(folderPath)
-          .filter(file => file.endsWith('.png'));
+        const jsonFiles = fs.readdirSync(folderPath)
+          .filter(file => file.endsWith('.json'));
 
-        console.log(`[API] Processing ${files.length} files in ${folderName} -> ${layerKey}`);
+        console.log(`[API] Processing ${jsonFiles.length} JSON files in ${folderName} -> ${layerKey}`);
 
-        files.forEach(filename => {
-          const metadata = parseFilename(filename);
-          assetData.push({
-            layer: layerKey, // Use the mapped layer key
-            filename,
-            name: metadata.name || filename.replace(/\.png$/i, ''), // Ensure name is always string
-            assetNumber: metadata.assetNumber,
-            rarity: metadata.rarity,
-            type: metadata.type,
-            character: metadata.character,
-            genes: metadata.genes,
-            stats: metadata.stats
-          });
+        jsonFiles.forEach(jsonFilename => {
+          const asset = loadAssetFromJSON(folderPath, jsonFilename, layerKey);
+          if (asset) {
+            assetData.push(asset);
+          }
         });
       } catch (error) {
         console.error(`[API] Error reading folder ${folderName}:`, error);
@@ -184,32 +169,41 @@ function buildAssetData(): AssetDetail[] {
     console.log(`[API] Built asset data for ${assetData.length} assets across ${folders.length} folders`);
     return assetData;
   } catch (error) {
-    console.error('Error building asset data:', error);
+    console.error('[API] Error building asset data:', error);
     return [];
   }
 }
 
-// GET handler for the API endpoint
+// === API HANDLER ===
 export async function GET() {
   try {
-    const currentTime = Date.now();
+    console.log('[API] Building asset data from JSON files...');
     
-    // Check if cache needs to be refreshed
-    if (!cachedAssetData || currentTime - lastCacheTime > CACHE_DURATION) {
-      console.log('[API] Refreshing asset cache...');
-      cachedAssetData = buildAssetData();
-      lastCacheTime = currentTime;
+    const assetData = buildAssetData();
+    
+    if (assetData.length === 0) {
+      console.warn('[API] No asset data found');
+      return NextResponse.json({ 
+        success: false, 
+        error: 'No asset data found',
+        data: []
+      });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      data: cachedAssetData 
+    console.log(`[API] Successfully loaded ${assetData.length} assets`);
+    
+    return NextResponse.json({
+      success: true,
+      data: assetData,
+      count: assetData.length
     });
-  } catch (error) {
-    console.error('Error in GET handler:', error);
+    
+  } catch (error: any) {
+    console.error('[API] Error in asset-data route:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Failed to retrieve asset data' 
+      error: 'Failed to load asset data', 
+      details: error.message 
     }, { 
       status: 500 
     });

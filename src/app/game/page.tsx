@@ -137,8 +137,8 @@ export default function GamePage() {
 
   // <<< Updated handleCreateMatch function >>>
   const handleCreateMatch = async () => {
-    if (!selectedNftIdentifier || !profile?.handle || !isConnected) {
-      console.error("Cannot create match: User not connected, handle missing, or NFT not selected.", { isConnected, handle: profile?.handle, selectedNftIdentifier });
+    if (!selectedNftIdentifier || !profile?.publicProfile?.handle || !isConnected) {
+      console.error("Cannot create match: User not connected, handle missing, or NFT not selected.", { isConnected, handle: profile?.publicProfile?.handle, selectedNftIdentifier });
       setMatchError("Connect wallet, ensure profile is loaded, and select an NFT.");
       return;
     }
@@ -175,16 +175,16 @@ export default function GamePage() {
 
     try {
         // <<< Add console logs right before fetch >>>
-        console.log("[GamePage Frontend] Sending Handle:", profile?.handle); 
+        console.log("[GamePage Frontend] Sending Handle:", profile?.publicProfile?.handle); 
         console.log("[GamePage Frontend] Sending NFT Data:", initiatorNftData);
         
-        console.log("Creating new match via API:", { initiatorHandle: profile?.handle, initiatorNft: initiatorNftData });
+        console.log("Creating new match via API:", { initiatorHandle: profile?.publicProfile?.handle, initiatorNft: initiatorNftData });
         // <<< Send POST request to API >>>
         const response = await fetch('/api/matches', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                initiatorHandle: profile?.handle,
+                initiatorHandle: profile?.publicProfile?.handle,
                 initiatorNft: initiatorNftData // Send the mapped data
             })
         });
@@ -283,13 +283,13 @@ export default function GamePage() {
                     <button 
                       onClick={handleCreateMatch}
                       // <<< Update disabled condition to include profile.handle check >>>
-                      disabled={!selectedNftIdentifier || !profile?.handle || createMatchStatus === 'loading'}
+                      disabled={!selectedNftIdentifier || !profile?.publicProfile?.handle || createMatchStatus === 'loading'}
                       className={`w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${createMatchStatus === 'loading' ? 'cursor-wait' : ''}`}
                     >
                       {createMatchStatus === 'loading' ? 'Creating Match...' : 'Create Match'}
                     </button>
                      {/* Optional: Add a small message if handle is missing but connected */}
-                     {!profile?.handle && isConnected && (
+                     {!profile?.publicProfile?.handle && isConnected && (
                         <p className="text-xs text-yellow-500 text-center">Waiting for profile handle...</p>
                      )}
                   </div>
@@ -329,7 +329,7 @@ export default function GamePage() {
                              // <<< Use match.id >>>
                             onClick={() => handleJoinMatch(match.id)}
                              // <<< Use match.initiator_handle >>>
-                            disabled={!isConnected || profile?.handle === match.initiator_handle} // Can't join own match
+                            disabled={!isConnected || profile?.publicProfile?.handle === match.initiator_handle} // Can't join own match
                             className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition-colors text-sm disabled:opacity-50"
                           >
                             Join Match

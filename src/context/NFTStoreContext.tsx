@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useCallback, useEffect } from 'react';
 import { NFTType, NFTAttribute, StatsType } from '@/types';
-import { useHandCash } from '@/context/HandCashContext';
+// HandCash import removed
 import { supabase } from '@/lib/supabaseClient';
 
 // Interface now mirrors NFTType more closely for component compatibility
@@ -33,7 +33,7 @@ const NFTStoreContext = createContext<NFTStoreContextType | undefined>(undefined
 
 export const NFTStoreProvider = ({ children }: { children: ReactNode }) => {
   const [listedNFTs, setListedNFTs] = useState<ListedItemInfo[]>([]);
-  const { profile } = useHandCash(); 
+  // HandCash profile removed 
 
   // Add function to fetch listings from Supabase
   const fetchListedNfts = useCallback(async () => {
@@ -73,10 +73,7 @@ export const NFTStoreProvider = ({ children }: { children: ReactNode }) => {
     console.log(`[NFTStore listNFT] Received price:`, price);
     // <<<
     
-    if (!profile) {
-      console.error('[NFTStore] Cannot list NFT: User profile not loaded.');
-      return;
-    }
+    // Profile check removed - using placeholder for now
     
     const newItemListingData = {
       identifier: itemData.origin || itemData.id,
@@ -90,7 +87,7 @@ export const NFTStoreProvider = ({ children }: { children: ReactNode }) => {
       attributes: itemData.attributes || [],
       stats: itemData.stats || { strength: 0, speed: 0, skill: 0, stamina: 0, stealth: 0, style: 0 },
       qrData: itemData.qrData || 'N/A',
-      seller_handle: profile.publicProfile.handle, 
+      seller_handle: 'temp_user', // Placeholder until auth is implemented 
       is_listed: true, 
       listed_at: new Date().toISOString(), 
     };
@@ -129,7 +126,7 @@ export const NFTStoreProvider = ({ children }: { children: ReactNode }) => {
       // Optionally: show error notification to user
       console.error(`[NFTStore] Listing failed for ${newItemListingData.identifier}.`);
     }
-  }, [profile, fetchListedNfts]); // Keep fetchListedNfts dependency here now
+  }, [fetchListedNfts]); // Profile dependency removed
 
   // delistNFT - Update is_listed to false
   const delistNFT = useCallback(async (identifier: string) => {

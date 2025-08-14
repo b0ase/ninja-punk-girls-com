@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "021",
+  "category": "Body",
+  "item_name": "Bot",
+  "character": null,
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "21_021_Body_Bot_x_Erobot_x_Uncommon_Strength_0_Speed_0_Skill_2_Stamina_0_Stealth_2_Style_0_.png",
+  "simplified_filename": "21_021_Body_Bot.png"
+}

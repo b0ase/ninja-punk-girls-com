@@ -1,0 +1,20 @@
+{
+  "folder_number": "16",
+  "asset_number": "011",
+  "category": "Bra",
+  "item_name": "Rubber-Tank-Top",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 2,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "16_011_Bra_Rubber-Tank-Top_x_x_x_Common_Strength_0_Speed_2_Skill_0_Stamina_1_Stealth_0_Style_0_.png",
+  "simplified_filename": "16_011_Bra_Rubber-Tank-Top.png"
+}

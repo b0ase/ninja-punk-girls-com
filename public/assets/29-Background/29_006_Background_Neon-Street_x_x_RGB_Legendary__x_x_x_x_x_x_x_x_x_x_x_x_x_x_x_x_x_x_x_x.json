@@ -1,0 +1,20 @@
+{
+  "folder_number": "29",
+  "asset_number": "006",
+  "category": "Background",
+  "item_name": "Neon-Street",
+  "character": null,
+  "team": null,
+  "genes": "RGB",
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "29_006_Background_Neon-Street_x_x_RGB_Legendary__x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png",
+  "simplified_filename": "29_006_Background_Neon-Street.png"
+}

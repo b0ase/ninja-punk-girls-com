@@ -1,0 +1,20 @@
+{
+  "folder_number": "16",
+  "asset_number": "000",
+  "category": "Bra",
+  "item_name": "Nipple-Hearts",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "16_000_Bra_Nipple-Hearts_x_x_x_Common_Strength_0_Speed_0_Skill_1_Stamina_0_Stealth_1_Style_0_.png",
+  "simplified_filename": "16_000_Bra_Nipple-Hearts.png"
+}

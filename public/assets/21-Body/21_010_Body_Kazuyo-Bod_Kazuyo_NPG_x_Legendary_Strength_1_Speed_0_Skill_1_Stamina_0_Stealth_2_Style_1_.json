@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "010",
+  "category": "Body",
+  "item_name": "Kazuyo-Bod",
+  "character": "Kazuyo",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "21_010_Body_Kazuyo-Bod_Kazuyo_NPG_x_Legendary_Strength_1_Speed_0_Skill_1_Stamina_0_Stealth_2_Style_1_.png",
+  "simplified_filename": "21_010_Body_Kazuyo-Bod.png"
+}

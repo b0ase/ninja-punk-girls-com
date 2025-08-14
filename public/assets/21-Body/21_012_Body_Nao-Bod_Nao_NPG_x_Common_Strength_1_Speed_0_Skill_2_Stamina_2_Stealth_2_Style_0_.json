@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "012",
+  "category": "Body",
+  "item_name": "Nao-Bod",
+  "character": "Nao",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "21_012_Body_Nao-Bod_Nao_NPG_x_Common_Strength_1_Speed_0_Skill_2_Stamina_2_Stealth_2_Style_0_.png",
+  "simplified_filename": "21_012_Body_Nao-Bod.png"
+}

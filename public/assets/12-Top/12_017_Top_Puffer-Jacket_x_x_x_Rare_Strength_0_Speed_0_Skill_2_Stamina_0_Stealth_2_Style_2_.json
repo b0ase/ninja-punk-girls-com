@@ -1,0 +1,20 @@
+{
+  "folder_number": "12",
+  "asset_number": "017",
+  "category": "Top",
+  "item_name": "Puffer-Jacket",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "12_017_Top_Puffer-Jacket_x_x_x_Rare_Strength_0_Speed_0_Skill_2_Stamina_0_Stealth_2_Style_2_.png",
+  "simplified_filename": "12_017_Top_Puffer-Jacket.png"
+}

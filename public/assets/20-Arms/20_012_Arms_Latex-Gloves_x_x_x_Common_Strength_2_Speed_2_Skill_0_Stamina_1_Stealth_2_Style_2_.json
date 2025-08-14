@@ -1,0 +1,20 @@
+{
+  "folder_number": "20",
+  "asset_number": "012",
+  "category": "Arms",
+  "item_name": "Latex-Gloves",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "20_012_Arms_Latex-Gloves_x_x_x_Common_Strength_2_Speed_2_Skill_0_Stamina_1_Stealth_2_Style_2_.png",
+  "simplified_filename": "20_012_Arms_Latex-Gloves.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "07",
+  "asset_number": "004",
+  "category": "Right-Weapon",
+  "item_name": "Black-Axe",
+  "character": "Scarlet",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "07_004_Right-Weapon_Black-Axe_Scarlet_Erobot_x_Uncommon_Strength_1_Speed_0_Skill_1_Stamina_0_Stealth_2_Style_0_.png",
+  "simplified_filename": "07_004_Right-Weapon_Black-Axe.png"
+}

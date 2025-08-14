@@ -1,0 +1,20 @@
+{
+  "folder_number": "07",
+  "asset_number": "002",
+  "category": "Right-Weapon",
+  "item_name": "Thrasher",
+  "character": "Hikaru",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "07_002_Right-Weapon_Thrasher_Hikaru_Erobot_x_Common_Strength_0_Speed_2_Skill_1_Stamina_1_Stealth_2_Style_0_.png",
+  "simplified_filename": "07_002_Right-Weapon_Thrasher.png"
+}

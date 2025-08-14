@@ -1,0 +1,20 @@
+{
+  "folder_number": "18",
+  "asset_number": "008",
+  "category": "Face",
+  "item_name": "Peggy-Face",
+  "character": "Peggy",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 0,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 1,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "18_008_Face_Peggy-Face_Peggy_Erobot_x_Uncommon_Strength_0_Speed_2_Skill_2_Stamina_1_Stealth_1_Style_1_.png",
+  "simplified_filename": "18_008_Face_Peggy-Face.png"
+}

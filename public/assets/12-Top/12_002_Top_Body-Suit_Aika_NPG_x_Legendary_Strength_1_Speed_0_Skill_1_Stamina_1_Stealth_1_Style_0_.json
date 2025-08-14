@@ -1,0 +1,20 @@
+{
+  "folder_number": "12",
+  "asset_number": "002",
+  "category": "Top",
+  "item_name": "Body-Suit",
+  "character": "Aika",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 1,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "12_002_Top_Body-Suit_Aika_NPG_x_Legendary_Strength_1_Speed_0_Skill_1_Stamina_1_Stealth_1_Style_0_.png",
+  "simplified_filename": "12_002_Top_Body-Suit.png"
+}
