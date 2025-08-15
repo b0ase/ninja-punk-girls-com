@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Force dynamic rendering to prevent build-time execution
+export const dynamic = 'force-dynamic';
+
 // === TYPES ===
 export interface AssetDetail {
   layer: string;
