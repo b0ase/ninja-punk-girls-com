@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`HandCash Collection API: Getting collection for token prefix: ${authToken.substring(0,6)}...`);
+    console.log(`HandCash Collection API: Our app ID: ${handcashAppId}`);
 
     // Get account and items
     const account = handCashConnect.getAccountFromAuthToken(authToken);
@@ -75,9 +76,15 @@ export async function POST(request: NextRequest) {
         return false;
       }
       
+      const itemName = item.name || item.id || '';
+      const appId = item.app?.id || '';
+      const origin = item.origin || '';
+      
+      // Check if this item belongs to our HandCash app
+      const isOurApp = appId === handcashAppId;
+      
       // Check if the item has qrData that matches our game patterns
       const qrData = item.qrData || item.name || item.id || '';
-      const itemName = item.name || item.id || '';
       
       // NPG NFTs start with "npg-nft-" or contain "npg"
       const isNPG = qrData.toLowerCase().includes('npg-nft-') || 
@@ -105,12 +112,23 @@ export async function POST(request: NextRequest) {
       const metadata = item.metadata || {};
       const hasGameMetadata = metadata.team || metadata.series || metadata.game;
       
-      const isOurGame = isNPG || isErobot || isOurTeam || hasOurAttributes || hasGameMetadata;
+      // Check if the origin contains our game identifiers
+      const hasGameOrigin = origin.toLowerCase().includes('npg') || 
+                           origin.toLowerCase().includes('erobot') ||
+                           origin.toLowerCase().includes('ninja') ||
+                           origin.toLowerCase().includes('punk');
+      
+      // TEMPORARY: For debugging, let's show all items for now to see what we actually have
+      // TODO: Once we understand the data structure, implement proper filtering
+      const isOurGame = true; // Show all items temporarily
+      
+      // Original logic (commented out for now):
+      // const isOurGame = isOurApp || isNPG || isErobot || isOurTeam || hasOurAttributes || hasGameMetadata || hasGameOrigin;
       
       if (!isOurGame) {
-        console.log(`HandCash Collection API: Filtering out non-game item: ${itemName} (qrData: ${qrData}, team: ${team}, hasAttributes: ${!!hasOurAttributes})`);
+        console.log(`HandCash Collection API: Filtering out non-game item: ${itemName} (appId: ${appId}, origin: ${origin}, hasAttributes: ${!!hasOurAttributes})`);
       } else {
-        console.log(`HandCash Collection API: Keeping game item: ${itemName} (type: ${isNPG ? 'NPG' : isErobot ? 'Erobot' : 'Other'})`);
+        console.log(`HandCash Collection API: Keeping game item: ${itemName} (appId: ${appId}, origin: ${origin}, type: ${isNPG ? 'NPG' : isErobot ? 'Erobot' : isOurApp ? 'OurApp' : 'Other'})`);
       }
       
       return isOurGame;
