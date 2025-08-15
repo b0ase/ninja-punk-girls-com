@@ -152,10 +152,11 @@ function MintPageContent(): React.ReactElement {
           const backgroundMap: Record<string, string> = {};
           data.files.forEach((file: any) => {
             const nameWithoutExtension = file.name.split('.')[0];
-            backgroundMap[nameWithoutExtension.toLowerCase()] = file.path;
+            backgroundMap[nameWithoutExtension] = file.path; // Don't convert to lowercase
           });
           setElementCardBackgrounds(backgroundMap);
           console.log('[MintPage] Element card background map loaded:', backgroundMap);
+          console.log('[MintPage] Available background keys:', Object.keys(backgroundMap));
         } else {
           throw new Error(data.error || 'Invalid response structure for backgrounds');
         }
