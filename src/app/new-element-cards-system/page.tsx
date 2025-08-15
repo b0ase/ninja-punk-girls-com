@@ -8,7 +8,7 @@ import VectorElementCard from '@/components/VectorElementCard';
 import VectorElementCardNew from '@/components/VectorElementCardNew';
 
 export default function NewElementCardsSystemPage() {
-  const { availableAssets, isLoading, error } = useAssets();
+  const { availableAssets, isInitialized, assetLoadingProgress } = useAssets();
   const [selectedLayer, setSelectedLayer] = useState<string>('BODY_SKIN');
   const [showOldSystem, setShowOldSystem] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<'cards' | 'table' | 'grid'>('cards');
@@ -17,27 +17,25 @@ export default function NewElementCardsSystemPage() {
     rarity: '',
     character: '',
     genes: '',
-    series: '',
     search: ''
   });
 
-  if (isLoading) {
+  if (!isInitialized) {
     return (
       <div className="min-h-screen bg-gray-900 text-white p-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold mb-8">Loading Vector Element Cards System...</h1>
-          <div className="animate-pulse">Loading assets...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Error Loading Vector Element Cards System</h1>
-          <div className="text-red-400">Error: {error}</div>
+          <div className="space-y-4">
+            <div className="w-full bg-gray-700 rounded-full h-2">
+              <div 
+                className="bg-pink-500 h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${assetLoadingProgress}%` }}
+              ></div>
+            </div>
+            <div className="text-center text-gray-400">
+              Loading assets... {assetLoadingProgress}%
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -54,31 +52,16 @@ export default function NewElementCardsSystemPage() {
     if (filters.rarity && asset.rarity?.toLowerCase() !== filters.rarity.toLowerCase()) return false;
     if (filters.character && asset.character?.toLowerCase() !== filters.character.toLowerCase()) return false;
     if (filters.genes && asset.genes?.toLowerCase() !== filters.genes.toLowerCase()) return false;
-    if (filters.series && asset.series?.toLowerCase() !== filters.series.toLowerCase()) return false;
     if (filters.search && !asset.name?.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
 
-  // Debug logging
-  console.log('🔍 Debug Info:', {
-    selectedLayer,
-    totalAssets: selectedAssets.length,
-    filteredAssets: filteredAssets.length,
-    filters,
-    sampleAsset: selectedAssets[0],
-    allAssets: selectedAssets,
-    availableLayers: Object.keys(availableAssets),
-    layerAssetCounts: Object.entries(availableAssets).reduce((acc, [layer, assets]) => {
-      acc[layer] = assets.length;
-      return acc;
-    }, {} as Record<string, number>)
-  });
+
 
   // Get unique values for filter options
   const uniqueRarities = [...new Set(selectedAssets.map(asset => asset.rarity).filter(Boolean))];
   const uniqueCharacters = [...new Set(selectedAssets.map(asset => asset.character).filter(Boolean))];
   const uniqueGenes = [...new Set(selectedAssets.map(asset => asset.genes).filter(Boolean))];
-  const uniqueSeries = [...new Set(selectedAssets.map(asset => asset.series).filter(Boolean))];
 
   // Helper function for rarity colors
   const getRarityColor = (rarity: string) => {
@@ -221,42 +204,24 @@ export default function NewElementCardsSystemPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Genes
-                  </label>
-                  <select
-                    value={filters.genes}
-                    onChange={(e) => setFilters(prev => ({ ...prev, genes: e.target.value }))}
-                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  >
-                    <option value="">All Genes</option>
-                    {uniqueGenes.map(genes => (
-                      <option key={genes} value={genes}>{genes}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Series
-                  </label>
-                  <select
-                    value={filters.series}
-                    onChange={(e) => setFilters(prev => ({ ...prev, series: e.target.value }))}
-                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  >
-                    <option value="">All Series</option>
-                    {uniqueSeries.map(series => (
-                      <option key={series} value={series}>{series}</option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Genes
+                </label>
+                <select
+                  value={filters.genes}
+                  onChange={(e) => setFilters(prev => ({ ...prev, genes: e.target.value }))}
+                  className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                >
+                  <option value="">All Genes</option>
+                  {uniqueGenes.map(genes => (
+                    <option key={genes} value={genes}>{genes}</option>
+                  ))}
+                </select>
               </div>
 
               <button
-                onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                onClick={() => setFilters({ rarity: '', character: '', genes: '', search: '' })}
                 className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
               >
                 🗑️ Clear All Filters
@@ -293,7 +258,7 @@ export default function NewElementCardsSystemPage() {
                 </div>
               </div>
               <button
-                onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                onClick={() => setFilters({ rarity: '', character: '', genes: '', search: '' })}
                 className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-sm font-medium transition-colors"
               >
                 Clear All
@@ -328,7 +293,7 @@ export default function NewElementCardsSystemPage() {
                     <div className="text-lg font-medium mb-2">No assets match the current filters</div>
                     <div className="text-sm mb-4">Try adjusting your filters or clearing them to see all assets</div>
                     <button
-                      onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                      onClick={() => setFilters({ rarity: '', character: '', genes: '', search: '' })}
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
                     >
                       Clear All Filters
@@ -350,7 +315,7 @@ export default function NewElementCardsSystemPage() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Rarity</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Character</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Genes</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Series</th>
+
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Stats</th>
                       </tr>
                     </thead>
@@ -379,7 +344,7 @@ export default function NewElementCardsSystemPage() {
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-300">{asset.character || 'N/A'}</td>
                           <td className="px-4 py-3 text-sm text-gray-300">{asset.genes || 'N/A'}</td>
-                          <td className="px-4 py-3 text-sm text-gray-300">{asset.series || 'N/A'}</td>
+
                           <td className="px-4 py-3 text-sm text-gray-300">
                             {asset.stats && (
                               <div className="text-xs">
@@ -399,7 +364,7 @@ export default function NewElementCardsSystemPage() {
                     <div className="text-lg font-medium mb-2">No assets match the current filters</div>
                     <div className="text-sm mb-4">Try adjusting your filters or clearing them to see all assets</div>
                     <button
-                      onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                      onClick={() => setFilters({ rarity: '', character: '', genes: '', search: '' })}
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
                     >
                       Clear All Filters
@@ -434,9 +399,6 @@ export default function NewElementCardsSystemPage() {
                         {asset.genes && (
                           <div className="text-gray-400">Genes: {asset.genes}</div>
                         )}
-                        {asset.series && (
-                          <div className="text-gray-400">Series: {asset.series}</div>
-                        )}
                       </div>
                     </div>
                   ))}
@@ -446,7 +408,7 @@ export default function NewElementCardsSystemPage() {
                     <div className="text-lg font-medium mb-2">No assets match the current filters</div>
                     <div className="text-sm mb-4">Try adjusting your filters or clearing them to see all assets</div>
                     <button
-                      onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                      onClick={() => setFilters({ rarity: '', character: '', genes: '', search: '' })}
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
                     >
                       Clear All Filters
@@ -467,52 +429,23 @@ export default function NewElementCardsSystemPage() {
                     <div key={asset.filename || index} className="flex justify-center">
                       <VectorElementCard
                         elementKey={selectedLayer}
-                        showDetails={true}
+                        variant="default"
+                        width={160}
+                        height={240}
                       />
                     </div>
                   ))}
+                </div>
+                <div className="mt-4 text-center text-gray-400 text-sm">
+                  <p>Old system: Static vector cards with predefined colors and patterns</p>
+                  <p>New system: Dynamic cards with actual asset data and customizable backgrounds</p>
                 </div>
               </div>
             </div>
           )}
         </div>
 
-                {/* Debug Section - Temporary */}
-        <div className="mt-8 bg-red-900/20 border border-red-500 rounded-lg p-6">
-          <h3 className="text-xl font-bold mb-4 text-red-400">🐛 Debug Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-bold text-red-300 mb-2">Available Layers:</h4>
-              <div className="text-sm text-gray-300 space-y-1">
-                {Object.entries(availableAssets).map(([layer, assets]) => (
-                  <div key={layer} className="flex justify-between">
-                    <span>{layer}:</span>
-                    <span className={assets.length > 0 ? 'text-green-400' : 'text-red-400'}>
-                      {assets.length} assets
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold text-red-300 mb-2">Current Selection:</h4>
-              <div className="text-sm text-gray-300 space-y-1">
-                <div><strong>Selected Layer:</strong> {selectedLayer}</div>
-                <div><strong>Total Assets:</strong> {selectedAssets.length}</div>
-                <div><strong>Filtered Assets:</strong> {filteredAssets.length}</div>
-                <div><strong>Active Filters:</strong> {Object.entries(filters).filter(([k, v]) => v).map(([k, v]) => `${k}: ${v}`).join(', ') || 'None'}</div>
-              </div>
-              {selectedAssets.length > 0 && (
-                <div className="mt-3">
-                  <h5 className="font-bold text-red-300 mb-1">Sample Asset:</h5>
-                  <pre className="text-xs text-gray-400 bg-gray-800 p-2 rounded overflow-auto">
-                    {JSON.stringify(selectedAssets[0], null, 2)}
-                  </pre>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        
 
         {/* Layer Overview */}
         <div className="mt-8 bg-gray-800 rounded-lg p-6">

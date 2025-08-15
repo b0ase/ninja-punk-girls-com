@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { NFTAttribute, NFTType, StatsType, AssetMetadata, AssetDetail } from '@/types';
+import { NFTAttribute, NFTType, StatsType, AssetMetadata } from '@/types';
+import { AssetDetail } from '@/app/api/asset-data/route';
 import { LAYER_ORDER, REQUIRED_LAYERS, EXCLUDED_LAYERS, LAYER_DETAILS } from '@/data/layer-config';
 import { getRandomName } from '@/data/japanese-names';
 import { useAssets } from '@/context/AssetContext';
