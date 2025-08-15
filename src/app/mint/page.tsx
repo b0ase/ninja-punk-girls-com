@@ -722,8 +722,13 @@ function MintPageContent(): React.ReactElement {
       
       // Get the background URL using the attribute's layer key directly with the map
       const backgroundUrl = getCardBackgroundPath(attribute.layer, backgroundMap);
-      
       const elementUrl = getElementAssetUrl(attribute);
+
+      // Debug logging
+      console.log(`[GalleryElementCard] Rendering for layer: ${attribute.layer}`);
+      console.log(`[GalleryElementCard] Background URL: ${backgroundUrl}`);
+      console.log(`[GalleryElementCard] Element URL: ${elementUrl}`);
+      console.log(`[GalleryElementCard] Background map keys:`, Object.keys(backgroundMap));
 
       if (!attribute || !attribute.layer) {
         return <div className="bg-gray-700 rounded aspect-[2/3] flex items-center justify-center text-xs text-red-400">Invalid Attr</div>;
