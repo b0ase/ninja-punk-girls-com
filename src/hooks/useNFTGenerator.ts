@@ -180,9 +180,9 @@ export const generateNewNFTData = (
 
            // <<< ADD LOGGING HERE >>>
            // Log the critical fields right before pushing the attribute
-           console.log(`[Attr Generation] LayerKey: ${selectedAssetDetail.layerKey}, Name: '${selectedAssetDetail.name}', Filename: ${selectedAssetDetail.filename}`);
+           console.log(`[Attr Generation] Layer: ${selectedAssetDetail.layer}, Name: '${selectedAssetDetail.name}', Filename: ${selectedAssetDetail.filename}`);
            if (typeof selectedAssetDetail.name !== 'string' || selectedAssetDetail.name.trim() === '') {
-               console.error(`[Attr Generation ERROR] Name is invalid for layer key ${selectedAssetDetail.layerKey}!`, selectedAssetDetail);
+               console.error(`[Attr Generation ERROR] Name is invalid for layer ${selectedAssetDetail.layer}!`, selectedAssetDetail);
            }
            // <<< END LOGGING >>>
 
@@ -190,7 +190,7 @@ export const generateNewNFTData = (
            // Add to summary attributes
            attributes.push({
              // Map from AssetDetail to NFTAttribute
-             layer: selectedAssetDetail.layerKey || 'UNKNOWN_LAYER',
+             layer: selectedAssetDetail.layer || 'UNKNOWN_LAYER',
              elementNameForAssetField: selectedAssetDetail.name,
              assetNumber: String(selectedAssetDetail.assetNumber || ''),
              fullFilename: selectedAssetDetail.filename, // <<< Map filename to fullFilename
