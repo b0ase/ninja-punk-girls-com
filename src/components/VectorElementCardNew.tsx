@@ -12,63 +12,191 @@ interface VectorElementCardNewProps {
   size?: 'small' | 'medium' | 'large';
 }
 
-// Vector background patterns and gradients for different layers
+// Simple vector background with layer-specific colors
 const getVectorBackground = (layerKey: string, size: 'small' | 'medium' | 'large' = 'medium') => {
   const layerDetail = LAYER_DETAILS[layerKey];
   if (!layerDetail) return null;
 
+  // Use card-sized dimensions while maintaining 961:1441 proportions
   const dimensions = {
-    small: { width: 120, height: 180 },
-    medium: { width: 160, height: 240 },
-    large: { width: 200, height: 300 }
+    small: { width: 128, height: 192 },   // Small card (128:192 = 961:1441 ratio)
+    medium: { width: 192, height: 288 },  // Medium card (192:288 = 961:1441 ratio)
+    large: { width: 256, height: 384 }    // Large card (256:384 = 961:1441 ratio)
   };
 
   const { width, height } = dimensions[size];
 
-  // Define color schemes for different layer categories
+  // Define color schemes for different layer categories (matching the working cards)
   const getColorScheme = (layerKey: string) => {
-    if (layerKey.includes('WEAPON')) {
-      return {
-        primary: '#ef4444',
-        secondary: '#dc2626',
-        accent: '#fca5a5',
-        pattern: '#991b1b'
-      };
-    } else if (layerKey.includes('BODY') || layerKey.includes('SKIN')) {
-      return {
-        primary: '#f59e0b',
-        secondary: '#d97706',
-        accent: '#fbbf24',
-        pattern: '#92400e'
-      };
-    } else if (layerKey.includes('HAIR')) {
-      return {
-        primary: '#8b5cf6',
-        secondary: '#7c3aed',
-        accent: '#a78bfa',
-        pattern: '#5b21b6'
-      };
-    } else if (layerKey.includes('FACE')) {
-      return {
-        primary: '#ec4899',
-        secondary: '#db2777',
-        accent: '#f472b6',
-        pattern: '#9d174d'
-      };
-    } else if (layerKey.includes('HORNS')) {
-      return {
-        primary: '#10b981',
-        secondary: '#059669',
-        accent: '#34d399',
-        pattern: '#047857'
-      };
-    } else {
-      return {
-        primary: '#6b7280',
-        secondary: '#4b5563',
-        accent: '#9ca3af',
-        pattern: '#374151'
-      };
+    switch (layerKey) {
+      case 'ACCESSORIES': // COLLAR
+        return {
+          primary: '#fbbf24', // Yellow
+          secondary: '#f59e0b',
+          accent: '#fde047',
+          pattern: '#d97706'
+        };
+      case 'ARMS': // GLOVES AND SLEEVES
+        return {
+          primary: '#10b981', // Green
+          secondary: '#059669',
+          accent: '#34d399',
+          pattern: '#047857'
+        };
+      case 'BACK':
+        return {
+          primary: '#ef4444', // Red
+          secondary: '#dc2626',
+          accent: '#fca5a5',
+          pattern: '#991b1b'
+        };
+      case 'BODY_SKIN': // BODY
+        return {
+          primary: '#ec4899', // Pink
+          secondary: '#db2777',
+          accent: '#f472b6',
+          pattern: '#9d174d'
+        };
+      case 'BOOTS':
+        return {
+          primary: '#3b82f6', // Blue
+          secondary: '#2563eb',
+          accent: '#60a5fa',
+          pattern: '#1d4ed8'
+        };
+      case 'BOTTOM': // SHORTS
+        return {
+          primary: '#8b5cf6', // Purple
+          secondary: '#7c3aed',
+          accent: '#a78bfa',
+          pattern: '#5b21b6'
+        };
+      case 'BRA':
+        return {
+          primary: '#f59e0b', // Orange/Amber
+          secondary: '#d97706',
+          accent: '#fbbf24',
+          pattern: '#92400e'
+        };
+      case 'FACE':
+        return {
+          primary: '#ec4899', // Pink/Magenta
+          secondary: '#db2777',
+          accent: '#f472b6',
+          pattern: '#9d174d'
+        };
+      case 'HAIR':
+        return {
+          primary: '#8b5cf6', // Purple
+          secondary: '#7c3aed',
+          accent: '#a78bfa',
+          pattern: '#5b21b6'
+        };
+      case 'HORNS': // HAIR AND HORNS
+        return {
+          primary: '#10b981', // Green
+          secondary: '#059669',
+          accent: '#34d399',
+          pattern: '#047857'
+        };
+      case 'JEWELLERY': // BIRTHMARKS AND TATTOOS
+        return {
+          primary: '#ef4444', // Red
+          secondary: '#dc2626',
+          accent: '#fca5a5',
+          pattern: '#991b1b'
+        };
+      case 'LEFT_WEAPON': // LEFT HAND WEAPON
+        return {
+          primary: '#3b82f6', // Blue
+          secondary: '#2563eb',
+          accent: '#60a5fa',
+          pattern: '#1d4ed8'
+        };
+      case 'MASK':
+        return {
+          primary: '#8b5cf6', // Purple
+          secondary: '#7c3aed',
+          accent: '#a78bfa',
+          pattern: '#5b21b6'
+        };
+      case 'REAR_HAIR': // HAIR (Rear hair)
+        return {
+          primary: '#8b5cf6', // Purple
+          secondary: '#7c3aed',
+          accent: '#a78bfa',
+          pattern: '#5b21b6'
+        };
+      case 'REAR_HORNS': // BACK HORNS
+        return {
+          primary: '#10b981', // Green
+          secondary: '#059669',
+          accent: '#34d399',
+          pattern: '#047857'
+        };
+      case 'RIGHT_WEAPON': // RIGHT HAND WEAPON
+        return {
+          primary: '#3b82f6', // Blue
+          secondary: '#2563eb',
+          accent: '#60a5fa',
+          pattern: '#1d4ed8'
+        };
+      case 'TOP':
+        return {
+          primary: '#10b981', // Green
+          secondary: '#059669',
+          accent: '#34d399',
+          pattern: '#047857'
+        };
+      case 'UNDERWEAR':
+        return {
+          primary: '#f59e0b', // Orange/Amber
+          secondary: '#d97706',
+          accent: '#fbbf24',
+          pattern: '#92400e'
+        };
+      case 'EFFECTS':
+        return {
+          primary: '#6b7280', // Gray
+          secondary: '#4b5563',
+          accent: '#9ca3af',
+          pattern: '#374151'
+        };
+      case 'DECALS':
+        return {
+          primary: '#ef4444', // Red
+          secondary: '#dc2626',
+          accent: '#fca5a5',
+          pattern: '#991b1b'
+        };
+      case 'BANNER':
+        return {
+          primary: '#8b5cf6', // Purple
+          secondary: '#7c3aed',
+          accent: '#a78bfa',
+          pattern: '#5b21b6'
+        };
+      case 'GLOW':
+        return {
+          primary: '#fbbf24', // Yellow
+          secondary: '#f59e0b',
+          accent: '#fde047',
+          pattern: '#d97706'
+        };
+      case 'BACKGROUND':
+        return {
+          primary: '#6b7280', // Gray
+          secondary: '#4b5563',
+          accent: '#9ca3af',
+          pattern: '#374151'
+        };
+      default:
+        return {
+          primary: '#6b7280', // Gray
+          secondary: '#4b5563',
+          accent: '#9ca3af',
+          pattern: '#374151'
+        };
     }
   };
 
@@ -139,16 +267,16 @@ const getVectorBackground = (layerKey: string, size: 'small' | 'medium' | 'large
       <rect
         x="8"
         y="8"
-        width="40"
-        height="20"
+        width="32"
+        height="16"
         fill={colors.pattern}
         opacity="0.9"
         rx="4"
         ry="4"
       />
       <text
-        x="28"
-        y="22"
+        x="24"
+        y="20"
         textAnchor="middle"
         fill="white"
         fontSize="10"
@@ -179,7 +307,7 @@ const RarityIndicator: React.FC<{ rarity?: string | null }> = ({ rarity }) => {
 
   return (
     <div
-      className="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold text-white"
+      className="absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-bold text-white"
       style={{ backgroundColor: getRarityColor(rarity) }}
     >
       {rarity}
@@ -202,8 +330,8 @@ const StatsDisplay: React.FC<{ stats?: Partial<{ strength: number; speed: number
   ];
 
   return (
-    <div className="absolute bottom-2 left-2 right-2">
-      <div className="grid grid-cols-3 gap-1 text-xs">
+    <div className="absolute bottom-4 left-4 right-4">
+      <div className="grid grid-cols-3 gap-2 text-sm">
         {statNames.map((stat, index) => (
           <div key={stat} className="text-center">
             <div className="text-gray-300 font-bold">{stat}</div>
@@ -227,13 +355,13 @@ export default function VectorElementCardNew({
   const getSizeClasses = (size: 'small' | 'medium' | 'large') => {
     switch (size) {
       case 'small':
-        return 'w-32 h-48';
+        return 'w-32 h-48'; // Small card size (maintains 961:1441 ratio)
       case 'medium':
-        return 'w-40 h-60';
+        return 'w-48 h-72'; // Medium card size (maintains 961:1441 ratio)
       case 'large':
-        return 'w-48 h-72';
+        return 'w-64 h-96'; // Large card size (maintains 961:1441 ratio)
       default:
-        return 'w-40 h-60';
+        return 'w-48 h-72'; // Default to medium card size
     }
   };
 
@@ -251,8 +379,8 @@ export default function VectorElementCardNew({
           <Image
             src={`/assets/${layerDetail?.folderName || layerKey}/${asset.filename}`}
             alt={asset.name || 'Unknown Asset'}
-            width={size === 'small' ? 80 : size === 'medium' ? 100 : 120}
-            height={size === 'small' ? 80 : size === 'medium' ? 100 : 120}
+            width={size === 'small' ? 80 : size === 'medium' ? 120 : 160}
+            height={size === 'small' ? 80 : size === 'medium' ? 120 : 160}
             className="object-contain z-10"
             unoptimized
             onError={(e) => {
@@ -269,7 +397,7 @@ export default function VectorElementCardNew({
 
       {/* RGB Indicator */}
       {isRgb && (
-        <div className="absolute top-2 left-2 px-2 py-1 bg-gradient-to-r from-red-500 via-green-500 to-blue-500 rounded-full text-xs font-bold text-white">
+        <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-red-500 via-green-500 to-blue-500 rounded-full text-sm font-bold text-white">
           RGB
         </div>
       )}

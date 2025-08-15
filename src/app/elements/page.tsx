@@ -26,7 +26,7 @@ const toTitleCase = (str: string): string => {
 };
 // --------------------------------------
 
-// Layers to exclude from the main library view
+// Layers to exclude from the main library view (non-character elements)
 const EXCLUDED_LIBRARY_LAYERS = new Set([
   'BACKGROUND',
   'GLOW',
@@ -57,7 +57,7 @@ const getCoverImageUrl = (layerKey: string): string => {
   // <<< END FIX >>>
 
   const filename = `${layerDetail.number}_${baseName}.jpg`;
-  // console.log(`[getCoverImageUrl] Generated filename: ${filename} for layer key: ${layerKey}`);
+  console.log(`[getCoverImageUrl] Generated filename: ${filename} for layer key: ${layerKey}, full path: /element_cards/${filename}`);
   return `/element_cards/${filename}`;
 };
 
@@ -448,7 +448,7 @@ function ElementsIndexPageContent() {
                     // Get URL for the card background JPG
                     const cardBackgroundUrl = getCoverImageUrl(layerKey);
                     
-                    console.log(`[Elements Index] Rendering Card - LayerKey: ${layerKey}, Count: ${assetCount}, Image: ${firstAssetImageUrl}`);
+                    console.log(`[Elements Index] Rendering Card - LayerKey: ${layerKey}, Count: ${assetCount}, Image: ${firstAssetImageUrl}, Background: ${cardBackgroundUrl}`);
 
                     return (
                       <Link 
@@ -456,26 +456,31 @@ function ElementsIndexPageContent() {
                         href={`/elements/${encodeURIComponent(folderName)}`}
                         className="block bg-gray-800 rounded-lg shadow-md overflow-hidden hover:border-pink-500/50 border border-gray-700/50 transition-all duration-200 group"
                       >
-                        {/* Image Container - Use CSS background for card, Image tag for element */}
-                        <div 
-                           className="w-full aspect-[961/1441] bg-center bg-no-repeat bg-contain" // Set aspect ratio of card, bg props 
-                           style={{ backgroundImage: `url(${cardBackgroundUrl})` }}
-                        >
-                           <div className="relative w-full h-full"> {/* Inner div for positioning element */} 
-                              <Image 
-                                 src={firstAssetImageUrl} 
-                                 alt={`${layerKey} element preview`}
-                                 layout="fill" // Fill the container 
-                                 objectFit="contain" // Contain the element within the card aspect ratio
-                                 unoptimized
-                                 onError={(e) => {
-                                   // Hide element image on error, background will show
-                                   e.currentTarget.style.display = 'none';
-                                   console.error(`Asset Image Load Error for ${layerKey}: ${firstAssetImageUrl}`);
-                                 }}
-                                 className="group-hover:opacity-80 transition-opacity duration-150"
-                               />
-                           </div>
+                        {/* Image Container - Layered images: background card + element PNG */}
+                        <div className="w-full aspect-[961/1441] relative bg-gray-700 rounded-t-lg overflow-hidden">
+                           {/* Background Card Image (bottom layer) */}
+                           <img 
+                             src={cardBackgroundUrl} 
+                             alt={`${layerKey} background card`}
+                             className="absolute inset-0 w-full h-full object-contain z-0"
+                             onError={(e) => {
+                               console.error(`Background Card Load Error for ${layerKey}: ${cardBackgroundUrl}`);
+                               e.currentTarget.style.display = 'none';
+                             }}
+                           />
+                           
+                           {/* Element PNG Image (top layer) */}
+                           {firstAssetImageUrl && firstAssetImageUrl !== '/placeholder.png' && (
+                             <img 
+                               src={firstAssetImageUrl} 
+                               alt={`${layerKey} element`}
+                               className="absolute inset-0 w-full h-full object-contain z-10"
+                               onError={(e) => {
+                                 console.error(`Element PNG Load Error for ${layerKey}: ${firstAssetImageUrl}`);
+                                 e.currentTarget.style.display = 'none';
+                               }}
+                             />
+                           )}
                         </div>
                         {/* Category Info */}
                         <div className="p-3">

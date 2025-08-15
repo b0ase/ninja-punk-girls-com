@@ -85,6 +85,14 @@ export default function NewElementCardsSystemPage() {
           <p className="text-gray-300 text-lg">
             New lightweight vector-based element cards system. Replaces PNG backgrounds with scalable SVG graphics.
           </p>
+          <div className="mt-4">
+            <a 
+              href="/new-element-cards-system/all" 
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            >
+              🗂️ View All Element Cards ({Object.values(availableAssets || {}).reduce((total, assets) => total + (Array.isArray(assets) ? assets.length : 0), 0)} total)
+            </a>
+          </div>
         </div>
 
         {/* Controls */}
@@ -276,7 +284,7 @@ export default function NewElementCardsSystemPage() {
             {/* View Mode Selection */}
             {viewMode === 'cards' && (
               <div className="bg-gray-800 rounded-lg p-6">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                <div className="flex flex-wrap gap-4 justify-center">
                   {filteredAssets.map((asset, index) => (
                     <div key={asset.filename || index} className="flex justify-center">
                       <VectorElementCardNew
@@ -376,7 +384,7 @@ export default function NewElementCardsSystemPage() {
 
             {viewMode === 'grid' && (
               <div className="bg-gray-800 rounded-lg p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="flex flex-wrap gap-6 justify-center">
                   {filteredAssets.map((asset, index) => (
                     <div key={asset.filename || index} className="bg-gray-700 rounded-lg p-4">
                       <div className="flex justify-center mb-4">

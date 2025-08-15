@@ -104,88 +104,67 @@ const getLayerFolder = (layer: string): string => {
   return LAYER_TO_FOLDER[layer] || layer.toLowerCase().replace(/_/g, '-');
 };
 
-// Organized structure with each asset class on its own row
+// Non-character element layers to exclude (same as main elements page)
+const EXCLUDED_LAYERS = new Set([
+  'LOGO', 'COPYRIGHT', 'TEAM', 'INTERFACE', 'EFFECTS', 
+  'DECALS', 'BANNER', 'GLOW', 'BACKGROUND'
+]);
+
+// Organized structure with each asset class on its own row (character elements only)
 const PYRAMID_STRUCTURE = [
-  // Row 1: Logo (01-Logo)
-  { title: "01 - Logo Class", elements: ['LOGO'], layout: 'center' },
-  
-  // Row 2: Copyright (02-Copyright) 
-  { title: "02 - Copyright Class", elements: ['COPYRIGHT'], layout: 'center' },
-  
-  // Row 3: Team (04-Team)
-  { title: "04 - Team Class", elements: ['TEAM'], layout: 'center' },
-  
-  // Row 4: Interface (05-Interface)
-  { title: "05 - Interface Class", elements: ['INTERFACE'], layout: 'center' },
-  
-  // Row 5: Effects (06-Effects)
-  { title: "06 - Effects Class", elements: ['EFFECTS'], layout: 'center' },
-  
-  // Row 6: Right Weapon (07-Right-Weapon)
+  // Row 1: Right Weapon (07-Right-Weapon)
   { title: "07 - Right Weapon Class", elements: ['RIGHT_WEAPON'], layout: 'center' },
   
-  // Row 7: Left Weapon (08-Left-Weapon)
+  // Row 2: Left Weapon (08-Left-Weapon)
   { title: "08 - Left Weapon Class", elements: ['LEFT_WEAPON'], layout: 'center' },
   
-  // Row 8: Horns (09-Horns)
+  // Row 3: Horns (09-Horns)
   { title: "09 - Horns Class", elements: ['HORNS'], layout: 'center' },
   
-  // Row 9: Hair (10-Hair)
+  // Row 4: Hair (10-Hair)
   { title: "10 - Hair Class", elements: ['HAIR'], layout: 'center' },
   
-  // Row 10: Mask (11-Mask)
+  // Row 5: Mask (11-Mask)
   { title: "11 - Mask Class", elements: ['MASK'], layout: 'center' },
   
-  // Row 11: Top (12-Top)
+  // Row 6: Top (12-Top)
   { title: "12 - Top Class", elements: ['TOP'], layout: 'center' },
   
-  // Row 12: Boots (13-Boots)
+  // Row 7: Boots (13-Boots)
   { title: "13 - Boots Class", elements: ['BOOTS'], layout: 'center' },
   
-  // Row 13: Jewellery (14-Jewellery)
+  // Row 8: Jewellery (14-Jewellery)
   { title: "14 - Jewellery Class", elements: ['JEWELLERY'], layout: 'center' },
   
-  // Row 14: Accessories (15-Accessories)
+  // Row 9: Accessories (15-Accessories)
   { title: "15 - Accessories Class", elements: ['ACCESSORIES'], layout: 'center' },
   
-  // Row 15: Bra (16-Bra)
+  // Row 10: Bra (16-Bra)
   { title: "16 - Bra Class", elements: ['BRA'], layout: 'center' },
   
-  // Row 16: Bottom (17-Bottom)
+  // Row 11: Bottom (17-Bottom)
   { title: "17 - Bottom Class", elements: ['BOTTOM'], layout: 'center' },
   
-  // Row 17: Face (18-Face)
+  // Row 12: Face (18-Face)
   { title: "18 - Face Class", elements: ['FACE'], layout: 'center' },
   
-  // Row 18: Underwear (19-Underwear)
+  // Row 13: Underwear (19-Underwear)
   { title: "19 - Underwear Class", elements: ['UNDERWEAR'], layout: 'center' },
   
-  // Row 19: Arms (20-Arms)
+  // Row 14: Arms (20-Arms)
   { title: "20 - Arms Class", elements: ['ARMS'], layout: 'center' },
   
-  // Row 20: Body (21-Body)
+  // Row 15: Body (21-Body)
   { title: "21 - Body Class", elements: ['BODY_SKIN'], layout: 'center' },
   
-  // Row 21: Back (22-Back)
+  // Row 16: Back (22-Back)
   { title: "22 - Back Class", elements: ['BACK'], layout: 'center' },
   
-  // Row 22: Rear Horns (23-Rear-Horns)
+  // Row 17: Rear Horns (23-Rear-Horns)
   { title: "23 - Rear Horns Class", elements: ['REAR_HORNS'], layout: 'center' },
   
-  // Row 23: Rear Hair (24-Rear-Hair)
-  { title: "24 - Rear Hair Class", elements: ['REAR_HAIR'], layout: 'center' },
-  
-  // Row 24: Decals (26-Decals)
-  { title: "26 - Decals Class", elements: ['DECALS'], layout: 'center' },
-  
-  // Row 25: Banner (27-Banner)
-  { title: "27 - Banner Class", elements: ['BANNER'], layout: 'center' },
-  
-  // Row 26: Glow (28-Glow)
-  { title: "28 - Glow Class", elements: ['GLOW'], layout: 'center' },
-  
-  // Row 27: Background (29-Background)
-  { title: "29 - Background Class", elements: ['BACKGROUND'], layout: 'center' }
+  // Row 18: Rear Hair (24-Rear-Hair)
+  { title: "24 - Rear Hair Class", elements: ['REAR_HAIR'], layout: 'center' }
 ];
 
 interface PeriodicTableProps {
@@ -211,17 +190,20 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
         const data = await response.json();
         if (data.success && Array.isArray(data.data)) {
           // Map AssetDetail objects from API to Asset objects expected by component
-          const mappedAssets: Asset[] = data.data.map((apiAsset: AssetDetail) => ({
-            layer: apiAsset.layer,
-            filename: apiAsset.filename,
-            name: apiAsset.name || apiAsset.item_name || 'Unknown',
-            assetNumber: apiAsset.assetNumber,
-            type: apiAsset.category,
-            character: apiAsset.character,
-            genes: apiAsset.genes,
-            rarity: apiAsset.rarity,
-            stats: apiAsset.stats
-          }));
+          // Filter out non-character elements
+          const mappedAssets: Asset[] = data.data
+            .filter((apiAsset: AssetDetail) => !EXCLUDED_LAYERS.has(apiAsset.layer))
+            .map((apiAsset: AssetDetail) => ({
+              layer: apiAsset.layer,
+              filename: apiAsset.filename,
+              name: apiAsset.name || apiAsset.item_name || 'Unknown',
+              assetNumber: apiAsset.assetNumber,
+              type: apiAsset.category,
+              character: apiAsset.character,
+              genes: apiAsset.genes,
+              rarity: apiAsset.rarity,
+              stats: apiAsset.stats
+            }));
           setAssets(mappedAssets);
         }
       } catch (error) {
@@ -234,8 +216,8 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
     fetchAssets();
   }, []);
 
-  // Category filter options
-  const categories = ['All', 'Frame', 'Effects', 'Combat', 'Head', 'Clothing', 'Accessory', 'Body'];
+  // Category filter options (character elements only)
+  const categories = ['All', 'Combat', 'Head', 'Clothing', 'Accessory', 'Body'];
   
   // Filter assets based on search and category
   const filteredAssets = assets.filter(asset => {
@@ -244,10 +226,8 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
     
     if (selectedCategory === 'All') return matchesSearch;
     
-    // Map layers to categories
+    // Map layers to categories (character elements only)
     const layerToCategory: { [key: string]: string } = {
-      'LOGO': 'Frame', 'COPYRIGHT': 'Frame', 'TEAM': 'Frame', 'INTERFACE': 'Frame',
-      'EFFECTS': 'Effects', 'DECALS': 'Effects', 'BANNER': 'Effects', 'GLOW': 'Effects', 'BACKGROUND': 'Effects',
       'RIGHT_WEAPON': 'Combat', 'LEFT_WEAPON': 'Combat',
       'HORNS': 'Head', 'HAIR': 'Head', 'MASK': 'Head', 'FACE': 'Head', 'REAR_HORNS': 'Head', 'REAR_HAIR': 'Head',
       'TOP': 'Clothing', 'BOOTS': 'Clothing', 'BRA': 'Clothing', 'BOTTOM': 'Clothing', 'UNDERWEAR': 'Clothing',
@@ -298,10 +278,10 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-pink-500 mb-2">
-          The Periodic Table of NPG Elements
+          The Periodic Table of NPG Character Elements
         </h1>
         <p className="text-xl text-gray-400">
-          {filteredAssets.length} Individual Assets
+          {filteredAssets.length} Character Assets (Interface/UI elements excluded)
         </p>
       </div>
 
@@ -331,8 +311,6 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
       {/* Class Legend */}
       <div className="flex flex-wrap justify-center gap-4 mb-8 text-sm">
         {[
-          { category: 'Frame', hex: '#FF69B4', assets: ['Logo', 'Copyright', 'Team', 'Interface'] },
-          { category: 'Effects', hex: '#00FFFF', assets: ['Effects', 'Decals', 'Banner', 'Glow', 'Background'] },
           { category: 'Combat', hex: '#FF4500', assets: ['Right Weapon', 'Left Weapon'] },
           { category: 'Head', hex: '#4169E1', assets: ['Horns', 'Hair', 'Mask', 'Face', 'Rear Horns', 'Rear Hair'] },
           { category: 'Clothing', hex: '#32CD32', assets: ['Top', 'Boots', 'Bra', 'Bottom', 'Underwear'] },

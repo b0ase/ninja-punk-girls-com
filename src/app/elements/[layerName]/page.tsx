@@ -5,7 +5,7 @@ import { useAssets } from '@/context/AssetContext';
 // @ts-ignore - Attempting to suppress persistent build error for AssetDetail import
 import { AssetDetail, StatsType } from '@/types';
 import { LAYER_DETAILS } from '@/data/layer-config';
-import Image from 'next/image'; 
+// import Image from 'next/image'; // No longer needed - using regular img tags 
 import ErrorBoundary from '@/components/ErrorBoundary';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -46,9 +46,13 @@ const getCoverImageUrl = (layerKey: string): string => {
     return '/placeholder.png';
   }
   
-  const baseName = layerKey.toLowerCase().replace(/-/g, '_').replace(/\s+/g, '_');
+  // Special handling for BODY_SKIN to match the actual filename
+  let baseName = layerKey.toLowerCase().replace(/-/g, '_').replace(/\s+/g, '_');
+  if (layerKey === 'BODY_SKIN') {
+    baseName = 'body'; // Use 'body' instead of 'body_skin' to match 21_body.jpg
+  }
   const filename = `${layerDetail.number}_${baseName}.jpg`;
-  console.log(`[getCoverImageUrl] Generated filename: ${filename} for layer key: ${layerKey}`);
+  console.log(`[getCoverImageUrl] Generated filename: ${filename} for layer key: ${layerKey}, full path: /element_cards/${filename}`);
   return `/element_cards/${filename}`;
 };
 
@@ -112,40 +116,34 @@ const AssetCard: React.FC<{
   console.log(`[AssetCard] Rendering for ${asset.filename || 'unknown file'}, Stats:`, asset.stats);
   // *** ADDED: Log generated image URLs for debugging ***
   console.log(`[AssetCard] DEBUG: assetPngUrl=${assetPngUrl}, coverImageUrl=${coverImageUrl}`);
+  console.log(`[AssetCard] Layer: ${layerKey}, Asset: ${asset.filename}`);
 
   return (
     <div className="block bg-gray-800 rounded-lg shadow-md overflow-hidden flex flex-col text-xs border border-gray-700/50 group">
-      {/* Image container with relative positioning */}
-      {/* Let the background image establish the size/aspect ratio */}
-      <div className="relative w-full bg-gray-700"> 
-        {/* Background Cover Image - Use responsive layout */}
-        <Image
+      {/* Image container with proper layering */}
+      <div className="relative w-full bg-gray-700" style={{ aspectRatio: `${cardWidth}/${cardHeight}` }}> 
+        {/* Background Cover Image (bottom layer) */}
+        <img
           src={coverImageUrl}
-          alt={`${layerKey || 'Layer'} background`}
-          layout="responsive" 
-          width={cardWidth} 
-          height={cardHeight}
-          // objectFit="cover" // Usually default for responsive
-          unoptimized 
-          className="block group-hover:opacity-60 transition-opacity duration-150" // Acts as base layer
+          alt={`${layerKey || 'Layer'} background card`}
+          className="absolute inset-0 w-full h-full object-contain z-0"
+          onLoad={(e) => {
+            console.log(`[AssetCard] Background image loaded successfully: ${coverImageUrl}`);
+          }}
           onError={(e) => { 
             console.error(`[AssetCard] Cover Image Load Error for src: ${coverImageUrl}`);
             e.currentTarget.style.display = 'none';
           }} 
         />
-        {/* Foreground Asset PNG Image - Use fill layout */}
-        <Image
+        
+        {/* Foreground Asset PNG Image (top layer) */}
+        <img
           src={assetPngUrl}
           alt={`${layerKey || 'Element'} layer: ${asset.name || asset.filename}`}
-          layout="fill" // Fill the container established by the background
-          objectFit="contain" // Contain within the bounds, keep aspect ratio
-          unoptimized 
-          className="absolute inset-0 w-full h-full group-hover:scale-105 transition-transform duration-150 z-10" // Position over background
+          className="absolute inset-0 w-full h-full object-contain z-10 group-hover:scale-105 transition-transform duration-150"
           onError={(e) => { 
             console.error(`[AssetCard] Asset Image Load Error for src: ${assetPngUrl}`);
-            // Optional: Hide or show placeholder if foreground fails
-            e.currentTarget.src = '/placeholder.png'; // Show placeholder on error
-            (e.target as HTMLImageElement).style.objectFit = 'scale-down'; // Adjust fit for placeholder
+            e.currentTarget.style.display = 'none';
           }} 
         />
       </div>
