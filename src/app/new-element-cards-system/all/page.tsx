@@ -17,22 +17,31 @@ export default function AllElementCardsPage() {
     layer: ''
   });
 
-  // Get all assets from all layers
+  // Get all assets from all layers (defensive approach)
   const getAllAssets = (): AssetDetail[] => {
-    if (!availableAssets) return [];
+    if (!availableAssets || typeof availableAssets !== 'object') return [];
     
-    const allAssets: AssetDetail[] = [];
-    Object.entries(availableAssets).forEach(([layerKey, assets]) => {
-      if (Array.isArray(assets)) {
-        assets.forEach(asset => {
-          allAssets.push({
-            ...asset,
-            layerKey // Add layer key to each asset for reference
-          });
-        });
+    try {
+      const allAssets: AssetDetail[] = [];
+      const entries = Object.entries(availableAssets);
+      
+      for (const [layerKey, assets] of entries) {
+        if (Array.isArray(assets) && assets.length > 0) {
+          for (const asset of assets) {
+            if (asset && typeof asset === 'object') {
+              allAssets.push({
+                ...asset,
+                layerKey // Add layer key to each asset for reference
+              });
+            }
+          }
+        }
       }
-    });
-    return allAssets;
+      return allAssets;
+    } catch (error) {
+      console.error('Error getting all assets:', error);
+      return [];
+    }
   };
 
   const allAssets = getAllAssets();
