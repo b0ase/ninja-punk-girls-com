@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const authToken = request.headers.get('authorization')?.replace('Bearer ', '') || body.authToken;
+    const showAllItems = body.showAllItems || false; // Toggle to show all items
 
     if (!authToken) {
       console.error("HandCash Collection API: authToken missing in request body or headers.");
@@ -118,23 +119,30 @@ export async function POST(request: NextRequest) {
                            origin.toLowerCase().includes('ninja') ||
                            origin.toLowerCase().includes('punk');
       
-      // TEMPORARY: For debugging, let's show all items for now to see what we actually have
-      // TODO: Once we understand the data structure, implement proper filtering
-      const isOurGame = true; // Show all items temporarily
+      // Determine if this item belongs to our game
+      const isOurGame = isOurApp || isNPG || isErobot || isOurTeam || hasOurAttributes || hasGameMetadata || hasGameOrigin;
       
-      // Original logic (commented out for now):
-      // const isOurGame = isOurApp || isNPG || isErobot || isOurTeam || hasOurAttributes || hasGameMetadata || hasGameOrigin;
+      // If showAllItems is true, keep everything. Otherwise, only keep our game items
+      const shouldKeepItem = showAllItems || isOurGame;
       
       if (!isOurGame) {
-        console.log(`HandCash Collection API: Filtering out non-game item: ${itemName} (appId: ${appId}, origin: ${origin}, hasAttributes: ${!!hasOurAttributes})`);
+        if (showAllItems) {
+          console.log(`HandCash Collection API: Showing non-game item (showAllItems=true): ${itemName} (appId: ${appId}, origin: ${origin})`);
+        } else {
+          console.log(`HandCash Collection API: Filtering out non-game item: ${itemName} (appId: ${appId}, origin: ${origin}, hasAttributes: ${!!hasOurAttributes})`);
+        }
       } else {
         console.log(`HandCash Collection API: Keeping game item: ${itemName} (appId: ${appId}, origin: ${origin}, type: ${isNPG ? 'NPG' : isErobot ? 'Erobot' : isOurApp ? 'OurApp' : 'Other'})`);
       }
       
-      return isOurGame;
+      return shouldKeepItem;
     });
 
-    console.log(`HandCash Collection API: Filtered to ${filteredItems.length} game items out of ${items.length} total items`);
+    if (showAllItems) {
+      console.log(`HandCash Collection API: Showing ALL items (showAllItems=true): ${filteredItems.length} items out of ${items.length} total items`);
+    } else {
+      console.log(`HandCash Collection API: Filtered to ${filteredItems.length} game items out of ${items.length} total items`);
+    }
 
     // Transform filtered items to expected format
     const transformedItems = filteredItems.map((item: any) => ({
@@ -149,7 +157,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      items: transformedItems
+      items: transformedItems,
+      showAllItems: showAllItems,
+      totalItems: items.length,
+      filteredItems: filteredItems.length
     });
 
   } catch (error: any) {
