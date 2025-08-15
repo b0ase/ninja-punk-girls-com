@@ -68,7 +68,7 @@ export default function HandCashCallback() {
         // Store the HandCash auth token for the context
         localStorage.setItem('handcash_auth_token', handcashAuthToken);
         
-        // Get the profile data and emit success event
+        // Get the profile data and create wallet in HandCashWalletContext
         try {
           const profileResponse = await fetch('/api/handcash/profile', {
             method: 'POST',
@@ -79,15 +79,28 @@ export default function HandCashCallback() {
           if (profileResponse.ok) {
             const profileData = await profileResponse.json();
             if (profileData.success && profileData.profile) {
-              // Emit success event for HandCashContext
-              const event = new CustomEvent('handcash-auth-success', {
-                detail: {
-                  authToken: handcashAuthToken,
-                  profile: profileData.profile
-                }
+              // Create wallet object for HandCashWalletContext
+              const walletData = {
+                id: profileData.profile.publicProfile?.publicKey || handcashAuthToken,
+                email: profileData.profile.publicProfile?.handle || 'handcash_user',
+                balance: 0,
+                currency: 'BSV',
+                paymail: profileData.profile.publicProfile?.paymail,
+                createdAt: new Date().toISOString(),
+              };
+              
+              // Store wallet in localStorage for HandCashWalletContext to pick up
+              localStorage.setItem('handcash_wallet_data', JSON.stringify(walletData));
+              localStorage.setItem('handcash_auth_token', handcashAuthToken);
+              
+              console.log('[HandCashCallback] Wallet data stored for HandCashWalletContext');
+              
+              // Dispatch a custom event to notify the context immediately
+              const walletEvent = new CustomEvent('handcash-wallet-ready', {
+                detail: { wallet: walletData }
               });
-              window.dispatchEvent(event);
-              console.log('[HandCashCallback] HandCash context event dispatched');
+              window.dispatchEvent(walletEvent);
+              console.log('[HandCashCallback] Wallet ready event dispatched');
             }
           }
         } catch (profileError) {
@@ -95,12 +108,12 @@ export default function HandCashCallback() {
           // Continue anyway since Supabase session is set
         }
         
-        setStatus('Redirecting to mint page...');
+        setStatus('Wallet connected! Redirecting...');
         
-        // Add a small delay to show the success message
+        // Add a longer delay to ensure the context has time to pick up the data
         setTimeout(() => {
-          router.push('/mint');
-        }, 1000);
+          router.push('/');
+        }, 2000);
 
       } catch (err: any) {
         console.error('[HandCashCallback] Authentication error:', err);

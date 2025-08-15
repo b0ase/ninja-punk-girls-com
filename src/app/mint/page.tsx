@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNFTGenerator, NftFilter } from '@/hooks/useNFTGenerator';
-import { useHandCash } from '@/context/HandCashContext';
+import { useHandCashWallet } from '@/context/HandCashWalletContext';
 import { useNFTStore } from '@/context/NFTStoreContext';
 import NFTCanvas from '@/components/NFTCanvas';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -59,13 +59,10 @@ function MintPageContent(): React.ReactElement {
   // HandCash context
   const { 
     isConnected, 
-    authToken, 
-    connect, 
-    profile,
-    disconnect,
+    wallet,
     isLoading: isHandCashLoading, 
     error: handCashError 
-  } = useHandCash();
+  } = useHandCashWallet();
   
   // Ensure useNFTGenerator hook is called correctly and returns expected values
   const { availableAssets: nftGeneratorAvailableAssets, generateNewNFTData: nftGeneratorGenerateNewNFTData, isInitialized: isAssetsInitialized, assetLoadingProgress: nftGeneratorAssetLoadingProgress } = useNFTGenerator();
@@ -191,34 +188,31 @@ function MintPageContent(): React.ReactElement {
 
   // Fetch wallet balance
   const fetchWalletBalance = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsLoadingBalance(true);
     try {
-      const response = await fetch('/api/handcash/balance', { 
+      const response = await fetch('/api/handcash-wallet/balance', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ authToken })
+          body: JSON.stringify({ walletId: wallet.id })
        });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Failed to fetch balance');
       setWalletBalance(data);
     } catch (err) { console.error('Error fetching balance:', err); setWalletBalance(null); }
     finally { setIsLoadingBalance(false); }
-  }, [authToken]);
+  }, [wallet?.id]);
 
   // Fetch NPG balance (update function name potentially later, but keep for now)
   const fetchNpgBalance = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsLoadingNpgBalance(true);
     setWalletItems([]); // Reset the correct state
     try {
-      const response = await fetch('/api/handcash/collection', { 
+      const response = await fetch('/api/handcash-wallet/collection', { 
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`
-           },
-          body: JSON.stringify({})
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ walletId: wallet.id })
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Failed to fetch wallet items');
@@ -226,18 +220,18 @@ function MintPageContent(): React.ReactElement {
       setWalletItems(Array.isArray(data.items) ? data.items : []); 
     } catch (err) { console.error('Error fetching wallet items:', err); setWalletItems([]); } // Update log and state reset
     finally { setIsLoadingNpgBalance(false); }
-  }, [authToken]);
+  }, [wallet?.id]);
 
   // Load balances on connect
   useEffect(() => {
-    if (isConnected && authToken) {
+    if (isConnected && wallet?.id) {
       fetchWalletBalance();
       fetchNpgBalance();
     } else {
       setWalletBalance(null);
       setWalletItems([]); // Reset correct state
     }
-  }, [isConnected, authToken, fetchWalletBalance, fetchNpgBalance]);
+  }, [isConnected, wallet?.id, fetchWalletBalance, fetchNpgBalance]);
 
   // <<< Add useEffect for Progress Bar Simulation >>>
   useEffect(() => {
@@ -294,7 +288,7 @@ function MintPageContent(): React.ReactElement {
     setSingleMintApiStatus('idle');
     setSingleMintApiError(null);
     
-    if (!isConnected || !authToken) { console.log('Not connected...'); connect(); return; }
+    if (!isConnected || !wallet?.id) { console.log('Not connected...'); return; }
     if (!isInitialized || Object.keys(availableAssets).length === 0) { setError("Assets not loaded."); setStatus('error'); return; }
 
     let paymentSuccess = false;
@@ -310,7 +304,7 @@ function MintPageContent(): React.ReactElement {
       console.log(`[handleGenerate - ${caller}] Generated NFT Data:`, newNftData);
       
       setStatus('paying');
-      const userHandle = profile?.publicProfile?.handle;
+      const userHandle = wallet?.email?.split('@')[0];
       if (userHandle === 'boase') { // Keep skip logic if needed
         console.log(`[handleGenerate - ${caller}] Skipping payment for user: $boase`);
         paymentSuccess = true;
@@ -319,7 +313,7 @@ function MintPageContent(): React.ReactElement {
         const paymentResponse = await fetch('/api/handcash/pay', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ authToken, amount: currentPrice }),
+            body: JSON.stringify({ walletId: wallet?.id, amount: currentPrice }),
         });
         const paymentData = await paymentResponse.json();
         if (!paymentResponse.ok || !paymentData.success) throw new Error(paymentData.error || 'Payment failed.');
@@ -375,7 +369,7 @@ function MintPageContent(): React.ReactElement {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-              authToken: authToken, 
+              walletId: wallet?.id, 
               name: finalNFTDataForDisplay.name,
               imageUrl: finalNFTDataForDisplay.image,
               attributes: finalNFTDataForDisplay.attributes,
@@ -423,7 +417,7 @@ function MintPageContent(): React.ReactElement {
       setIsSpinning(false);
     }
   // Dependencies might need adjustment
-  }, [isConnected, authToken, profile, isInitialized, availableAssets, connect, generateNewNFTData, singleMintStatus, setSingleMintStatus, setSingleMintError, setSingleMintOrderId, setSingleMintApiStatus, setSingleMintApiError, isSpinning, setIsSpinning, setMintedNftOrigin]); 
+  }, [isConnected, wallet?.id, isInitialized, availableAssets, generateNewNFTData, singleMintStatus, setSingleMintStatus, setSingleMintError, setSingleMintOrderId, setSingleMintApiStatus, setSingleMintApiError, isSpinning, setIsSpinning, setMintedNftOrigin]); 
 
   // <<< REPURPOSED: handleMint - Single button click handler >>>
   const handleMint = useCallback(() => { 
@@ -519,7 +513,7 @@ function MintPageContent(): React.ReactElement {
 
   // <<< CONFIRM Handlers for Action Modals (contain API logic placeholders) >>>
   const handleSendConfirm = useCallback(async (recipient: string) => {
-    if (!nftToManage || !authToken) return;
+    if (!nftToManage || !wallet?.id) return;
     const origin = nftToManage.qrData; // Use qrData which should hold the origin
     if (!origin) { setActionError("NFT origin not found."); toast.error("NFT origin is missing."); return; }
     
@@ -529,7 +523,7 @@ function MintPageContent(): React.ReactElement {
       const response = await fetch('/api/handcash/send-nft', { // Assuming this is the endpoint
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ authToken, origin, recipientHandle: recipient }),
+          body: JSON.stringify({ walletId: wallet?.id, origin, recipientHandle: recipient }),
       });
       const result = await response.json();
       if (!response.ok || !result.success) {
@@ -546,12 +540,12 @@ function MintPageContent(): React.ReactElement {
     } finally {
         setIsProcessingAction(false);
     }
-  }, [nftToManage, authToken, fetchNpgBalance]);
+  }, [nftToManage, wallet?.id, fetchNpgBalance]);
 
   // <<< RESTORE handleListConfirm (with toast added) >>>
   const handleListConfirm = useCallback(async (price: number) => {
     console.log("[handleListConfirm] Initiated. NFT:", nftToManage, "Price:", price);
-    if (!nftToManage || !authToken || !listNFT) {
+    if (!nftToManage || !wallet?.id || !listNFT) {
       console.error("[handleListConfirm] Aborting: Missing required data or function.");
       toast.error("Listing function not available or missing data.");
       setActionError("Listing function not available or missing data.");
@@ -599,11 +593,11 @@ function MintPageContent(): React.ReactElement {
        console.log("[handleListConfirm] Setting isProcessingAction to false.");
        setIsProcessingAction(false);
     }
-  }, [nftToManage, authToken, listNFT]);
+  }, [nftToManage, wallet?.id, listNFT]);
 
   // <<< Uncommented: Handle Burn Confirmation >>>
   const handleBurnConfirm = useCallback(async () => {
-    if (!nftToManage || !authToken) return;
+    if (!nftToManage || !wallet?.id) return;
     const origin = nftToManage.qrData;
     if (!origin) { setActionError("NFT origin not found."); toast.error("NFT origin is missing."); return; }
 
@@ -613,7 +607,7 @@ function MintPageContent(): React.ReactElement {
       const response = await fetch('/api/handcash/burn-nft', { // Assuming endpoint
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ authToken, origin }),
+          body: JSON.stringify({ walletId: wallet?.id, origin }),
       });
       const result = await response.json();
       if (!response.ok || !result.success) {
@@ -630,12 +624,12 @@ function MintPageContent(): React.ReactElement {
     } finally {
         setIsProcessingAction(false);
     }
-  }, [nftToManage, authToken, fetchNpgBalance]);
+  }, [nftToManage, wallet?.id, fetchNpgBalance]);
 
   // <<< Uncommented: Handle Melt Confirmation >>>
   const handleMeltConfirm = useCallback(async () => {
     // Use the confirmed origin stored in state
-    if (!mintedNftOrigin || !nftToManage || !authToken || nftToManage.qrData !== mintedNftOrigin) {
+    if (!mintedNftOrigin || !nftToManage || !wallet?.id || nftToManage.qrData !== mintedNftOrigin) {
       toast.error("Cannot confirm melt: Invalid state or data mismatch.");
       return;
     }
@@ -657,7 +651,7 @@ function MintPageContent(): React.ReactElement {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`, // Use Authorization header if API expects it
+          'Authorization': `Bearer ${wallet?.id}`, // Use Authorization header if API expects it
         },
         body: JSON.stringify({ nftId: mintedNftOrigin }), // Use the confirmed origin
       });
@@ -693,7 +687,7 @@ function MintPageContent(): React.ReactElement {
     } finally {
         setNftToManage(null); // Clear managed NFT after attempt
     }
-  }, [nftToManage, authToken, mintedNftOrigin, fetchNpgBalance, fetchWalletBalance, router]); // Added router to dependencies
+  }, [nftToManage, wallet?.id, mintedNftOrigin, fetchNpgBalance, fetchWalletBalance, router]); // Added router to dependencies
 
   
   const handleCloseSummaryModal = () => {
@@ -784,12 +778,12 @@ function MintPageContent(): React.ReactElement {
                    </svg>
                     Your Wallet
                  </h3>
-                 {isConnected && profile ? (
+                                   {isConnected && wallet ? (
                    <div className="space-y-3">
                       <div className="border-b border-gray-700/50 pb-3 mb-3">
                           <p className="text-gray-400 text-xs mb-1">Receive NPG Tokens & BSV at:</p>
-                          <p className="font-mono text-green-400 break-all cursor-pointer" title="Click to copy" onClick={() => navigator.clipboard.writeText(`$${profile.publicProfile.handle}`)}>
-                              ${profile.publicProfile.handle}
+                          <p className="font-mono text-green-400 break-all cursor-pointer" title="Click to copy"                 onClick={() => navigator.clipboard.writeText(`$${wallet?.email?.split('@')[0] || 'user'}`)}>
+                ${wallet?.email?.split('@')[0] || 'user'}
                           </p>
                       </div>
                       

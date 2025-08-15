@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { NFTType, StatsType, NFTAttribute } from '@/types';
 import { EXCLUDED_LAYERS } from '@/data/layer-config';
-import { useHandCash } from '@/context/HandCashContext';
+import { useHandCashWallet } from '@/context/HandCashWalletContext';
 
 interface NFTSummaryProps {
   nft: { 
@@ -21,7 +21,7 @@ const createEmptyStats = (): StatsType => ({
 });
 
 export default function NFTSummary({ nft }: NFTSummaryProps) {
-  const { profile } = useHandCash();
+  const { wallet } = useHandCashWallet();
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = (text: string) => {
@@ -103,15 +103,15 @@ export default function NFTSummary({ nft }: NFTSummaryProps) {
           <div>
             <span className="text-gray-400">Series:</span> {nft.series}
           </div>
-          {profile?.publicProfile?.publicKey && (
+          {wallet?.id && (
             <div className="sm:col-span-2">
-              <span className="text-gray-400">Owner Public Key:</span>
+              <span className="text-gray-400">Owner Wallet ID:</span>
               <div className="flex items-center space-x-2 mt-1">
-                <span className="font-mono text-xs break-all">{profile.publicProfile.publicKey}</span>
+                <span className="font-mono text-xs break-all">{wallet.id}</span>
                 <button 
-                  onClick={() => copyToClipboard(profile.publicProfile.publicKey || '')} 
+                  onClick={() => copyToClipboard(wallet.id || '')} 
                   className="p-1 bg-gray-700 hover:bg-gray-600 rounded text-gray-300 transition-colors"
-                  title="Copy Public Key"
+                  title="Copy Wallet ID"
                 >
                   {copied ? (
                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

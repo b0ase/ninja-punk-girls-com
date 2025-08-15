@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNFTStore } from '@/context/NFTStoreContext';
-import { useHandCash } from '@/context/HandCashContext';
+import { useHandCashWallet } from '@/context/HandCashWalletContext';
 import { supabase } from '@/lib/supabaseClient';
 import NFTCanvas from '@/components/NFTCanvas';
 import NFTSummary from '@/components/NFTSummary';
@@ -38,7 +38,7 @@ const getListingNftType = (item: MarketListing): 'npg' | 'erobot' | 'mix' => {
 };
 
 export default function MarketPage() {
-  const { profile } = useHandCash();
+  const { wallet } = useHandCashWallet();
   const { delistNFT } = useNFTStore();
 
   const [allListings, setAllListings] = useState<MarketListing[]>([]);
@@ -83,7 +83,7 @@ export default function MarketPage() {
     fetchAllListings();
   }, [fetchAllListings]);
 
-  const userHandle = profile?.publicProfile?.handle;
+  const userHandle = wallet?.email?.split('@')[0];
 
   const myListings = useMemo(() => {
     if (!userHandle) return [];

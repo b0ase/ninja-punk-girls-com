@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useHandCash } from '@/context/HandCashContext';
+import { useHandCashWallet } from '@/context/HandCashWalletContext';
 
 // Define type for generation history items
 interface GenerationHistoryItem {
@@ -148,7 +148,7 @@ const presetPrompts: Record<string, PromptTemplate> = {
 
 // Pass props to the component function
 const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesId }) => {
-  const { profile, authToken } = useHandCash();
+  const { isConnected, wallet, isLoading: isHandCashLoading, error: handCashError } = useHandCashWallet();
   const [prompt, setPrompt] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -160,7 +160,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
   
   // <<< Function to fetch saved backgrounds >>>
   const fetchSavedBackgrounds = useCallback(async () => {
-    if (!authToken) return; // Don't fetch if not logged in
+    if (!wallet?.id) return; // Don't fetch if not logged in
 
     setIsFetchingSaved(true);
     setFetchSavedError(null);
@@ -170,7 +170,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
       const response = await fetch('/api/save-background', { // Use the GET endpoint
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${authToken}` // Pass auth token
+          'Authorization': `Bearer ${wallet?.id}` // Pass wallet ID
         },
       });
       const result = await response.json();
@@ -189,7 +189,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
     } finally {
       setIsFetchingSaved(false);
     }
-  }, [authToken]);
+  }, [wallet?.id]);
 
   // <<< Fetch saved backgrounds on mount or when auth changes >>>
   useEffect(() => {
@@ -198,7 +198,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
 
   const handleGenerate = async () => {
     // <<< Temporarily bypass HandCash check >>>
-    // if (!profile || !authToken) {
+    // if (!wallet?.id) {
     //   setError('Please connect your HandCash wallet first.');
     //   return;
     // }
@@ -216,7 +216,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-              authToken: authToken!, // We would have checked authToken above
+              walletId: wallet?.id!, // We would have checked wallet?.id above
               payments: [{
                   destination: 'ninjapunkgirls',
                   currencyCode: 'BSV',
@@ -285,7 +285,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
     const originalPromptUsed = itemToSave.prompt; 
 
     if (!itemToSave || itemToSave.isSaving || itemToSave.supabaseUrl) return;
-    if (!authToken) {
+    if (!wallet?.id) {
        // Handle case where user might have logged out before saving
        setGenerationHistory(prev => 
          prev.map((item, i) => i === index ? { ...item, saveError: 'Authentication token missing. Please re-login.' } : item)
@@ -303,7 +303,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
             method: 'POST',
             headers: {
                  'Content-Type': 'application/json',
-                 'Authorization': `Bearer ${authToken}` // Include auth token for the POST request
+                 'Authorization': `Bearer ${wallet?.id}` // Include auth token for the POST request
             },
             body: JSON.stringify({
                 imageData: itemToSave.imageData,
@@ -336,7 +336,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
          prev.map((item, i) => i === index ? { ...item, isSaving: false, saveError: error.message || 'Unknown save error' } : item)
        );
     }
-  }, [generationHistory, selectedSeriesId, authToken, fetchSavedBackgrounds]); // Added dependencies
+  }, [generationHistory, selectedSeriesId, wallet?.id, fetchSavedBackgrounds]); // Added dependencies
 
   // <<< Handler for Preset Button Click >>>
   const handlePresetClick = (presetKey: string) => {
@@ -397,7 +397,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
             onClick={handleGenerate}
             disabled={isLoading || !prompt.trim()}
             className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-5 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title={!profile || !authToken ? "Connect HandCash wallet first (Payment bypassed for now)" : undefined}
+            title={!wallet?.id ? "Connect HandCash wallet first (Payment bypassed for now)" : undefined}
           >
             {isLoading ? 'Processing...' : 'Generate Background (0.001 BSV)'}
           </button>
@@ -406,7 +406,7 @@ const BackgroundDesigner: React.FC<BackgroundDesignerProps> = ({ selectedSeriesI
           {error && (
             <p className="text-red-500 text-sm bg-red-900/30 p-2 rounded mt-4">Error: {error}</p>
           )}
-          {!profile && (
+          {!wallet?.id && (
              <p className="text-yellow-500 text-sm bg-yellow-900/30 p-2 rounded mt-4">Connect HandCash to generate images (Payment bypassed for now).</p>
           )}
 

@@ -18,8 +18,8 @@ import { ChainProvider } from '@/context/ChainContext';
 // import { injected } from 'wagmi/connectors';
 // import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// === ADDED HandCash Context Import ===
-import { HandCashProvider } from '@/context/HandCashContext';
+// === ADDED HandCash White-label Wallet Context Import ===
+import { HandCashWalletProvider } from '@/context/HandCashWalletContext';
 
 // === ADDED AuthContext Import ===
 import { AuthProvider } from '@/context/AuthContext';
@@ -56,7 +56,7 @@ export function AppProviders({ children }: AppProvidersProps) {
     //   <QueryClientProvider client={queryClient}>
         <ChainProvider>
           <AuthProvider>
-            <HandCashProvider>
+            <HandCashWalletProvider>
               <LayerManagerProvider>
                 {/* <ConnectionProvider endpoint={endpoint}> */}
                 {/*   <WalletProvider wallets={wallets} autoConnect> */}
@@ -68,7 +68,7 @@ export function AppProviders({ children }: AppProvidersProps) {
                 {/*   </WalletProvider> */}
                 {/* </ConnectionProvider> */}
               </LayerManagerProvider>
-            </HandCashProvider>
+            </HandCashWalletProvider>
           </AuthProvider>
         </ChainProvider>
     //   </QueryClientProvider>

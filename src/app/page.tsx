@@ -1,8 +1,15 @@
 'use client';
 
 import Image from 'next/image'
+import { useHandCashWallet } from '@/context/HandCashWalletContext'
+import { WalletCreator } from '@/components/WalletCreator'
+import { WalletStatus } from '@/components/WalletStatus'
+import { useRouter } from 'next/navigation'
 
 export default function LandingPage() {
+  const router = useRouter()
+  const { isConnected, wallet, isLoading, error } = useHandCashWallet()
+  
   // All sample cards from the directory
   const sampleCards = [
     'card_0026_Miwako.jpg', 'card_0104_Seisa.jpg', 'card_0116_Shidzuku.jpg',
@@ -73,25 +80,8 @@ export default function LandingPage() {
             <h1 className="font-cyberpunk-italic text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[12rem] text-white relative z-10 drop-shadow-2xl px-8 py-2" 
                 style={{
                   textShadow: '0 0 20px rgba(236, 72, 153, 0.8), 0 0 40px rgba(168, 85, 247, 0.6), 0 0 60px rgba(236, 72, 153, 0.4)',
-                  WebkitTextStroke: '3px #ec4899',
-                  textStroke: '3px #ec4899'
+                  WebkitTextStroke: '2px #ec4899'
                 }}>
-              <span style={{
-                WebkitTextStroke: '6px #7c3aed',
-                textStroke: '6px #7c3aed',
-                position: 'absolute',
-                left: '0',
-                top: '0',
-                zIndex: -1
-              }}>NINJA PUNK GIRLS</span>
-              <span style={{
-                WebkitTextStroke: '9px #1f2937',
-                textStroke: '9px #1f2937',
-                position: 'absolute',
-                left: '0',
-                top: '0',
-                zIndex: -2
-              }}>NINJA PUNK GIRLS</span>
               NINJA PUNK GIRLS
             </h1>
             <h2 className="font-mono text-sm sm:text-base md:text-lg lg:text-xl text-pink-300 relative z-10 drop-shadow-xl px-8 py-1 font-bold tracking-wider" 
@@ -101,12 +91,13 @@ export default function LandingPage() {
               VS THE EVIL EROBOTS
             </h2>
             
-            {/* HandCash Sign In Button */}
+            {/* HandCash White-label Wallet Logic */}
             <div className="mt-8 pointer-events-auto">
-              <button className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white font-bold py-4 px-8 rounded-xl text-xl shadow-2xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group">
-                <span className="relative z-10">SIGN IN WITH HANDCASH</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
+              {isConnected ? (
+                <WalletStatus onDisconnect={() => {}} />
+              ) : (
+                <WalletCreator onWalletCreated={() => {}} />
+              )}
             </div>
           </div>
         </div>

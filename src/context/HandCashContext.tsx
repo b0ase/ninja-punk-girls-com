@@ -30,7 +30,7 @@ export const HandCashProvider = ({ children }: { children: ReactNode }) => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [profile, setProfile] = useState<HandCashProfile | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
   const supabase = createClientComponentClient();
@@ -136,11 +136,19 @@ export const HandCashProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     
-    // Build HandCash OAuth URL
-    const handcashAuthUrl = `https://app.handcash.io/connect/${appId}?redirectUrl=${encodeURIComponent(redirectUrl)}`;
+    // Build HandCash OAuth URL - using the correct format from official documentation
+    const handcashAuthUrl = `https://app.handcash.io/#/authorizeApp?appId=${appId}&redirectUrl=${encodeURIComponent(redirectUrl)}`;
     
     // Redirect to HandCash
-    window.location.href = handcashAuthUrl;
+    console.log(`[HandCashContext] Redirecting to: ${handcashAuthUrl}`);
+    
+    // Add error handling for the redirect
+    try {
+      window.location.href = handcashAuthUrl;
+    } catch (error) {
+      console.error('[HandCashContext] Redirect failed:', error);
+      setError('Failed to redirect to HandCash. Please check your app configuration.');
+    }
   }, []);
 
   const disconnect = useCallback(async () => {

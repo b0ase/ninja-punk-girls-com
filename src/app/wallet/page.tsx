@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useHandCash } from '@/context/HandCashContext';
+import { useHandCashWallet } from '@/context/HandCashWalletContext';
 import { useNFTStore } from '@/context/NFTStoreContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import Link from 'next/link';
@@ -141,7 +141,7 @@ function WalletPageContent(): JSX.Element {
   // Moved hooks to the top to comply with Rules of Hooks
 
   // Context Hooks
-  const { isConnected, authToken, profile, isLoading: isHandCashLoading } = useHandCash();
+  const { isConnected, wallet, isLoading: isHandCashLoading } = useHandCashWallet();
   const { listNFT, listedNFTs, delistNFT } = useNFTStore();
   const router = useRouter(); // Add this hook call
 
@@ -332,7 +332,7 @@ function WalletPageContent(): JSX.Element {
 
   // Update the fetchElementCards function to also set loading state
   const fetchElementCards = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     
     console.log('[WalletPage] Fetching element cards...');
     
@@ -343,7 +343,7 @@ function WalletPageContent(): JSX.Element {
       const response = await fetch('/api/handcash/get-elements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ authToken }),
+        body: JSON.stringify({ walletId: wallet?.id }),
       });
       
       if (!response.ok) {
@@ -380,7 +380,7 @@ function WalletPageContent(): JSX.Element {
     } finally {
       setIsLoadingElements(false);
     }
-  }, [authToken, setElementCards, setIsLoadingElements]);
+  }, [wallet?.id, setElementCards, setIsLoadingElements]);
 
   // ============================================
 
@@ -433,7 +433,7 @@ function WalletPageContent(): JSX.Element {
 
   // Token Management Functions
   const fetchTokenBalance = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsTokenBalanceLoading(true);
     console.log("[WalletPage] TODO: Implement API call to fetch $NINJAPUNKGIRLS balance.");
     // Example:
@@ -447,13 +447,13 @@ function WalletPageContent(): JSX.Element {
       setTokenBalance(12345.67); // Example Balance
       setIsTokenBalanceLoading(false);
     }, 1000);
-  }, [authToken]);
+  }, [wallet?.id]);
 
   const handleSendToken = useCallback(async () => {
     setSendTokenError(null);
     setSendTokenSuccess(null);
     const amount = parseFloat(sendAmount);
-    if (!authToken || !recipientHandle.trim() || isNaN(amount) || amount <= 0) {
+    if (!wallet?.id || !recipientHandle.trim() || isNaN(amount) || amount <= 0) {
       setSendTokenError("Invalid recipient handle or amount.");
       return;
     }
@@ -461,7 +461,7 @@ function WalletPageContent(): JSX.Element {
     console.log(`[WalletPage] TODO: Implement API call to send ${amount} $NINJAPUNKGIRLS to ${recipientHandle}.`);
     // Example:
     // try {
-    //    const response = await fetch('/api/handcash/send-token', { body: JSON.stringify({ authToken, recipientHandle, amount, tokenId: 'YOUR_TOKEN_ID' }) ... });
+    //    const response = await fetch('/api/handcash/send-token', { body: JSON.stringify({ wallet?.id, recipientHandle, amount, tokenId: 'YOUR_TOKEN_ID' }) ... });
     //    const data = await response.json();
     //    if (!data.success) throw new Error(data.error);
     //    setSendTokenSuccess(`Sent ${amount} $NPG. Tx: ${data.transactionId?.substring(0, 8)}...`);
@@ -474,7 +474,7 @@ function WalletPageContent(): JSX.Element {
        fetchTokenBalance(); // Simulate balance update
        setIsSendingToken(false);
     }, 1500);
-  }, [authToken, recipientHandle, sendAmount, fetchTokenBalance]);
+  }, [wallet?.id, recipientHandle, sendAmount, fetchTokenBalance]);
 
   // Fetch Owned NFTs function
   const fetchOwnedNfts = useCallback(async (page: number, limit: number | string) => {
@@ -523,9 +523,9 @@ function WalletPageContent(): JSX.Element {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}` // <<< ADD Header
+            'Authorization': `Bearer ${wallet?.id}` // <<< ADD Header
           },
-          body: JSON.stringify({ limit: effectiveLimit, offset }) // <<< REMOVE authToken from body
+          body: JSON.stringify({ limit: effectiveLimit, offset }) // <<< REMOVE wallet?.id from body
       });
       const data = await response.json();
       
@@ -571,11 +571,11 @@ function WalletPageContent(): JSX.Element {
         setCanLoadMore(false);
     }
     finally { setIsLoadingOwnedNfts(false); }
-  }, [authToken, setOwnedNftItems, setIsLoadingOwnedNfts, setCurrentPage, setCanLoadMore, setItemsPerPage, listedNFTs, isShowingAll]); // <<< Add listedNFTs dependency
+  }, [wallet?.id, setOwnedNftItems, setIsLoadingOwnedNfts, setCurrentPage, setCanLoadMore, setItemsPerPage, listedNFTs, isShowingAll]); // <<< Add listedNFTs dependency
 
   // Fetch ALL owned NFTs (up to max limit for filtering)
   const fetchAllOwnedNfts = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsLoadingAllNfts(true);
     console.log(`[WalletPage FILTER DEBUG] ===> Fetching ALL owned NFTs for global search (Limit: 100)...`); // Updated log
 
@@ -584,7 +584,7 @@ function WalletPageContent(): JSX.Element {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}` // <<< ADD Header
+            'Authorization': `Bearer ${wallet?.id}` // <<< ADD Header
           },
           body: JSON.stringify({ limit: 100, offset: 0 }) // <<< CHANGED Limit to 100
       });
@@ -620,11 +620,11 @@ function WalletPageContent(): JSX.Element {
       console.error('[WalletPage FILTER DEBUG] ===> Error fetching all owned NFTs:', err);
       setAllNfts([]);
     } finally { setIsLoadingAllNfts(false); }
-  }, [authToken, setAllNfts, setIsLoadingAllNfts, listedNFTs]); // <<< Add listedNFTs dependency
+  }, [wallet?.id, setAllNfts, setIsLoadingAllNfts, listedNFTs]); // <<< Add listedNFTs dependency
 
   // Fetch Friends List Function
   const fetchFriendsList = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsLoadingFriends(true);
     setFriendsListError(null);
     console.log("[WalletPage] Fetching HandCash friends list...");
@@ -635,7 +635,7 @@ function WalletPageContent(): JSX.Element {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}` // <<< ADD Header
+          'Authorization': `Bearer ${wallet?.id}` // <<< ADD Header
         },
         body: JSON.stringify({}) // Sending empty body as POST often requires it
       });
@@ -657,11 +657,11 @@ function WalletPageContent(): JSX.Element {
     } finally {
       setIsLoadingFriends(false);
     }
-  }, [authToken]);
+  }, [wallet?.id]);
 
   // <<< DEFINE fetchNpgStackWallet BEFORE the useEffect that uses it >>>
   const fetchOrCreateStackWallet = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     console.log("[WalletPage] Fetching NPG Wallet details...");
     
     // Use state variables to track loading
@@ -679,7 +679,7 @@ function WalletPageContent(): JSX.Element {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ authToken })
+        body: JSON.stringify({ walletId: wallet?.id })
       });
       
       const data = await response.json();
@@ -700,7 +700,7 @@ function WalletPageContent(): JSX.Element {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ 
-            authToken,
+            walletId: wallet?.id,
             publicKey: data.publicKey 
           })
         });
@@ -724,13 +724,13 @@ function WalletPageContent(): JSX.Element {
     } finally {
       setIsLoadingStackWallet(false);
     }
-  }, [authToken, setTokenBalance]);
+  }, [wallet?.id, setTokenBalance]);
   // <<< End function definition >>>
 
   // Load Balances, NFTs, and Friends on Connect
   useEffect(() => {
-    if (authToken) {
-      console.log("[DEBUG ShowAll] useEffect[authToken] triggered. Fetching initial page.");
+    if (wallet?.id) {
+      console.log("[DEBUG ShowAll] useEffect[wallet?.id] triggered. Fetching initial page.");
       const initialLimit = typeof itemsPerPage === 'number' ? itemsPerPage : lastNumericItemsPerPage;
       fetchOwnedNfts(1, initialLimit);
       fetchAllOwnedNfts(); // Fetch all for global search
@@ -739,12 +739,12 @@ function WalletPageContent(): JSX.Element {
       fetchOrCreateStackWallet(); // Fetch NPG Stack Wallet details
       fetchElementCards(); // Fetch Element cards
     }
-  }, [authToken, fetchOwnedNfts, fetchAllOwnedNfts, fetchFriendsList, fetchOrCreateStackWallet, fetchElementCards, itemsPerPage, lastNumericItemsPerPage]); // <<< Ensure all callbacks are deps
+  }, [wallet?.id, fetchOwnedNfts, fetchAllOwnedNfts, fetchFriendsList, fetchOrCreateStackWallet, fetchElementCards, itemsPerPage, lastNumericItemsPerPage]); // <<< Ensure all callbacks are deps
 
   // Fetch token balance
   useEffect(() => {
     const fetchTokenBalance = async () => {
-      if (!authToken) return;
+      if (!wallet?.id) return;
       setIsTokenBalanceLoading(true);
       setTokenBalance(null); // Clear previous balance
       console.log('[WalletPage] TODO: Implement API call to fetch $NINJAPUNKGIRLS balance.');
@@ -767,14 +767,14 @@ function WalletPageContent(): JSX.Element {
         setIsTokenBalanceLoading(false);
       }
     };
-    if (authToken) {
+    if (wallet?.id) {
       fetchTokenBalance();
     }
-  }, [authToken]);
+  }, [wallet?.id]);
 
   // <<< ADD fetchWalletBalance useCallback definition >>>
   const fetchWalletBalance = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsLoadingBalance(true);
     setWalletBalance(null); // Clear previous balance
     console.log('[WalletPage] Fetching BSV wallet balance...');
@@ -783,7 +783,7 @@ function WalletPageContent(): JSX.Element {
         method: 'POST', // Or GET, depending on your API design
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
+          'Authorization': `Bearer ${wallet?.id}`
         },
         body: JSON.stringify({}) // Include body if needed, e.g., for POST
       });
@@ -801,14 +801,14 @@ function WalletPageContent(): JSX.Element {
     } finally {
       setIsLoadingBalance(false);
     }
-  }, [authToken]); // <<< REMOVED setIsLoadingBalance, setWalletBalance from dependencies
+  }, [wallet?.id]); // <<< REMOVED setIsLoadingBalance, setWalletBalance from dependencies
 
   // Fetch BSV balance - <<< UNCOMMENTED and ADDED CALL >>>
   useEffect(() => {
-    if (authToken) {
+    if (wallet?.id) {
       fetchWalletBalance();
     }
-  }, [authToken, fetchWalletBalance]); // <<< Added fetchWalletBalance to dependencies
+  }, [wallet?.id, fetchWalletBalance]); // <<< Added fetchWalletBalance to dependencies
 
   // Update lastNumericItemsPerPage when itemsPerPage changes to a number
   useEffect(() => {
@@ -820,16 +820,16 @@ function WalletPageContent(): JSX.Element {
   // Refetch NFTs when listedNFTs context changes (if not showing all)
   useEffect(() => {
     console.log("[DEBUG List UI] Context listedNFTs state changed:", listedNFTs);
-    if (!isShowingAll && authToken) {
+    if (!isShowingAll && wallet?.id) {
       console.log("[DEBUG List UI] Refetching current page due to listedNFTs change.");
       const currentLimit = typeof itemsPerPage === 'number' ? itemsPerPage : lastNumericItemsPerPage;
       fetchOwnedNfts(currentPage, currentLimit);
     }
-    if (isGlobalSearch && authToken) {
+    if (isGlobalSearch && wallet?.id) {
        console.log("[DEBUG List UI] Refetching all owned NFTs due to listedNFTs change (global search active).");
        fetchAllOwnedNfts();
     }
-  }, [listedNFTs, isShowingAll, isGlobalSearch, authToken, currentPage, itemsPerPage, lastNumericItemsPerPage, fetchOwnedNfts, fetchAllOwnedNfts]);
+  }, [listedNFTs, isShowingAll, isGlobalSearch, wallet?.id, currentPage, itemsPerPage, lastNumericItemsPerPage, fetchOwnedNfts, fetchAllOwnedNfts]);
 
   // *** UPDATED Handlers ***
   const handleShowAll = useCallback(() => {
@@ -893,7 +893,7 @@ function WalletPageContent(): JSX.Element {
 
   const handleSendNFT = useCallback(async (itemIdentifier: string) => {
     const recipientHandle = sendRecipientHandles[itemIdentifier]?.trim();
-    if (!authToken || !recipientHandle || !recipientHandle.startsWith('$')) {
+    if (!wallet?.id || !recipientHandle || !recipientHandle.startsWith('$')) {
       setItemActionError(prev => ({ ...prev, [itemIdentifier]: 'Invalid recipient handle (must start with $).' }));
       setTimeout(() => setItemActionError(prev => ({ ...prev, [itemIdentifier]: null })), 3000);
       return;
@@ -917,7 +917,7 @@ function WalletPageContent(): JSX.Element {
       const response = await fetch('/api/handcash/send-nft', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ authToken, nftId: nftIdToSend, recipientHandle }),
+                  body: JSON.stringify({ walletId: wallet?.id, nftId: nftIdToSend, recipientHandle }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Failed to send NFT.');
@@ -938,7 +938,7 @@ function WalletPageContent(): JSX.Element {
     } finally {
       setIsSendingNFT(prev => ({ ...prev, [itemIdentifier]: false }));
     }
-  }, [authToken, sendRecipientHandles, ownedNftItems, fetchOwnedNfts, isShowingAll, itemsPerPage, lastNumericItemsPerPage, currentPage]);
+  }, [wallet?.id, sendRecipientHandles, ownedNftItems, fetchOwnedNfts, isShowingAll, itemsPerPage, lastNumericItemsPerPage, currentPage]);
   // <<< End Add Handlers >>>
 
   // Memoize listed identifiers for quick lookup
@@ -1156,7 +1156,7 @@ function WalletPageContent(): JSX.Element {
   /*
   const handleMeltNFT = useCallback(async (itemIdentifier: string) => {
     // ... Entire function content removed ... 
-  }, [authToken, isMeltingNFT, listedNFTs, itemsPerPage, lastNumericItemsPerPage, currentPage, fetchOwnedNfts, fetchAllOwnedNfts, elementCards]);
+  }, [wallet?.id, isMeltingNFT, listedNFTs, itemsPerPage, lastNumericItemsPerPage, currentPage, fetchOwnedNfts, fetchAllOwnedNfts, elementCards]);
   */
    
   // <<< Function to OPEN Melt Confirmation Modal >>>
@@ -1169,7 +1169,7 @@ function WalletPageContent(): JSX.Element {
       setTimeout(() => setItemActionError(prev => ({ ...prev, [itemIdentifier]: null })), 3000);
       return;
     }
-    if (!authToken) {
+    if (!wallet?.id) {
       toast.error('Authentication token missing. Please reconnect wallet.');
       setItemActionError(prev => ({ ...prev, [itemIdentifier]: 'Authentication token missing.' }));
        setTimeout(() => setItemActionError(prev => ({ ...prev, [itemIdentifier]: null })), 3000);
@@ -1189,12 +1189,12 @@ function WalletPageContent(): JSX.Element {
     // Clear any previous action messages for this item
     setItemActionError(prev => ({ ...prev, [itemIdentifier]: null }));
     setItemActionSuccess(prev => ({ ...prev, [itemIdentifier]: null }));
-  }, [authToken, listedNFTs, meltApiStatus, ownedNftItems]);
+  }, [wallet?.id, listedNFTs, meltApiStatus, ownedNftItems]);
 
   // <<< Execute Burn Logic (Moved from handleBurnNFT) >>>
   const executeBurn = useCallback(async () => {
     if (!itemToConfirmBurn) return; // Ensure we have an item identifier
-    if (!authToken) {
+    if (!wallet?.id) {
         console.error("[WalletPage] executeBurn failed: No auth token.");
         setBurnError('Authentication token missing.');
         setIsBurnConfirmOpen(false); 
@@ -1217,7 +1217,7 @@ function WalletPageContent(): JSX.Element {
       const response = await fetch('/api/handcash/burn-nft', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ authToken, itemOrigin }), 
+                  body: JSON.stringify({ walletId: wallet?.id, itemOrigin }), 
       });
 
       // <<< START Debugging Block >>>
@@ -1278,7 +1278,7 @@ function WalletPageContent(): JSX.Element {
        }, 3000); 
     }
   }, [
-    authToken, 
+    wallet?.id, 
     itemToConfirmBurn, 
     burningItemId,
     fetchOwnedNfts, 
@@ -1293,7 +1293,7 @@ function WalletPageContent(): JSX.Element {
 
   // <<< Add NPG Stack Wallet Creation Function >>>
   const handleCreateNpgStackWallet = useCallback(async () => {
-    if (!authToken || !profile) {
+    if (!wallet?.id) {
       setStackWalletError("HandCash connection required.");
       toast.error("HandCash connection required");
       return;
@@ -1306,7 +1306,7 @@ function WalletPageContent(): JSX.Element {
     setShowStackWalletDetails(false);
     setShowPrivateKeyQR(false);
     
-    console.log("[NPG Wallet] Creating $NPG Wallet for HandCash user:", profile.publicProfile.handle);
+            console.log("[NPG Wallet] Creating $NPG Wallet for HandCash user:", wallet?.email);
     
     try {
       // Step 1: Request HandCash to sign our unique message
@@ -1314,14 +1314,14 @@ function WalletPageContent(): JSX.Element {
       
       // The message to sign should be unique to NPG and include the user's handle
       // so keys are deterministic but tied to their specific HandCash account
-      const messageToSign = `NPG-Wallet-${profile.publicProfile.handle}-v1`;
+              const messageToSign = `NPG-Wallet-${wallet?.email?.split('@')[0] || 'user'}-v1`;
       
       // This would be your actual API call to request a signature from HandCash
       const signatureResponse = await fetch('/api/handcash/sign-message', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
+          'Authorization': `Bearer ${wallet?.id}`
         },
         body: JSON.stringify({ message: messageToSign })
       });
@@ -1371,11 +1371,11 @@ function WalletPageContent(): JSX.Element {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
+          'Authorization': `Bearer ${wallet?.id}`
         },
         body: JSON.stringify({ 
           publicKey: keysData.publicKey,
-          handcashHandle: profile.publicProfile.handle,
+          handcashHandle: wallet?.email,
           isPrimary: true // Mark this as the primary wallet
         })
       });
@@ -1391,7 +1391,7 @@ function WalletPageContent(): JSX.Element {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          authToken,
+          walletId: wallet?.id,
           publicKey: keysData.publicKey
         })
       });
@@ -1405,7 +1405,7 @@ function WalletPageContent(): JSX.Element {
       }
       
       toast.success("$NPG Wallet created successfully!", { id: "stack-wallet-creation" });
-      console.log("[NPG Wallet] Wallet created and registered for:", profile.publicProfile.handle);
+              console.log("[NPG Wallet] Wallet created and registered for:", wallet?.email);
       
     } catch (error: any) {
       console.error("[NPG Wallet] Error creating wallet:", error);
@@ -1414,7 +1414,7 @@ function WalletPageContent(): JSX.Element {
     } finally {
       setIsCreatingStackWallet(false);
     }
-  }, [authToken, profile, setTokenBalance]);
+  }, [wallet?.id, setTokenBalance]);
   // <<< End NPG Stack Wallet Creation Function >>>
 
   // <<< Backup Handlers (will use simulated keys now) >>>
@@ -1428,7 +1428,7 @@ function WalletPageContent(): JSX.Element {
   };
 
   const handleDownloadKeyFile = useCallback(() => {
-    if (!npgStackPublicKey || !npgStackPrivateKeyWIF || !profile) return;
+    if (!npgStackPublicKey || !npgStackPrivateKeyWIF || !wallet?.id) return;
     
     try {
       // Create a BSV wallet export format with proper metadata
@@ -1439,7 +1439,7 @@ function WalletPageContent(): JSX.Element {
         public_key: npgStackPublicKey,
         private_key_wif: npgStackPrivateKeyWIF,
         address: "", // This would be derived from the public key in production
-        user_handle: profile.publicProfile.handle,
+        user_handle: wallet?.email,
         handcash_linked: true,
         created_from: "HandCash Signature",
         backup_date: new Date().toISOString(),
@@ -1450,7 +1450,7 @@ function WalletPageContent(): JSX.Element {
       
       // Generate a filename with timestamp and handle
       const walletTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const sanitizedHandle = profile.publicProfile.handle.replace(/[^a-zA-Z0-9]/g, '_');
+              const sanitizedHandle = (wallet?.email?.split('@')[0] || 'user').replace(/[^a-zA-Z0-9]/g, '_');
       const walletFilename = `npg_stack_wallet_${sanitizedHandle}_${walletTimestamp}.json`;
       
       // Create a Blob with the JSON data
@@ -1478,12 +1478,12 @@ function WalletPageContent(): JSX.Element {
       console.error("[StackWallet] Error downloading wallet backup:", error);
       toast.error("Failed to download wallet backup");
     }
-  }, [npgStackPublicKey, npgStackPrivateKeyWIF, profile]);
+  }, [npgStackPublicKey, npgStackPrivateKeyWIF, wallet?.id]);
   // <<< End Backup Handlers >>>
 
   // --- Burn All Logic (Existing) ---
   const handleBurnAllConfirm = useCallback(async () => {
-    if (!authToken) {
+    if (!wallet?.id) {
       toast.error("Authentication token is missing.");
       return;
     }
@@ -1503,7 +1503,7 @@ function WalletPageContent(): JSX.Element {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
+          'Authorization': `Bearer ${wallet?.id}`,
         },
         body: JSON.stringify({ origins: identifiersToBurn }), // Assuming API expects 'origins'
       });
@@ -1523,7 +1523,7 @@ function WalletPageContent(): JSX.Element {
     } finally {
       setIsBurningAll(false);
     }
-  }, [authToken, fetchOwnedNfts, lastNumericItemsPerPage, filteredAndSortedItems]); // NEW: Add filteredAndSortedItems to deps
+  }, [wallet?.id, fetchOwnedNfts, lastNumericItemsPerPage, filteredAndSortedItems]); // NEW: Add filteredAndSortedItems to deps
 
   const handleCancelBurnAll = () => {
     setIsBurnAllConfirmOpen(false);
@@ -1534,7 +1534,7 @@ function WalletPageContent(): JSX.Element {
 
   // <<< Execute Burn All Logic >>>
   const executeBurnAll = useCallback(async () => {
-      if (!authToken) {
+      if (!wallet?.id) {
           console.error("[WalletPage] executeBurnAll failed: No auth token.");
           setBurnAllError('Authentication token missing.');
           setIsBurnAllConfirmOpen(false);
@@ -1551,7 +1551,7 @@ function WalletPageContent(): JSX.Element {
           const response = await fetch('/api/handcash/burn-my-nfts', { // Call the BURN ALL API
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ authToken }),
+              body: JSON.stringify({ walletId: wallet?.id }),
           });
           const data = await response.json();
 
@@ -1580,7 +1580,7 @@ function WalletPageContent(): JSX.Element {
           }, 7000); // Longer timeout for batch result
       }
   }, [
-      authToken, 
+      wallet?.id, 
       fetchOwnedNfts, 
       fetchAllOwnedNfts, 
       lastNumericItemsPerPage, 
@@ -1589,7 +1589,7 @@ function WalletPageContent(): JSX.Element {
 
   // <<< Handle Burn All Confirmation >>>
   const handleBurnAllNFTs = useCallback(() => {
-      if (!authToken) {
+      if (!wallet?.id) {
           alert('Please connect your HandCash wallet first.'); // Simple alert for now
           return;
       }
@@ -1605,7 +1605,7 @@ function WalletPageContent(): JSX.Element {
       setBurnAllError(null); // Clear previous errors
       setBurnAllSuccessMessage(null);
 
-  }, [authToken, isBurningAll, burningItemId, ownedNftItems, allNfts]);
+  }, [wallet?.id, isBurningAll, burningItemId, ownedNftItems, allNfts]);
 
   // <<< Melt Modal Handlers >>>
   const handleMeltNFT = useCallback((nft: NFTType) => {
@@ -1618,7 +1618,7 @@ function WalletPageContent(): JSX.Element {
       setTimeout(() => setItemActionError(prev => ({ ...prev, [itemIdentifier]: null })), 3000);
       return;
     }
-    if (!authToken) {
+    if (!wallet?.id) {
       toast.error('Authentication token missing. Please reconnect wallet.');
       setItemActionError(prev => ({ ...prev, [itemIdentifier]: 'Authentication token missing.' }));
        setTimeout(() => setItemActionError(prev => ({ ...prev, [itemIdentifier]: null })), 3000);
@@ -1631,7 +1631,7 @@ function WalletPageContent(): JSX.Element {
     // Clear any previous action messages for this item
     setItemActionError(prev => ({ ...prev, [itemIdentifier]: null }));
     setItemActionSuccess(prev => ({ ...prev, [itemIdentifier]: null }));
-  }, [authToken, listedNFTs, meltApiStatus, ownedNftItems]);
+  }, [wallet?.id, listedNFTs, meltApiStatus, ownedNftItems]);
 
   // <<< Add Handlers to Open Modals (near other handlers) >>>
   const handleOpenSendModal = useCallback((item: NFTType) => {
@@ -1664,7 +1664,7 @@ function WalletPageContent(): JSX.Element {
       // Optionally set item-specific error: setItemActionError(prev => ({ ...prev, [itemIdentifier]: 'Cannot burn listed NFT.' }));
       return;
     }
-    if (!authToken) {
+    if (!wallet?.id) {
        toast.error('Authentication required to burn.');
       return;
     }
@@ -1674,11 +1674,11 @@ function WalletPageContent(): JSX.Element {
     setIsBurnConfirmOpen(true); // Use existing state
     // Clear item-specific errors if needed
     // setItemActionError(prev => ({ ...prev, [itemIdentifier]: null }));
-  }, [authToken, listedNFTs, burningItemId]); // Added dependencies
+  }, [wallet?.id, listedNFTs, burningItemId]); // Added dependencies
 
   // <<< Add Handlers for Modal Confirmation (near other handlers) >>>
   const handleSendConfirm = useCallback(async (recipient: string) => {
-    if (!nftToManage || !authToken) {
+    if (!nftToManage || !wallet?.id) {
         setActionError("Cannot send NFT: Missing data or auth.");
         return;
     }
@@ -1695,7 +1695,7 @@ function WalletPageContent(): JSX.Element {
       const response = await fetch('/api/handcash/send-nft', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ authToken, nftId: nftId, recipientHandle: recipient }),
+                  body: JSON.stringify({ walletId: wallet?.id, nftId: nftId, recipientHandle: recipient }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Failed to send NFT.');
@@ -1718,10 +1718,10 @@ function WalletPageContent(): JSX.Element {
     } finally {
       setIsProcessingAction(false);
     }
-  }, [nftToManage, authToken, fetchOwnedNfts, fetchAllOwnedNfts, isShowingAll, itemsPerPage, lastNumericItemsPerPage, currentPage, isGlobalSearch]);
+  }, [nftToManage, wallet?.id, fetchOwnedNfts, fetchAllOwnedNfts, isShowingAll, itemsPerPage, lastNumericItemsPerPage, currentPage, isGlobalSearch]);
 
   const handleListConfirm = useCallback(async (price: number) => {
-    if (!nftToManage || !authToken || !listNFT) {
+    if (!nftToManage || !wallet?.id || !listNFT) {
         setActionError("Cannot list NFT: Missing data, auth, or list function.");
         return;
     }
@@ -1761,14 +1761,14 @@ function WalletPageContent(): JSX.Element {
     } finally {
        setIsProcessingAction(false);
     }
-  }, [nftToManage, authToken, listNFT, fetchOwnedNfts, fetchAllOwnedNfts, isShowingAll, itemsPerPage, lastNumericItemsPerPage, currentPage, isGlobalSearch]); // Added listNFT to dependencies
+  }, [nftToManage, wallet?.id, listNFT, fetchOwnedNfts, fetchAllOwnedNfts, isShowingAll, itemsPerPage, lastNumericItemsPerPage, currentPage, isGlobalSearch]); // Added listNFT to dependencies
 
 
   // ================== HANDLE MELT CONFIRM (useCallback) ==================
   const handleMeltConfirm = useCallback(async () => {
-    if (!nftToMelt || !authToken) {
+    if (!nftToMelt || !wallet?.id) {
       toast.error("Melt failed: Required information is missing.");
-      console.error("Melt check failed:", { nftToMelt, authToken });
+      console.error("Melt check failed:", { nftToMelt, walletId: wallet?.id });
       return;
     }
 
@@ -1785,7 +1785,7 @@ function WalletPageContent(): JSX.Element {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             nftId: originToMelt, // Use the identifier
-            authToken: authToken,
+            walletId: wallet?.id,
             nftData: nftToMelt // Send the full NFT data to ensure API has all it needs
         }),
       });
@@ -1884,7 +1884,7 @@ function WalletPageContent(): JSX.Element {
     }
   }, [
     nftToMelt,
-    authToken,
+    wallet?.id,
     fetchOwnedNfts,
     fetchAllOwnedNfts,
     isShowingAll,
@@ -1929,7 +1929,7 @@ function WalletPageContent(): JSX.Element {
       </div>
     );
   }
-  if (!isConnected || !authToken) {
+  if (!isConnected || !wallet?.id) {
     return (
       <div className="min-h-screen bg-gray-950 text-white p-6 flex flex-col items-center justify-center">
         <h1 className="text-2xl font-bold text-pink-500 mb-4">Connect Wallet</h1>
@@ -2811,8 +2811,8 @@ function WalletPageContent(): JSX.Element {
           onClose={() => { setIsSendModalOpen(false); setNftToManage(null); setActionError(null); }}
           // Pass required props - check SendNftModal definition for exact names
           nftName={nftToManage.name}
-          // Remove authToken prop as it's not defined in SendNftModalProps
-          // authToken={authToken}
+          // Remove wallet?.id prop as it's not defined in SendNftModalProps
+          // wallet?.id={wallet?.id}
           onConfirm={handleSendConfirm} // Pass the confirmation handler
           // Pass loading/error states
           isLoading={isProcessingAction}
@@ -2832,8 +2832,8 @@ function WalletPageContent(): JSX.Element {
           nftName={nftToManage.name}
           // Remove nftImageUrl as it's not in ListNftModalProps
           // nftImageUrl={nftToManage.imageUrl} 
-          // Remove authToken as it's not in ListNftModalProps
-          // authToken={authToken}
+          // Remove wallet?.id as it's not in ListNftModalProps
+          // wallet?.id={wallet?.id}
           // Rename listNFTFunction to onConfirm and provide wrapper
           onConfirm={(price) => listNFT(nftToManage, price)}
           // Remove props that might have been added erroneously

@@ -3,7 +3,7 @@
 import React from 'react';
 import { NFTType } from '@/types';
 import { LAYER_DETAILS, EXCLUDED_LAYERS } from '@/data/layer-config';
-import { useHandCash } from '@/context/HandCashContext';
+import { useHandCashWallet } from '@/context/HandCashWalletContext';
 
 interface AttributesTableProps {
   nft: NFTType | null;

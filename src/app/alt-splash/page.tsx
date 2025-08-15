@@ -73,21 +73,18 @@ export default function AltSplashPage() {
             <h1 className="font-cyberpunk-italic text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[12rem] text-white relative z-10 drop-shadow-2xl px-8 py-2" 
                 style={{
                   textShadow: '0 0 20px rgba(236, 72, 153, 0.8), 0 0 40px rgba(168, 85, 247, 0.6), 0 0 60px rgba(236, 72, 153, 0.4)',
-                  WebkitTextStroke: '3px #ec4899',
-                  textStroke: '3px #ec4899'
+                  WebkitTextStroke: '3px #ec4899'
                 }}>
-              <span style={{
-                WebkitTextStroke: '6px #7c3aed',
-                textStroke: '6px #7c3aed',
-                position: 'absolute',
+                              <span style={{
+                  WebkitTextStroke: '6px #7c3aed',
+                  position: 'absolute',
                 left: '0',
                 top: '0',
                 zIndex: -1
               }}>NINJA PUNK GIRLS</span>
-              <span style={{
-                WebkitTextStroke: '9px #1f2937',
-                textStroke: '9px #1f2937',
-                position: 'absolute',
+                              <span style={{
+                  WebkitTextStroke: '9px #1f2937',
+                  position: 'absolute',
                 left: '0',
                 top: '0',
                 zIndex: -2

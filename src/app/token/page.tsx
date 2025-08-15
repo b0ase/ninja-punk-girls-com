@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link'; // Import Link
-import { useHandCash } from '@/context/HandCashContext'; // Import HandCash context
+import { useHandCashWallet } from '@/context/HandCashWalletContext'; // Import HandCash Wallet context
 import MockTokenChart from '@/components/MockTokenChart'; // Import the chart component
 
 // Define tab types
@@ -21,15 +21,12 @@ export default function TokenPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // <<< Added State from Mint Page >>>
-  const { 
+    const {
     isConnected, 
-    authToken, 
-    connect,
-    profile,
-    disconnect,
+    wallet,
     isLoading: isHandCashLoading, 
     error: handCashError 
-  } = useHandCash();
+  } = useHandCashWallet();
 
   const [walletBalance, setWalletBalance] = useState<any>(null);
   const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
@@ -80,40 +77,40 @@ export default function TokenPage() {
 
   // <<< Added Functions from Mint Page >>>
   const fetchWalletBalance = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsLoadingBalance(true);
     try {
       const response = await fetch('/api/handcash/balance', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ authToken })
+          body: JSON.stringify({ walletId: wallet?.id })
        });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Failed to fetch balance');
       setWalletBalance(data);
     } catch (err) { console.error('Error fetching balance:', err); setWalletBalance(null); }
     finally { setIsLoadingBalance(false); }
-  }, [authToken]);
+  }, [wallet?.id]);
 
   const fetchNpgBalance = useCallback(async () => {
     // NOTE: This currently fetches NFT origins, NOT the BSV21 token balance.
     // TODO: Update this to fetch actual $NINJAPUNKGIRLS token balance when API is ready.
     console.log("[Token Page] fetchNpgBalance: Placeholder - Fetches NFT origins, not token balance.");
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsLoadingNpgBalance(true);
     setNpgOrigins([]); // Keep this structure for now, but data represents NFTs
     try {
       const response = await fetch('/api/handcash/collection', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ authToken })
+          body: JSON.stringify({ walletId: wallet?.id })
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Failed to fetch NPG balance (NFTs)');
       setNpgOrigins(Array.isArray(data.npgOrigins) ? data.npgOrigins : []);
     } catch (err) { console.error('Error fetching NPG origins (NFTs):', err); setNpgOrigins([]); }
     finally { setIsLoadingNpgBalance(false); }
-  }, [authToken]);
+  }, [wallet?.id]);
 
   const handleSendNpg = useCallback(async () => {
     // NOTE: This sends an NPG NFT, NOT the BSV21 token.
@@ -121,7 +118,7 @@ export default function TokenPage() {
     console.log("[Token Page] handleSendNpg: Placeholder - Sends NFT, not token.");
     setSendError(null);
     setSendSuccess(null);
-    if (!authToken || npgOrigins.length === 0 || !recipientHandle.trim()) { 
+    if (!wallet?.id || npgOrigins.length === 0 || !recipientHandle.trim()) { 
         setSendError("Auth token, NPG NFT, and recipient handle required."); return; 
     }
     const originToSend = npgOrigins[0]; // Sending the first NFT
@@ -131,7 +128,7 @@ export default function TokenPage() {
         const response = await fetch('/api/handcash/send-npg', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ authToken, recipientHandle: recipient, origin: originToSend })
+            body: JSON.stringify({ walletId: wallet?.id, recipientHandle: recipient, origin: originToSend })
         });
         const data = await response.json();
         if (!response.ok || !data.success) throw new Error(data.error || 'Failed to send NPG NFT.');
@@ -140,18 +137,18 @@ export default function TokenPage() {
         fetchNpgBalance(); // Refresh NFT balance
     } catch (err: any) { setSendError(err.message); }
     finally { setIsSending(false); }
-  }, [authToken, npgOrigins, recipientHandle, fetchNpgBalance]);
+  }, [wallet?.id, npgOrigins, recipientHandle, fetchNpgBalance]);
 
   // Load balances on connect
   useEffect(() => {
-    if (isConnected && authToken) {
+    if (isConnected && wallet?.id) {
       fetchWalletBalance();
       fetchNpgBalance(); // Fetches NFT balance currently
     } else {
       setWalletBalance(null);
       setNpgOrigins([]); 
     }
-  }, [isConnected, authToken, fetchWalletBalance, fetchNpgBalance]);
+  }, [isConnected, wallet?.id, fetchWalletBalance, fetchNpgBalance]);
   // <<<
 
   // Define the actual tabs used in the UI
@@ -548,13 +545,13 @@ export default function TokenPage() {
                 </svg>
                 Your Wallet
               </h3>
-              {isConnected && profile ? (
+              {isConnected && wallet ? (
                 <div>
                   {/* Paymail Display */} 
                   <div className="border-b border-gray-700/50 pb-3 mb-3">
                       <p className="text-gray-400 text-xs mb-1">Receive NPG Tokens & BSV at:</p>
-                      <p className="font-mono text-green-400 break-all cursor-pointer" title="Click to copy" onClick={() => navigator.clipboard.writeText(`$${profile.publicProfile.handle}`)}>
-                          ${profile.publicProfile.handle}
+                      <p className="font-mono text-green-400 break-all cursor-pointer" title="Click to copy"                 onClick={() => navigator.clipboard.writeText(`$${wallet?.email?.split('@')[0] || 'user'}`)}>
+                ${wallet?.email?.split('@')[0] || 'user'}
                       </p>
                   </div>
                   
@@ -586,13 +583,9 @@ export default function TokenPage() {
                   </div>
                 </div>
               ) : (
-                <button 
-                  onClick={connect} 
-                  disabled={isHandCashLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors"
-                >
-                  {isHandCashLoading ? 'Connecting...' : 'Connect HandCash Wallet'}
-                </button>
+                <div className="text-center text-gray-400">
+                  <p>Wallet connection handled on landing page</p>
+                </div>
               )}
               
               {/* Refresh Button */} 

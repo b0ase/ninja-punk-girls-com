@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaTwitter, FaYoutube, FaTelegramPlane, FaEnvelope } from 'react-icons/fa';
-// HandCashConnectButton removed
+import { useHandCashWallet } from '@/context/HandCashWalletContext';
 
 // Solana Imports - Commented out
 // import { useWallet } from '@solana/wallet-adapter-react';
@@ -22,6 +22,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { isConnected, wallet, isLoading, error, connect } = useHandCashWallet();
 
   // Handle clicks outside the dropdown to close it
   useEffect(() => {
@@ -103,10 +104,20 @@ export default function Navbar() {
 
           {/* Right side: Connect Wallet and Social Links */}
           <div className="flex items-center gap-4 order-2 sm:order-3 flex-shrink-0"> 
-            {/* Connect Wallet Button - Temporarily removed */}
-            <div className="px-4 py-2 bg-gray-800 rounded-md text-sm text-gray-400">
-              Wallet Coming Soon
-            </div>
+            {/* HandCash Wallet Status */}
+            {isConnected ? (
+              <div className="px-4 py-2 bg-green-800/20 border border-green-500/30 rounded-md text-sm text-green-400 flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                {wallet?.email ? `${wallet.email.split('@')[0]}@...` : 'Wallet Connected'}
+              </div>
+            ) : (
+              <button
+                onClick={connect}
+                className="px-4 py-2 bg-green-500 hover:bg-green-400 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl"
+              >
+                Connect HandCash
+              </button>
+            )}
 
             {/* Social Links */}
             <div className="hidden sm:flex items-center gap-4 pl-4 border-l border-gray-700/50">

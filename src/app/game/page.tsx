@@ -1,7 +1,7 @@
 'use client'; // Likely needs client-side interaction
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHandCash } from '@/context/HandCashContext';
+import { useHandCashWallet } from '@/context/HandCashWalletContext';
 import { NFTType, NFTAttribute, StatsType } from '@/types';
 import Link from 'next/link';
 import NFTCanvas from '@/components/NFTCanvas'; // For displaying NFTs
@@ -50,9 +50,9 @@ interface OpenMatchFromDB {
 
 // <<< Rename component to GamePage >>>
 export default function GamePage() {
-  const { profile, isConnected, authToken } = useHandCash();
+  const { wallet, isConnected } = useHandCashWallet();
   // <<< Log profile on every render >>>
-  console.log("[GamePage] Rendering. Profile from useHandCash():", profile);
+  console.log("[GamePage] Rendering. Wallet from useHandCashWallet():", wallet);
 
   // <<< State for active tab >>>
   const [activeTab, setActiveTab] = useState<GameTab>('cardGame');
@@ -72,7 +72,7 @@ export default function GamePage() {
 
   // Fetch Owned NFTs function (Adapted from WalletPage)
   const fetchMyNfts = useCallback(async () => {
-    if (!authToken) return;
+    if (!wallet?.id) return;
     setIsLoadingNfts(true);
     console.log("[BattlePage] Fetching owned NFT items...");
     try {
@@ -80,7 +80,7 @@ export default function GamePage() {
       const response = await fetch('/api/handcash/collection', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ authToken })
+          body: JSON.stringify({ walletId: wallet.id })
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.error || 'Failed to fetch owned NFTs');
@@ -93,7 +93,7 @@ export default function GamePage() {
         setMyNfts([]); 
     }
     finally { setIsLoadingNfts(false); }
-  }, [authToken]);
+  }, [wallet?.id]);
 
   // <<< Function to fetch open matches from API >>>
   const fetchOpenMatches = useCallback(async () => {
@@ -129,16 +129,16 @@ export default function GamePage() {
 
   // Load user NFTs and open matches on connect/mount
   useEffect(() => {
-    if (isConnected && authToken) {
+    if (isConnected && wallet?.id) {
       fetchMyNfts();
     }
     fetchOpenMatches(); // Fetch matches regardless of connection status initially
-  }, [isConnected, authToken, fetchMyNfts, fetchOpenMatches]);
+  }, [isConnected, wallet?.id, fetchMyNfts, fetchOpenMatches]);
 
   // <<< Updated handleCreateMatch function >>>
   const handleCreateMatch = async () => {
-    if (!selectedNftIdentifier || !profile?.publicProfile?.handle || !isConnected) {
-      console.error("Cannot create match: User not connected, handle missing, or NFT not selected.", { isConnected, handle: profile?.publicProfile?.handle, selectedNftIdentifier });
+    if (!selectedNftIdentifier || !wallet?.email || !isConnected) {
+      console.error("Cannot create match: User not connected, email missing, or NFT not selected.", { isConnected, email: wallet?.email, selectedNftIdentifier });
       setMatchError("Connect wallet, ensure profile is loaded, and select an NFT.");
       return;
     }
@@ -175,16 +175,16 @@ export default function GamePage() {
 
     try {
         // <<< Add console logs right before fetch >>>
-        console.log("[GamePage Frontend] Sending Handle:", profile?.publicProfile?.handle); 
+        console.log("[GamePage Frontend] Sending Email:", wallet?.email); 
         console.log("[GamePage Frontend] Sending NFT Data:", initiatorNftData);
         
-        console.log("Creating new match via API:", { initiatorHandle: profile?.publicProfile?.handle, initiatorNft: initiatorNftData });
+        console.log("Creating new match via API:", { initiatorEmail: wallet?.email, initiatorNft: initiatorNftData });
         // <<< Send POST request to API >>>
         const response = await fetch('/api/matches', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                initiatorHandle: profile?.publicProfile?.handle,
+                initiatorEmail: wallet?.email,
                 initiatorNft: initiatorNftData // Send the mapped data
             })
         });
@@ -283,15 +283,15 @@ export default function GamePage() {
                     <button 
                       onClick={handleCreateMatch}
                       // <<< Update disabled condition to include profile.handle check >>>
-                      disabled={!selectedNftIdentifier || !profile?.publicProfile?.handle || createMatchStatus === 'loading'}
+                      disabled={!selectedNftIdentifier || !wallet?.email || createMatchStatus === 'loading'}
                       className={`w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${createMatchStatus === 'loading' ? 'cursor-wait' : ''}`}
                     >
                       {createMatchStatus === 'loading' ? 'Creating Match...' : 'Create Match'}
                     </button>
                      {/* Optional: Add a small message if handle is missing but connected */}
-                     {!profile?.publicProfile?.handle && isConnected && (
-                        <p className="text-xs text-yellow-500 text-center">Waiting for profile handle...</p>
-                     )}
+                                          {!wallet?.email && isConnected && (
+                        <p className="text-xs text-yellow-500 text-center">Waiting for wallet email...</p>
+                      )}
                   </div>
                 )}
               </div>
@@ -329,7 +329,7 @@ export default function GamePage() {
                              // <<< Use match.id >>>
                             onClick={() => handleJoinMatch(match.id)}
                              // <<< Use match.initiator_handle >>>
-                            disabled={!isConnected || profile?.publicProfile?.handle === match.initiator_handle} // Can't join own match
+                            disabled={!isConnected || wallet?.email === match.initiator_handle} // Can't join own match
                             className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition-colors text-sm disabled:opacity-50"
                           >
                             Join Match
