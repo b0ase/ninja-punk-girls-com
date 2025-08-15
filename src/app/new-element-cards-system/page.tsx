@@ -51,10 +51,10 @@ export default function NewElementCardsSystemPage() {
 
   // Comprehensive filtering
   const filteredAssets = selectedAssets.filter(asset => {
-    if (filters.rarity && asset.rarity !== filters.rarity) return false;
-    if (filters.character && asset.character !== filters.character) return false;
-    if (filters.genes && asset.genes !== filters.genes) return false;
-    if (filters.series && asset.series !== filters.series) return false;
+    if (filters.rarity && asset.rarity?.toLowerCase() !== filters.rarity.toLowerCase()) return false;
+    if (filters.character && asset.character?.toLowerCase() !== filters.character.toLowerCase()) return false;
+    if (filters.genes && asset.genes?.toLowerCase() !== filters.genes.toLowerCase()) return false;
+    if (filters.series && asset.series?.toLowerCase() !== filters.series.toLowerCase()) return false;
     if (filters.search && !asset.name?.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
@@ -259,7 +259,7 @@ export default function NewElementCardsSystemPage() {
                 onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
                 className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
               >
-                Clear All Filters
+                🗑️ Clear All Filters
               </button>
             </div>
           </div>
@@ -274,6 +274,33 @@ export default function NewElementCardsSystemPage() {
             </div>
           </div>
         </div>
+
+        {/* Filter Status */}
+        {Object.values(filters).some(filter => filter) && (
+          <div className="bg-yellow-900/20 border border-yellow-500 rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-yellow-400 text-lg">🔍</span>
+                <span className="text-yellow-300 font-medium">Active Filters:</span>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(filters).map(([key, value]) => 
+                    value && (
+                      <span key={key} className="px-2 py-1 bg-yellow-600/30 text-yellow-200 rounded text-sm">
+                        {key}: {value}
+                      </span>
+                    )
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-sm font-medium transition-colors"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Main Content Area */}
         <div className="space-y-8">
@@ -298,7 +325,14 @@ export default function NewElementCardsSystemPage() {
                 </div>
                 {filteredAssets.length === 0 && (
                   <div className="text-center text-gray-500 py-12">
-                    No assets match the current filters.
+                    <div className="text-lg font-medium mb-2">No assets match the current filters</div>
+                    <div className="text-sm mb-4">Try adjusting your filters or clearing them to see all assets</div>
+                    <button
+                      onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                    >
+                      Clear All Filters
+                    </button>
                   </div>
                 )}
               </div>
@@ -362,7 +396,14 @@ export default function NewElementCardsSystemPage() {
                 </div>
                 {filteredAssets.length === 0 && (
                   <div className="text-center text-gray-500 py-12">
-                    No assets match the current filters.
+                    <div className="text-lg font-medium mb-2">No assets match the current filters</div>
+                    <div className="text-sm mb-4">Try adjusting your filters or clearing them to see all assets</div>
+                    <button
+                      onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                    >
+                      Clear All Filters
+                    </button>
                   </div>
                 )}
               </div>
@@ -402,7 +443,14 @@ export default function NewElementCardsSystemPage() {
                 </div>
                 {filteredAssets.length === 0 && (
                   <div className="text-center text-gray-500 py-12">
-                    No assets match the current filters.
+                    <div className="text-lg font-medium mb-2">No assets match the current filters</div>
+                    <div className="text-sm mb-4">Try adjusting your filters or clearing them to see all assets</div>
+                    <button
+                      onClick={() => setFilters({ rarity: '', character: '', genes: '', series: '', search: '' })}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                    >
+                      Clear All Filters
+                    </button>
                   </div>
                 )}
               </div>
