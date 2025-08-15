@@ -31,43 +31,52 @@ const getBaseNameFromFolderName = (folderName: string): string | null => {
  * @returns The relative path to the background image.
  */
 export const getCardBackgroundPath = (layerName: string, backgroundMap: Record<string, string>): string => {
-  // Example: backgroundFileName = "01_BACKGROUND"
-  // Returns: "/element_cards/01_BACKGROUND.jpg"
   if (!layerName) {
     console.warn('[utils] getCardBackgroundPath called with empty layerName. Returning default.');
-    return '/element_cards/default_background.jpg'; // Provide a default or handle error
+    return '/element_cards/default_background.jpg';
   }
 
   // 1. Get layer details from config
   const layerDetail = LAYER_DETAILS[layerName];
-  if (!layerDetail || !layerDetail.number || !layerDetail.folderName) {
+  if (!layerDetail || !layerDetail.number) {
     console.warn(`[utils] Layer details missing for layer '${layerName}'. Cannot determine background map key.`);
-    return '/element_cards/default_background.jpg'; // Return default if no details
+    return '/element_cards/default_background.jpg';
   }
 
-  // 2. Construct the expected map key (e.g., "21_Body", "07_Right-Weapon")
-  const baseName = getBaseNameFromFolderName(layerDetail.folderName);
-  if (!baseName) { // Handle missing base name
-     return '/element_cards/default_background.jpg';
+  // 2. Construct the expected map key based on the actual file naming convention
+  // Files are named like: "21_body.jpg", "07_right_weapon.jpg"
+  let baseName: string;
+  
+  // Handle special cases
+  if (layerName === 'BODY_SKIN') {
+    baseName = 'body';
+  } else if (layerName === 'RIGHT_WEAPON') {
+    baseName = 'right_weapon';
+  } else if (layerName === 'LEFT_WEAPON') {
+    baseName = 'left_weapon';
+  } else if (layerName === 'REAR_HORNS') {
+    baseName = 'rear_horns';
+  } else if (layerName === 'REAR_HAIR') {
+    baseName = 'rear_hair';
+  } else {
+    // Convert layer name to lowercase and replace spaces/hyphens with underscores
+    baseName = layerName.toLowerCase().replace(/[\s-]/g, '_');
   }
-  // Construct key using number and baseName, replacing hyphens with underscores
-  const baseNameWithUnderscores = baseName.replace(/-/g, '_');
-  const expectedMapKey = `${layerDetail.number}_${baseNameWithUnderscores}`;
 
-  // Convert key to lowercase for case-insensitive lookup
-  const lookupKey = expectedMapKey.toLowerCase();
+  const expectedMapKey = `${layerDetail.number}_${baseName}`;
+  console.log(`[getCardBackgroundPath] Looking for key: '${expectedMapKey}' in backgroundMap`);
 
-  // Look up the path in the provided map using the lowercase key
-  const pathFromMap = backgroundMap[lookupKey];
+  // Look up the path in the provided map
+  const pathFromMap = backgroundMap[expectedMapKey];
 
   if (pathFromMap) {
+    console.log(`[getCardBackgroundPath] Found background: ${pathFromMap}`);
     return pathFromMap;
   }
 
-  // Fallback if not found in map (or if map is empty)
-  console.warn(`[utils] Background path for lookup key '${lookupKey}' (derived from layer '${layerName}') not found in map. Available keys:`, Object.keys(backgroundMap));
-  // This fallback might be incorrect if filenames don't match layer names exactly
-  return '/element_cards/default_background.jpg'; // Use default placeholder on failure
+  // Fallback if not found in map
+  console.warn(`[getCardBackgroundPath] Background path for key '${expectedMapKey}' not found in map. Available keys:`, Object.keys(backgroundMap));
+  return '/element_cards/default_background.jpg';
 };
 
 /**
@@ -81,7 +90,7 @@ export const getCardBackgroundPath = (layerName: string, backgroundMap: Record<s
 export const getElementAssetUrl = (attribute: NFTAttribute): string => {
   if (!attribute || !attribute.layer || !attribute.fullFilename) {
     console.warn('[utils] getElementAssetUrl called with invalid attribute:', attribute);
-    return '/placeholder.png'; // Return a placeholder or handle error
+    return '/placeholder.png';
   }
 
   // Access the layer detail directly using the layer key
@@ -89,12 +98,13 @@ export const getElementAssetUrl = (attribute: NFTAttribute): string => {
 
   if (!layerDetail || !layerDetail.folderName) {
     console.warn(`[utils] Layer detail or folderName not found for layer key: ${attribute.layer}. Using layer key as directory.`);
-    // Fallback: Use the layer key directly if no detail found (might be incorrect)
     return `/assets/${attribute.layer}/${attribute.fullFilename}`;
   }
 
   // Construct the path using the folderName from LAYER_DETAILS
-  // Example: layerDetail.folderName = "07 Right-Weapon", attribute.fullFilename = "07_001_WEAPON.png"
-  // Returns: "/assets/07 Right-Weapon/07_001_WEAPON.png"
-  return `/assets/${layerDetail.folderName}/${attribute.fullFilename}`;
+  // Example: layerDetail.folderName = "07-Right-Weapon", attribute.fullFilename = "07_001_Right-Weapon_Short-Whip.png"
+  // Returns: "/assets/07-Right-Weapon/07_001_Right-Weapon_Short-Whip.png"
+  const assetUrl = `/assets/${layerDetail.folderName}/${attribute.fullFilename}`;
+  console.log(`[getElementAssetUrl] Constructed URL: ${assetUrl} for layer: ${attribute.layer}, filename: ${attribute.fullFilename}`);
+  return assetUrl;
 }; 
