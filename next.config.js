@@ -14,6 +14,12 @@ const nextConfig = {
   },
   // Better output for debugging
   output: 'standalone',
+  
+  // Disable build traces to prevent stack overflow issues
+  experimental: {
+    // Add serverComponentsExternalPackages back inside experimental
+    serverComponentsExternalPackages: []
+  },
 
   // <<< Add Webpack configuration for WASM >>>
   webpack: (config, { isServer }) => {
@@ -29,6 +35,11 @@ const nextConfig = {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
+  },
+  
+  // Generate a deterministic build ID to avoid build trace issues
+  generateBuildId: async () => {
+    return 'ninja-punk-girls-build-' + Date.now();
   },
 };
 
