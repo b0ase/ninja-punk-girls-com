@@ -1,0 +1,7 @@
+public/assets/**/*.png
+public/assets/**/*.jpg
+public/assets/**/*.glb
+public/assets/**/*.gltf
+public/3D_assets/
+public/landing/
+public/models/

@@ -28,15 +28,14 @@ export interface AssetDetail {
 }
 
 // === FOLDER MAPPING ===
-// Maps folder names to API layer keys
 const FOLDER_MAPPING: { [key: string]: string } = {
   '01-Logo': 'LOGO',
-  '02-Copyright': 'COPYRIGHT', 
+  '02-Copyright': 'COPYRIGHT',
   '04-Team': 'TEAM',
   '05-Interface': 'INTERFACE',
   '06-Effects': 'EFFECTS',
   '07-Right-Weapon': 'RIGHT_WEAPON',
-  '08-Left-Weapon': 'LEFT_WEAPON', 
+  '08-Left-Weapon': 'LEFT_WEAPON',
   '09-Horns': 'HORNS',
   '10-Hair': 'HAIR',
   '11-Mask': 'MASK',
@@ -45,7 +44,7 @@ const FOLDER_MAPPING: { [key: string]: string } = {
   '14-Jewellery': 'JEWELLERY',
   '15-Accessories': 'ACCESSORIES',
   '16-Bra': 'BRA',
-  '17-Bottom': 'BOTTOM', 
+  '17-Bottom': 'BOTTOM',
   '18-Face': 'FACE',
   '19-Underwear': 'UNDERWEAR',
   '20-Arms': 'ARMS',
@@ -59,34 +58,34 @@ const FOLDER_MAPPING: { [key: string]: string } = {
   '29-Background': 'BACKGROUND'
 };
 
+// === CACHING ===
+let assetCache: AssetDetail[] | null = null;
+
 // Function to load asset data from JSON file
 function loadAssetFromJSON(folderPath: string, jsonFilename: string, layerKey: string): AssetDetail | null {
   try {
     const jsonPath = path.join(folderPath, jsonFilename);
-    
+
     if (!fs.existsSync(jsonPath)) {
       console.warn(`[API] JSON file not found: ${jsonPath}`);
       return null;
     }
 
     const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-    
-    // Find corresponding PNG file (should have simplified filename)
+
     const pngFilename = jsonData.simplified_filename || jsonData.original_filename;
-    
+
     if (!pngFilename) {
       console.warn(`[API] No PNG filename found in JSON: ${jsonFilename}`);
       return null;
     }
 
-    // Verify PNG file exists
     const pngPath = path.join(folderPath, pngFilename);
     if (!fs.existsSync(pngPath)) {
       console.warn(`[API] PNG file not found: ${pngPath}`);
       return null;
     }
 
-    // Create AssetDetail object from JSON data
     const asset: AssetDetail = {
       layer: layerKey,
       filename: pngFilename,
@@ -118,42 +117,33 @@ function loadAssetFromJSON(folderPath: string, jsonFilename: string, layerKey: s
   }
 }
 
-// Function to build asset data from JSON files
-function buildAssetData(): AssetDetail[] {
+// Function to load asset data on demand
+function loadAssetsOnDemand(): AssetDetail[] {
   const assetsDir = path.join(process.cwd(), 'public', 'assets');
   const assetData: AssetDetail[] = [];
 
   try {
-    // Check if assets directory exists
     if (!fs.existsSync(assetsDir)) {
       console.warn(`Assets directory not found: ${assetsDir}`);
       return [];
     }
 
-    // Get all subdirectories in the assets folder
     const folders = fs.readdirSync(assetsDir, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory())
       .map(dirent => dirent.name);
 
-    console.log(`[API] Found asset folders:`, folders);
-
     folders.forEach(folderName => {
       const folderPath = path.join(assetsDir, folderName);
-      
-      // Map folder name to layer key using FOLDER_MAPPING
       const layerKey = FOLDER_MAPPING[folderName];
-      
+
       if (!layerKey) {
         console.warn(`[API] No layer mapping found for folder: ${folderName}`);
         return;
       }
 
-      // Process all JSON files in this folder
       try {
         const jsonFiles = fs.readdirSync(folderPath)
           .filter(file => file.endsWith('.json'));
-
-        console.log(`[API] Processing ${jsonFiles.length} JSON files in ${folderName} -> ${layerKey}`);
 
         jsonFiles.forEach(jsonFilename => {
           const asset = loadAssetFromJSON(folderPath, jsonFilename, layerKey);
@@ -166,10 +156,9 @@ function buildAssetData(): AssetDetail[] {
       }
     });
 
-    console.log(`[API] Built asset data for ${assetData.length} assets across ${folders.length} folders`);
     return assetData;
   } catch (error) {
-    console.error('[API] Error building asset data:', error);
+    console.error('[API] Error loading assets on demand:', error);
     return [];
   }
 }
@@ -177,35 +166,44 @@ function buildAssetData(): AssetDetail[] {
 // === API HANDLER ===
 export async function GET() {
   try {
-    console.log('[API] Building asset data from JSON files...');
-    
-    const assetData = buildAssetData();
-    
+    if (assetCache) {
+      console.log('[API] Returning cached asset data');
+      return NextResponse.json({
+        success: true,
+        data: assetCache,
+        count: assetCache.length
+      });
+    }
+
+    console.log('[API] Loading asset data from JSON files...');
+    const assetData = loadAssetsOnDemand();
+
     if (assetData.length === 0) {
       console.warn('[API] No asset data found');
-      return NextResponse.json({ 
-        success: false, 
+      return NextResponse.json({
+        success: false,
         error: 'No asset data found',
         data: []
       });
     }
 
-    console.log(`[API] Successfully loaded ${assetData.length} assets`);
-    
+    console.log(`[API] Successfully loaded ${assetData.length} assets, caching result.`);
+    assetCache = assetData;
+
     return NextResponse.json({
       success: true,
       data: assetData,
       count: assetData.length
     });
-    
+
   } catch (error: any) {
     console.error('[API] Error in asset-data route:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Failed to load asset data', 
-      details: error.message 
-    }, { 
-      status: 500 
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to load asset data',
+      details: error.message
+    }, {
+      status: 500
     });
   }
-} 
+}

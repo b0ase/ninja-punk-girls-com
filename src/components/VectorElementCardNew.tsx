@@ -331,7 +331,7 @@ export default function VectorElementCardNew({
             src={`/assets/${layerDetail?.folderName || layerKey}/${asset.filename}`}
             alt={asset.name || 'Unknown Asset'}
             width={size === 'small' ? 80 : size === 'medium' ? 120 : 160}
-            height={size === 'small' ? 80 : size === 'medium' ? 120 : 160}
+            height={size === 'small' ? 120 : size === 'medium' ? 180 : 240}
             className="object-contain z-10"
             unoptimized
             onError={(e) => {
