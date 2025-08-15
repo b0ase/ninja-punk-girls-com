@@ -59,6 +59,21 @@ export default function NewElementCardsSystemPage() {
     return true;
   });
 
+  // Debug logging
+  console.log('🔍 Debug Info:', {
+    selectedLayer,
+    totalAssets: selectedAssets.length,
+    filteredAssets: filteredAssets.length,
+    filters,
+    sampleAsset: selectedAssets[0],
+    allAssets: selectedAssets,
+    availableLayers: Object.keys(availableAssets),
+    layerAssetCounts: Object.entries(availableAssets).reduce((acc, [layer, assets]) => {
+      acc[layer] = assets.length;
+      return acc;
+    }, {} as Record<string, number>)
+  });
+
   // Get unique values for filter options
   const uniqueRarities = [...new Set(selectedAssets.map(asset => asset.rarity).filter(Boolean))];
   const uniqueCharacters = [...new Set(selectedAssets.map(asset => asset.character).filter(Boolean))];
@@ -412,6 +427,43 @@ export default function NewElementCardsSystemPage() {
               </div>
             </div>
           )}
+        </div>
+
+                {/* Debug Section - Temporary */}
+        <div className="mt-8 bg-red-900/20 border border-red-500 rounded-lg p-6">
+          <h3 className="text-xl font-bold mb-4 text-red-400">🐛 Debug Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-bold text-red-300 mb-2">Available Layers:</h4>
+              <div className="text-sm text-gray-300 space-y-1">
+                {Object.entries(availableAssets).map(([layer, assets]) => (
+                  <div key={layer} className="flex justify-between">
+                    <span>{layer}:</span>
+                    <span className={assets.length > 0 ? 'text-green-400' : 'text-red-400'}>
+                      {assets.length} assets
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold text-red-300 mb-2">Current Selection:</h4>
+              <div className="text-sm text-gray-300 space-y-1">
+                <div><strong>Selected Layer:</strong> {selectedLayer}</div>
+                <div><strong>Total Assets:</strong> {selectedAssets.length}</div>
+                <div><strong>Filtered Assets:</strong> {filteredAssets.length}</div>
+                <div><strong>Active Filters:</strong> {Object.entries(filters).filter(([k, v]) => v).map(([k, v]) => `${k}: ${v}`).join(', ') || 'None'}</div>
+              </div>
+              {selectedAssets.length > 0 && (
+                <div className="mt-3">
+                  <h5 className="font-bold text-red-300 mb-1">Sample Asset:</h5>
+                  <pre className="text-xs text-gray-400 bg-gray-800 p-2 rounded overflow-auto">
+                    {JSON.stringify(selectedAssets[0], null, 2)}
+                  </pre>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Layer Overview */}
