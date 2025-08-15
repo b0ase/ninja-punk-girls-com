@@ -7,10 +7,13 @@ const nextConfig = {
   },
   // Allow more time for static generation
   staticPageGenerationTimeout: 180,
-  // Workaround for OpenTelemetry issue
+  
+  // Disable static optimization for problematic pages
   experimental: {
     // Add serverComponentsExternalPackages back inside experimental
-    serverComponentsExternalPackages: []
+    serverComponentsExternalPackages: [],
+    // Reduce build complexity
+    swcMinify: false
   },
   // Better output for debugging
   output: 'standalone',
