@@ -227,11 +227,11 @@ export default function VectorElementCardNew({
   const getSizeClasses = (size: 'small' | 'medium' | 'large') => {
     switch (size) {
       case 'small':
-        return 'w-30 h-45';
+        return 'w-32 h-48';
       case 'medium':
         return 'w-40 h-60';
       case 'large':
-        return 'w-50 h-75';
+        return 'w-48 h-72';
       default:
         return 'w-40 h-60';
     }
