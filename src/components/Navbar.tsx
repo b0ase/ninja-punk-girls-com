@@ -46,6 +46,7 @@ export default function Navbar() {
     { href: '/wallet', label: 'Wallet', colorClass: 'text-yellow-400' },
     { href: '/market', label: 'Market', colorClass: 'text-green-400' },
     { href: '/elements', label: 'Elements', colorClass: 'text-teal-400' },
+    { href: '/new-element-cards-system', label: 'New Cards', colorClass: 'text-emerald-400' },
     { href: '/characters', label: 'Characters', colorClass: 'text-cyan-400' },
     { href: '/token', label: 'Token', colorClass: 'text-blue-400' },
     { href: '/game', label: 'Game', colorClass: 'text-indigo-400' },
