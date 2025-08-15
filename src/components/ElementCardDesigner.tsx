@@ -44,6 +44,15 @@ const elementLabelMap: Record<ElementPositionKeys, string> = {
     stealthStat: "Stealth Stat (S5)",
     styleStat: "Style Stat (S6)",
     characterName: "Character Name",
+    // New vector card interface elements
+    topBanner: "Top Banner",
+    layerBanner: "Layer Banner",
+    statBox1: "Stat Box 1 (Strength)",
+    statBox2: "Stat Box 2 (Speed)",
+    statBox3: "Stat Box 3 (Skill)",
+    statBox4: "Stat Box 4 (Stamina)",
+    statBox5: "Stat Box 5 (Stealth)",
+    statBox6: "Stat Box 6 (Style)",
 };
 const defaultElementDimensions: CanvasDimensions = { width: 400, height: 600 }; // Example smaller dimensions
 

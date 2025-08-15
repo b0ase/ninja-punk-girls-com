@@ -17,11 +17,11 @@ const getVectorBackground = (layerKey: string, size: 'small' | 'medium' | 'large
   const layerDetail = LAYER_DETAILS[layerKey];
   if (!layerDetail) return null;
 
-  // Use card-sized dimensions while maintaining 961:1441 proportions
+  // Use scaled dimensions that match the display size while maintaining 961:1441 proportions
   const dimensions = {
-    small: { width: 128, height: 192 },   // Small card (128:192 = 961:1441 ratio)
-    medium: { width: 192, height: 288 },  // Medium card (192:288 = 961:1441 ratio)
-    large: { width: 256, height: 384 }    // Large card (256:384 = 961:1441 ratio)
+    small: { width: 128, height: 192 },   // 128:192 = 961:1441 ratio
+    medium: { width: 192, height: 288 },  // 192:288 = 961:1441 ratio
+    large: { width: 256, height: 384 }    // 256:384 = 961:1441 ratio
   };
 
   const { width, height } = dimensions[size];
@@ -207,79 +207,30 @@ const getVectorBackground = (layerKey: string, size: 'small' | 'medium' | 'large
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className="absolute inset-0 w-full h-full"
+      className="w-full h-full"
     >
-      {/* Background gradient */}
-      <defs>
-        <linearGradient id={`gradient-${layerKey}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={colors.primary} />
-          <stop offset="100%" stopColor={colors.secondary} />
-        </linearGradient>
-        
-        {/* Pattern definition */}
-        <pattern
-          id={`pattern-${layerKey}`}
-          patternUnits="userSpaceOnUse"
-          width="20"
-          height="20"
-        >
-          <rect width="20" height="20" fill={colors.primary} opacity="0.1" />
-          <circle cx="10" cy="10" r="2" fill={colors.pattern} opacity="0.3" />
-        </pattern>
-      </defs>
-
-      {/* Main background */}
+      {/* Clean background - no rounded corners, no borders */}
       <rect
         width={width}
         height={height}
-        fill={`url(#gradient-${layerKey})`}
-        rx="12"
-        ry="12"
+        fill={colors.primary}
       />
 
-      {/* Pattern overlay */}
+      {/* Layer indicator - minimal */}
       <rect
-        width={width}
-        height={height}
-        fill={`url(#pattern-${layerKey})`}
-        rx="12"
-        ry="12"
-      />
-
-      {/* Border */}
-      <rect
-        width={width}
-        height={height}
-        fill="none"
-        stroke={colors.accent}
-        strokeWidth="2"
-        rx="12"
-        ry="12"
-      />
-
-      {/* Corner accents */}
-      <circle cx="12" cy="12" r="4" fill={colors.accent} opacity="0.8" />
-      <circle cx={width - 12} cy="12" r="4" fill={colors.accent} opacity="0.8" />
-      <circle cx="12" cy={height - 12} r="4" fill={colors.accent} opacity="0.8" />
-      <circle cx={width - 12} cy={height - 12} r="4" fill={colors.accent} opacity="0.8" />
-
-      {/* Layer indicator */}
-      <rect
-        x="8"
-        y="8"
-        width="32"
-        height="16"
+        x="10"
+        y="10"
+        width="60"
+        height="30"
         fill={colors.pattern}
         opacity="0.9"
-        rx="4"
-        ry="4"
       />
       <text
-        x="24"
-        y="20"
+        x="40"
+        y="30"
         textAnchor="middle"
         fill="white"
-        fontSize="10"
+        fontSize="16"
         fontWeight="bold"
         fontFamily="monospace"
       >
@@ -355,13 +306,13 @@ export default function VectorElementCardNew({
   const getSizeClasses = (size: 'small' | 'medium' | 'large') => {
     switch (size) {
       case 'small':
-        return 'w-32 h-48'; // Small card size (maintains 961:1441 ratio)
+        return 'w-32 h-48'; // Small view (scaled down)
       case 'medium':
-        return 'w-48 h-72'; // Medium card size (maintains 961:1441 ratio)
+        return 'w-48 h-72'; // Medium view (scaled down)
       case 'large':
-        return 'w-64 h-96'; // Large card size (maintains 961:1441 ratio)
+        return 'w-64 h-96'; // Large view (scaled down)
       default:
-        return 'w-48 h-72'; // Default to medium card size
+        return 'w-48 h-72'; // Default to medium view
     }
   };
 
@@ -374,7 +325,7 @@ export default function VectorElementCardNew({
       <RarityIndicator rarity={asset.rarity} />
 
       {/* Element Image */}
-      <div className="absolute inset-0 flex items-center justify-center p-4">
+      <div className="absolute inset-0 flex items-center justify-center">
         {asset.filename ? (
           <Image
             src={`/assets/${layerDetail?.folderName || layerKey}/${asset.filename}`}

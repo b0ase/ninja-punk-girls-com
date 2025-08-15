@@ -38,9 +38,9 @@ export default function AllElementCardsPage() {
   const allAssets = getAllAssets();
   
   // Get unique values for filter options
-  const uniqueRarities = [...new Set(allAssets.map(asset => asset.rarity).filter(Boolean))];
-  const uniqueCharacters = [...new Set(allAssets.map(asset => asset.character).filter(Boolean))];
-  const uniqueGenes = [...new Set(allAssets.map(asset => asset.genes).filter(Boolean))];
+  const uniqueRarities = [...new Set(allAssets.map(asset => asset.rarity).filter((rarity): rarity is string => Boolean(rarity)))];
+  const uniqueCharacters = [...new Set(allAssets.map(asset => asset.character).filter((character): character is string => Boolean(character)))];
+  const uniqueGenes = [...new Set(allAssets.map(asset => asset.genes).filter((genes): genes is string => Boolean(genes)))];
   const uniqueLayers = Object.keys(availableAssets || {});
 
   // Apply filters
@@ -297,7 +297,7 @@ export default function AllElementCardsPage() {
                   <div key={`${asset.layerKey}-${asset.filename || index}`} className="flex justify-center">
                     <VectorElementCardNew
                       asset={asset}
-                      layerKey={asset.layerKey}
+                      layerKey={asset.layerKey || 'UNKNOWN'}
                       showDetails={true}
                       size={cardSize}
                     />
@@ -343,7 +343,7 @@ export default function AllElementCardsPage() {
                           <div className="w-16 h-24">
                             <VectorElementCardNew
                               asset={asset}
-                              layerKey={asset.layerKey}
+                              layerKey={asset.layerKey || 'UNKNOWN'}
                               showDetails={false}
                               size="small"
                             />
