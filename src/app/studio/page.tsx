@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import BackgroundDesigner from '@/components/BackgroundDesigner';
 import NftCardDesigner from '@/components/NftCardDesigner'; 
 import ElementCardDesigner from '@/components/ElementCardDesigner';
+import VectorElementCardDesigner from '@/components/studio/VectorElementCardDesigner';
 import { LayerManagerProvider, useLayerManager } from '@/context/LayerManagerContext';
 import { ParsedFileInfo } from '@/app/api/asset-files/route'; 
 import type { PositionState } from '@/components/ElementCardDesigner'; // Ensure this is correctly typed
@@ -719,10 +720,9 @@ const StudioPage = () => {
       case 'nftCardDesign':
         return <NftCardDesigner selectedSeriesId={selectedSeriesId} />;
       case 'elementCardDesign':
-        return <ElementCardDesigner
-          initialLayout={elementLayoutPositions}
-          onSaveLayout={handleElementLayoutSave}
+        return <ElementCardDesigner 
           selectedSeriesId={selectedSeriesId}
+          onSaveLayout={handleElementLayoutSave}
         />;
       case 'seriesMaker':
         return <div className="bg-gray-900 p-6 rounded-lg shadow-lg max-w-3xl mx-auto">

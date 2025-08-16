@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import * as fs from 'fs';
-import * as path from 'path';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // === TYPES ===
 export interface AssetDetail {
@@ -25,52 +25,66 @@ export interface AssetDetail {
 let assetCache: AssetDetail[] | null = null;
 
 // === HELPER FUNCTIONS ===
-function loadAssetsFromDirectory(dirPath: string): AssetDetail[] {
-  const assets: AssetDetail[] = [];
-  
-  try {
-    if (!fs.existsSync(dirPath)) {
-      return assets;
-    }
+async function loadAssetsFromDirectory(): Promise<AssetDetail[]> {
+  const assetsDir = path.join(process.cwd(), 'public', 'assets', 'assets-source');
+  const allAssets: AssetDetail[] = [];
 
-    const files = fs.readdirSync(dirPath);
+  try {
+    // Read all subdirectories (layers)
+    const layerDirs = await fs.readdir(assetsDir);
     
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        try {
-          const jsonPath = path.join(dirPath, file);
-          const jsonContent = fs.readFileSync(jsonPath, 'utf8');
-          const jsonData = JSON.parse(jsonContent);
-          
-          const asset: AssetDetail = {
-            layer: path.basename(dirPath),
-            filename: file.replace('.json', '.png'),
-            name: jsonData.item_name || jsonData.name || 'Unknown',
-            rarity: jsonData.rarity,
-            character: jsonData.character,
-            genes: jsonData.genes,
-            team: jsonData.team,
-            stats: jsonData.stats || {
-              strength: 0,
-              speed: 0,
-              skill: 0,
-              stamina: 0,
-              stealth: 0,
-              style: 0
+    for (const layerDir of layerDirs) {
+      const layerPath = path.join(assetsDir, layerDir);
+      const layerStat = await fs.stat(layerPath);
+      
+      if (layerStat.isDirectory()) {
+        // Read files in this layer directory
+        const files = await fs.readdir(layerPath);
+        
+        for (const file of files) {
+          if (file.endsWith('.png')) {
+            // Try to find corresponding JSON file for metadata
+            const jsonFile = file.replace('.png', '.json');
+            const jsonPath = path.join(layerPath, jsonFile);
+            
+            let assetData: Partial<AssetDetail> = {
+              layer: layerDir,
+              filename: file,
+              name: file.replace('.png', '').replace(/_/g, ' '),
+              rarity: 'Common',
+              stats: { strength: 0, speed: 0, skill: 0, stamina: 0, stealth: 0, style: 0 }
+            };
+
+            try {
+              // Try to load JSON metadata if it exists
+              const jsonContent = await fs.readFile(jsonPath, 'utf-8');
+              const metadata = JSON.parse(jsonContent);
+              
+              // Extract metadata from JSON
+              if (metadata.rarity) assetData.rarity = metadata.rarity;
+              if (metadata.character) assetData.character = metadata.character;
+              if (metadata.genes) assetData.genes = metadata.genes;
+              if (metadata.team) assetData.team = metadata.team;
+              if (metadata.stats) assetData.stats = metadata.stats;
+              if (metadata.name) assetData.name = metadata.name;
+            } catch (jsonError) {
+              // JSON file doesn't exist or is invalid, use defaults
+              console.log(`[API] No JSON metadata for ${file}, using defaults`);
             }
-          };
-          
-          assets.push(asset);
-        } catch (error) {
-          console.warn(`Failed to load JSON for ${file}:`, error);
+
+            allAssets.push(assetData as AssetDetail);
+          }
         }
       }
     }
+
+    console.log(`[API] Successfully loaded ${allAssets.length} assets from local directory`);
+    return allAssets;
+
   } catch (error) {
-    console.error(`Error reading directory ${dirPath}:`, error);
+    console.error('[API] Error reading assets directory:', error);
+    throw error;
   }
-  
-  return assets;
 }
 
 // === API HANDLER ===
@@ -85,30 +99,9 @@ export async function GET() {
       });
     }
 
-    console.log('[API] Loading asset data from public/assets...');
+    console.log('[API] Loading asset data from local assets directory...');
     
-    const assetsDir = path.join(process.cwd(), 'public', 'assets');
-    if (!fs.existsSync(assetsDir)) {
-      console.warn('[API] Assets directory not found');
-      return NextResponse.json({
-        success: false,
-        error: 'Assets directory not found',
-        data: []
-      });
-    }
-
-    const allAssets: AssetDetail[] = [];
-    const subdirs = fs.readdirSync(assetsDir, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
-
-    for (const subdir of subdirs) {
-      const subdirPath = path.join(assetsDir, subdir);
-      const assets = loadAssetsFromDirectory(subdirPath);
-      allAssets.push(...assets);
-    }
-
-    console.log(`[API] Successfully loaded ${allAssets.length} assets, caching result.`);
+    const allAssets = await loadAssetsFromDirectory();
     assetCache = allAssets;
 
     return NextResponse.json({

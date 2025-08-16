@@ -5,6 +5,10 @@ import Image from 'next/image';
 import DraggableCore, { DraggableData, DraggableEvent } from 'react-draggable';
 import cn from 'classnames';
 import { initialElementCoords, ElementPositionKeys } from '@/data/layout-constants';
+import { useAssets } from '@/context/AssetContext';
+import { AssetDetail } from '@/types';
+import { LAYER_ORDER, LAYER_DETAILS } from '@/data/layer-config';
+import VectorElementCardNew from '@/components/VectorElementCardNew';
 
 // --- Shared Interfaces & Types ---
 export interface PositionState {
@@ -149,150 +153,108 @@ const PositionControl = <T extends string>({
                  value={pos.backgroundColor ?? ''} 
                  placeholder="rgba(0,0,0,0.5)" 
                  onChange={e => handleStyleChange('backgroundColor', e.target.value)} 
-                 className="bg-gray-700 px-1 py-0.5 rounded w-24 text-[11px]"
-                 title="Background Color (CSS format)" 
+                 className="bg-gray-700 px-1 py-0.5 rounded w-20 text-[11px]" 
+                 title="Background color (CSS color value)"
                />
                <label className="text-gray-400 text-[10px]">Radius:</label>
                <input 
-                  type="number" 
-                  value={pos.borderRadius ?? ''} 
-                  placeholder="0" 
-                  onChange={e => handleStyleChange('borderRadius', e.target.value)} 
-                  className="bg-gray-700 px-1 py-0.5 rounded w-10 text-[11px]" 
-                  min="0"
-                  title="Border Radius (px)" 
-                />
-                <label className="text-gray-400 text-[10px]">Align:</label>
-                <select 
-                   value={pos.textAlign ?? 'left'} 
-                   onChange={e => handleStyleChange('textAlign', e.target.value)} 
-                   className="bg-gray-700 px-1 py-0.5 rounded text-[11px]"
-                   title="Text Alignment within container"
-                 >
-                    <option value="left">Left</option>
-                    <option value="center">Center</option>
-                    <option value="right">Right</option>
-                </select>
+                 type="number" 
+                 value={pos.borderRadius ?? ''} 
+                 placeholder="0" 
+                 onChange={e => handleStyleChange('borderRadius', e.target.value)} 
+                 className="bg-gray-700 px-1 py-0.5 rounded w-10 text-[11px]" 
+                 min="0"
+                 title="Border radius in pixels"
+               />
+               <label className="text-gray-400 text-[10px]">Align:</label>
+               <select 
+                 value={pos.textAlign ?? 'left'} 
+                 onChange={e => handleStyleChange('textAlign', e.target.value)} 
+                 className="bg-gray-700 px-1 py-0.5 rounded text-[11px]"
+               >
+                 <option value="left">Left</option>
+                 <option value="center">Center</option>
+                 <option value="right">Right</option>
+               </select>
            </div>
         )}
-        {/* Display Coordinates */}
-        <div className="text-cyan-400 text-[9px] mt-0.5 opacity-75">
-          (X:{pos.x}, Y:{pos.y}{pos.width !== undefined ? `, W:${pos.width}`:''}{pos.height !== undefined ? `, H:${pos.height}`:''}{isTextElement ? `, Size:${pos.fontSize}` : ''})
-        </div>
       </div>
   );
 };
 
-// --- Shared Scaling Logic Hook (Copied from InterfaceDesignerTab) ---
-const useAutoScale = (containerRef: React.RefObject<HTMLDivElement>, canvasWidth: number) => { 
+// --- Main Component ---
+interface ElementCardDesignerProps {
+  selectedSeriesId?: string | null;
+  onSaveLayout?: (layout: Record<ElementPositionKeys, PositionState>) => void;
+  className?: string;
+}
+
+export default function ElementCardDesigner({ selectedSeriesId, onSaveLayout, className }: ElementCardDesignerProps) {
+  // --- State Management ---
+  const [activeTab, setActiveTab] = useState<'layout' | 'vector'>('layout');
+  
+  // Define control order early so it can be used in state initialization
+  const controlOrder: ElementPositionKeys[] = [
+    'elementName', 'elementImage', 'seriesNumber', 'layerName', 'elementNumber',
+    'rarity', 'strengthStat', 'speedStat', 'skillStat', 'staminaStat', 'stealthStat', 'styleStat', 'characterName',
+    'topBanner', 'layerBanner', 'statBox1', 'statBox2', 'statBox3', 'statBox4', 'statBox5', 'statBox6'
+  ];
+  
+  // Layout Designer State
+  const [elementPositions, setElementPositions] = useState<Record<ElementPositionKeys, PositionState>>(initialElementCoords);
+  const [sampleTexts, setSampleTexts] = useState<Record<ElementPositionKeys, string>>(() => {
+    // Initialize with empty strings for all keys
+    const initial: Record<ElementPositionKeys, string> = {} as Record<ElementPositionKeys, string>;
+    controlOrder.forEach(key => {
+      initial[key] = '';
+    });
+    return initial;
+  });
+  const [availableInterfaces, setAvailableInterfaces] = useState<InterfaceFileInfo[]>([]);
+  const [selectedElementInterface, setSelectedElementInterface] = useState<string>('');
+  const [elementCanvasDimensions, setElementCanvasDimensions] = useState<CanvasDimensions>(defaultElementDimensions);
+  const [isLoadingInterfaces, setIsLoadingInterfaces] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const elementPreviewContainerRef = useRef<HTMLDivElement>(null);
+
+  // Vector Cards State
+  const { availableAssets, isInitialized, assetLoadingProgress } = useAssets();
+  const [selectedLayer, setSelectedLayer] = useState<string>('21-Body'); // Use folder name that matches API
+  const [viewMode, setViewMode] = useState<'cards' | 'table' | 'grid'>('cards');
+  const [cardSize, setCardSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [showIntegration, setShowIntegration] = useState<boolean>(false); // New state for side-by-side view
+  const [filters, setFilters] = useState({
+    rarity: '',
+    character: '',
+    genes: '',
+    search: ''
+  });
+
+  // --- Layout Designer Logic ---
+  // Auto-scale hook for preview
+  const useAutoScale = (containerRef: React.RefObject<HTMLDivElement>, baseWidth: number) => {
     const [scale, setScale] = useState(1);
+    
     useEffect(() => {
       const updateScale = () => {
-        if (containerRef.current && canvasWidth > 0) { 
+        if (containerRef.current && baseWidth > 0) {
           const containerWidth = containerRef.current.offsetWidth;
-          let newScale = 1;
-          if (containerWidth > 10) { 
-            newScale = containerWidth / canvasWidth;
-          } else {
-            newScale = 10 / canvasWidth; 
-          }
+          const newScale = Math.min(1, containerWidth / baseWidth);
           setScale(newScale);
-        } else {
-            if (scale !== 1) setScale(1);
         }
       };
-      let observer: ResizeObserver | null = null;
-      const currentRef = containerRef.current; 
-      if (currentRef) {
-          observer = new ResizeObserver(updateScale);
-          observer.observe(currentRef);
-      }
+      
       updateScale();
       window.addEventListener('resize', updateScale);
-      return () => {
-          if (observer && currentRef) {
-              observer.unobserve(currentRef);
-          }
-          window.removeEventListener('resize', updateScale);
-      };
-    }, [containerRef, canvasWidth, scale]);
+      return () => window.removeEventListener('resize', updateScale);
+    }, [containerRef, baseWidth]);
+    
     return scale;
   };
 
-// Define the props for the ElementCardDesigner component
-export interface ElementCardDesignerProps { // Export if needed elsewhere
-  initialLayout: Record<ElementPositionKeys, PositionState>;
-  onSaveLayout: (newLayout: Record<ElementPositionKeys, PositionState>) => void;
-  selectedSeriesId: string | null; // Add this prop
-}
-
-// --- Element Card Designer Component ---
-const ElementCardDesigner: React.FC<ElementCardDesignerProps> = ({ 
-  initialLayout,
-  onSaveLayout,
-  selectedSeriesId // Destructure the new prop
-}) => {
-  // --- State ---
-  const [availableInterfaces, setAvailableInterfaces] = useState<InterfaceFileInfo[]>([]); 
-  const [fetchError, setFetchError] = useState<string | null>(null);
-  const [isLoadingInterfaces, setIsLoadingInterfaces] = useState<boolean>(true);
-  const [elementPositions, setElementPositions] = useState<Record<ElementPositionKeys, PositionState>>(initialLayout);
-  const elementPreviewContainerRef = useRef<HTMLDivElement>(null);
-  const [selectedElementInterface, setSelectedElementInterface] = useState<string>('');
-  const [elementCanvasDimensions, setElementCanvasDimensions] = useState<CanvasDimensions>(defaultElementDimensions);
-  const baseElementImageUrl = "/placeholder-element-bg.png";
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-
-  // --- Sample Data (Expanded) ---
-  const sampleElementName = "Plasma Sword";
-  const sampleSeries = "II";
-  const sampleLayer = "Right-Weapon";
-  const sampleNumber = "#015";
-  const sampleRarity = "Rare (150/999)";
-  const sampleS6 = { strength: 12, speed: 5, skill: 8, stamina: 0, stealth: 0, style: 9 };
-  const sampleCharacter = "Ryder"; // Optional
-
-  // --- Initial Sample Data & Control Order ---
-  const generateInitialSampleTexts = useCallback(() => {
-    const sampleS6 = { strength: 12, speed: 5, skill: 8, stamina: 0, stealth: 0, style: 9 };
-    const sampleCharacter = "Ryder";
-    return {
-      elementName: "Plasma Sword",
-      elementImage: "IMG", // Not editable text
-      seriesNumber: `#II`,
-      layerName: "Right-Weapon",
-      elementNumber: "#015",
-      rarity: "Rare (150/999)",
-      strengthStat: `Strength ${sampleS6.strength}`,
-      speedStat: `Speed ${sampleS6.speed}`,
-      skillStat: `Skill ${sampleS6.skill}`,
-      staminaStat: `Stamina ${sampleS6.stamina}`,
-      stealthStat: `Stealth ${sampleS6.stealth}`,
-      styleStat: `Style ${sampleS6.style}`,
-      characterName: sampleCharacter ? `Char: ${sampleCharacter}` : 'Char: -',
-    } as Record<ElementPositionKeys, string>; // Assert type
-  }, []);
-
-  const [sampleTexts, setSampleTexts] = useState<Record<ElementPositionKeys, string>>(generateInitialSampleTexts());
-  
-  // <<< Define static control order (remove state management for it) >>>
-  const controlOrder: ElementPositionKeys[] = [
-    'characterName', 'elementName', 'seriesNumber', 'layerName', 
-    'elementNumber', 'rarity', 'elementImage', 'strengthStat', 'speedStat', 
-    'skillStat', 'staminaStat', 'stealthStat', 'styleStat'
-  ];
-
-  // --- Effects ---
-  useEffect(() => {
-    setElementPositions(initialLayout);
-  }, [initialLayout]);
-
-  useEffect(() => {
-    setSampleTexts(generateInitialSampleTexts());
-  }, [generateInitialSampleTexts]);
-
-  // Fetch Interfaces Effect
+  // Fetch interface files
   useEffect(() => {
     const fetchInterfaces = async () => {
       setIsLoadingInterfaces(true);
@@ -345,11 +307,12 @@ const ElementCardDesigner: React.FC<ElementCardDesignerProps> = ({
        return { ...prev, [key]: { ...current, x: newX, y: newY, fontSize: current.fontSize, ...existingSize } };
      });
   };
-  const textBaseStyle = { position: 'absolute' as const, color: 'white', fontFamily: '"Cyberpunks Italic", sans-serif', whiteSpace: 'nowrap' as const, cursor: 'grab' as const, };
 
   const handleSaveLayout = () => {
     console.log(`Saving Element Layout:`, elementPositions);
-    onSaveLayout(elementPositions);
+    if (onSaveLayout) {
+      onSaveLayout(elementPositions);
+    }
     alert('Element layout positions saved!');
   };
   
@@ -421,198 +384,708 @@ const ElementCardDesigner: React.FC<ElementCardDesignerProps> = ({
 
   const currentElementScale = useAutoScale(elementPreviewContainerRef, elementCanvasDimensions.width);
 
-  // --- JSX ---
-  return (
-    <div className="p-4 bg-gray-800/50 text-white rounded-lg shadow-inner flex flex-col gap-4 min-w-0">
-      {/* <<< Add Tab Title >>> */}
-      <h2 className="text-2xl font-semibold text-cyan-400 mb-4 text-center flex-shrink-0">
-          Element Card Layout Designer
-      </h2>
-      {/* <<< END Tab Title >>> */}
+  // --- Vector Cards Logic ---
+  // Get layer options from available assets (API response uses folder names as keys)
+  const layerOptions = Object.keys(availableAssets).filter(layer => 
+    !['29-Background', '28-Glow', '27-Banner', '26-Decals', '01-Logo', '02-Copyright', '03-Scores', '04-Team', '05-Interface', '06-Effects'].includes(layer)
+  );
 
-      {/* Interface Selection & Upload - Rearranged */}
-       <div className="flex flex-col sm:flex-row gap-2 items-center bg-gray-900/30 p-3 rounded-md">
-        {/* Upload Button (Moved First) */}
-        <label htmlFor="element-interface-upload" className={cn(
-            "px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded cursor-pointer transition-colors",
-            { 'opacity-50 cursor-not-allowed': isUploading } // Disable visually during upload
-        )}>
-            {isUploading ? 'Uploading...' : 'Upload Interface Template'}
-        </label>
-        <input
-           id="element-interface-upload"
-           type="file"
-           accept=".png,.jpg,.jpeg"
-           onChange={handleInterfaceUpload}
-           className="hidden"
-           disabled={isUploading} // Disable functionally during upload
-         />
+  const selectedAssets = availableAssets[selectedLayer] || [];
 
-        {/* Select Dropdown (Moved Second) */}
-        <label htmlFor="element-interface-select" className="text-sm text-gray-300 flex-shrink-0 mr-2 sm:ml-2">Select Interface:</label>
-        <select
-           id="element-interface-select"
-           value={selectedElementInterface}
-           onChange={handleElementInterfaceChange}
-           disabled={isLoadingInterfaces || availableInterfaces.length === 0 || isUploading}
-           className="flex-grow p-1.5 rounded bg-gray-700 border border-gray-600 text-white text-sm focus:outline-none focus:ring-1 focus:ring-cyan-500 disabled:opacity-50 min-w-0"
-        >
-            {isLoadingInterfaces && <option>Loading...</option>}
-            {fetchError && <option>Error fetching: {fetchError}</option>}
-            {!isLoadingInterfaces && !fetchError && availableInterfaces.length === 0 && <option>No interfaces found</option>}
-            {availableInterfaces.map(fileInfo => (
-                <option key={`element-${fileInfo.filename}`} value={fileInfo.filename}>{fileInfo.filename} ({fileInfo.width}x{fileInfo.height})</option>
-            ))}
-        </select>
+  // Comprehensive filtering
+  const filteredAssets = selectedAssets.filter(asset => {
+    if (filters.rarity && asset.rarity?.toLowerCase() !== filters.rarity.toLowerCase()) return false;
+    if (filters.character && asset.character?.toLowerCase() !== filters.character.toLowerCase()) return false;
+    if (filters.genes && asset.genes?.toLowerCase() !== filters.genes.toLowerCase()) return false;
+    if (filters.search && !asset.name?.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    return true;
+  });
+
+  // Get unique values for filter options
+  const uniqueRarities = [...new Set(selectedAssets.map(asset => asset.rarity).filter(Boolean))];
+  const uniqueCharacters = [...new Set(selectedAssets.map(asset => asset.character).filter(Boolean))];
+  const uniqueGenes = [...new Set(selectedAssets.map(asset => asset.genes).filter(Boolean))];
+
+  // Helper function for rarity colors
+  const getRarityColor = (rarity: string) => {
+    switch (rarity.toLowerCase()) {
+      case 'common': return '#6b7280';
+      case 'uncommon': return '#10b981';
+      case 'rare': return '#3b82f6';
+      case 'epic': return '#8b5cf6';
+      case 'legendary': return '#f59e0b';
+      case 'mythic': return '#ef4444';
+      default: return '#6b7280';
+    }
+  };
+
+  const renderVectorCards = () => (
+    <div className="space-y-6">
+      {/* Layout Controls for Vector Cards */}
+      <div className="bg-gray-700 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-white mb-4">Vector Card Layout Controls</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Interface Template Selection */}
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Card Background Template</label>
+            <select
+              value={selectedElementInterface}
+              onChange={(e) => setSelectedElementInterface(e.target.value)}
+              className="w-full bg-gray-600 text-white rounded-lg px-3 py-2 border border-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="">Select Interface Template</option>
+              {availableInterfaces.map(interfaceFile => (
+                <option key={interfaceFile.filename} value={interfaceFile.filename}>
+                  {interfaceFile.filename} ({interfaceFile.width}x{interfaceFile.height})
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Layout Scale */}
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Layout Scale: {Math.round(currentElementScale * 100)}%</label>
+            <input
+              type="range"
+              min="0.5"
+              max="1.5"
+              step="0.1"
+              value={currentElementScale}
+              onChange={(e) => {
+                // This will be handled by the useAutoScale hook
+                // We'll update the preview container dimensions
+              }}
+              className="w-full"
+            />
+          </div>
+        </div>
       </div>
-      {/* Display Upload Error */}
-      {uploadError && (
-          <p className="text-red-500 text-sm bg-red-900/30 p-2 rounded">Upload Error: {uploadError}</p>
-      )}
 
-      <div className="flex flex-col xl:flex-row gap-4 flex-grow min-h-0">
-          {/* Left: Scaled Image Preview */} 
-          <div 
-            ref={elementPreviewContainerRef} 
-            className="w-full xl:w-2/3 flex-shrink-0 overflow-hidden bg-gray-700 rounded relative" 
-            style={{ 
-              aspectRatio: elementCanvasDimensions.width && elementCanvasDimensions.height ? `${elementCanvasDimensions.width} / ${elementCanvasDimensions.height}` : `${defaultElementDimensions.width} / ${defaultElementDimensions.height}` 
-            }}
-          > 
-              <div style={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                width: `${elementCanvasDimensions.width}px`, 
-                height: `${elementCanvasDimensions.height}px`, 
-                transform: `scale(${currentElementScale})`, 
-                transformOrigin: 'top left' 
-              }}>
-                  <Image src={baseElementImageUrl} layout="fill" alt="Base Element Card Background" priority unoptimized />
-                  {selectedElementInterface && (
-                       <Image 
-                           key={`element-overlay-${selectedElementInterface}`} 
-                           src={`/assets/05 Interface/${selectedElementInterface}`}
-                           layout="fill" 
-                           alt="Selected Element Interface Overlay" 
-                           priority 
-                           unoptimized 
-                           style={{ opacity: 0.9, pointerEvents: 'none' }} 
-                           onError={(e) => { console.error(`Error loading Element interface: ${selectedElementInterface}`); e.currentTarget.style.display='none'; }} 
-                        />
-                  )}
-                  {/* Draggable Elements (Use Containers) */} 
-                  {Object.entries(elementPositions).map(([key, pos]) => {
-                       const k = key as ElementPositionKeys;
-                       const textContent = sampleTexts[k] || k; 
-                       const isArea = k === 'elementImage';
-                       const isText = !isArea;
-
-                       // <<< Updated Rendering Logic >>>
-                       const hasContainer = isText && pos.width !== undefined && pos.height !== undefined;
-                       
-                       const containerStyle: React.CSSProperties = {
-                            position: 'absolute',
-                            top: `${pos.y}px`,
-                            left: `${pos.x}px`,
-                            width: `${pos.width}px`,
-                            height: `${pos.height}px`,
-                            backgroundColor: pos.backgroundColor, 
-                            borderRadius: pos.borderRadius !== undefined ? `${pos.borderRadius}px` : undefined,
-                            display: 'flex', // Use flex to align text inside
-                            padding: '2px 4px', // Add some padding
-                            boxSizing: 'border-box',
-                            overflow: 'hidden', // Prevent text overflow
-                       };
-                       
-                       // Determine text alignment for flexbox
-                       let justifyContent = 'flex-start'; // default left
-                       if (pos.textAlign === 'center') justifyContent = 'center';
-                       else if (pos.textAlign === 'right') justifyContent = 'flex-end';
-                       containerStyle.justifyContent = justifyContent;
-                       containerStyle.alignItems = 'center'; // Vertically center
-                       
-                       const textStyle: React.CSSProperties = {
-                           fontSize: `${pos.fontSize}px`,
-                           color: 'white', // Assuming white text, could be configurable later
-                           fontFamily: '"Cyberpunks Italic", sans-serif',
-                           whiteSpace: 'nowrap',
-                           // Text alignment is handled by container's flex properties
-                       };
-
-                       if (isArea) {
-                          // Render Image Area (largely unchanged, but using DraggableCore)
-                          return (
-                            <DraggableCore key={`element-drag-${k}`} onDrag={handlePreviewDrag(k)} >
-                              <div style={{ ...containerStyle, border: '1px dashed cyan', cursor: 'grab', alignItems: 'center', justifyContent: 'center' }}>
-                                <span style={{fontSize: '10px', color: 'cyan'}}>{textContent}</span> { /* Simple placeholder */}
-                              </div>
-                            </DraggableCore>
-                          );
-                       } else if (hasContainer) {
-                           // Render Text with Container
-                           return (
-                            <DraggableCore key={`element-drag-${k}`} onDrag={handlePreviewDrag(k)} >
-                              <div style={{ ...containerStyle, cursor: 'grab' }}>
-                                 <span style={textStyle}>{textContent}</span>
-                              </div>
-                            </DraggableCore>
-                           );
-                       } else {
-                           // Render Plain Text (no container)
-                           return (
-                              <DraggableCore key={`element-drag-${k}`} onDrag={handlePreviewDrag(k)} >
-                                 <div style={{ 
-                                     position: 'absolute', 
-                                     top: `${pos.y}px`, 
-                                     left: `${pos.x}px`, 
-                                     ...textStyle, // Apply text styles directly
-                                     padding: '2px', 
-                                     border: '1px dotted rgba(100,200,255,0.3)', 
-                                     cursor: 'grab' 
-                                  }}>
-                                    {textContent}
-                                 </div>
-                              </DraggableCore>
-                           );
-                       }
-                  })}
-              </div>
+      {/* Vector Cards with Layout Designer Integration */}
+      <div className="space-y-6">
+        {/* Real-time Preview Section */}
+        <div className="bg-gray-700 rounded-lg p-4">
+          <h3 className="text-lg font-semibold text-white mb-4">Real-time Layout Preview</h3>
+          <p className="text-gray-300 text-sm mb-4">
+            Changes made in the Layout Designer tab will automatically apply to all Vector Element Cards below.
+          </p>
+          
+          {/* Live Preview Card */}
+          <div className="flex justify-center">
+            <VectorElementCardNew
+              asset={filteredAssets[0] || {
+                layer: selectedLayer,
+                filename: 'preview.png',
+                name: 'Preview Card',
+                stats: { strength: 5, speed: 5, skill: 5, stamina: 5, stealth: 5, style: 5 },
+                rarity: 'Preview'
+              }}
+              layerKey={selectedLayer}
+              size="medium"
+              showDetails={false}
+              interfaceTemplate={selectedElementInterface}
+              elementPositions={elementPositions}
+              sampleTexts={sampleTexts}
+              layoutScale={currentElementScale}
+            />
           </div>
-          {/* Right: Controls (Static Order) */} 
-          <div className="w-full xl:w-1/3 overflow-hidden bg-gray-900/50 p-4 rounded-md shadow-inner flex flex-col">
-              <h3 className="text-lg font-semibold mb-3 text-gray-300">Element Position Controls</h3>
-              <button onClick={handleSaveLayout} className="mb-3 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow-md">
-                 Save Element Layout
-              </button>
-              <div 
-                className="flex-grow space-y-1 overflow-y-auto pr-2"
-              >
-                {controlOrder.map((key) => {
-                  const k = key as ElementPositionKeys;
-                  const pos = elementPositions[k];
-                  if (!pos) return null;
-                  const isTextElement = k !== 'elementImage';
-                  
-                  return (
-                      <PositionControl<ElementPositionKeys>
-                        key={`element-ctrl-${k}`}
-                        label={elementLabelMap[k] || k}
-                        pos={pos}
-                        setPos={updatePosition}
-                        itemKey={k}
-                        isTextElement={isTextElement}
-                        isAreaElement={k === 'elementImage'}
-                        sampleText={sampleTexts[k]}
-                        onSampleTextChange={isTextElement ? (newText) => handleSampleTextChange(k, newText) : undefined}
-                      />
-                  );
-                })}
-              </div>
-          </div>
+        </div>
+
+        {/* Vector Cards Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {filteredAssets.map((asset, index) => (
+            <div key={`${asset.filename}-${index}`} className="flex justify-center">
+              <VectorElementCardNew
+                asset={asset}
+                layerKey={selectedLayer}
+                size={cardSize}
+                showDetails={true}
+                // Pass layout designer props for integration
+                interfaceTemplate={selectedElementInterface}
+                elementPositions={elementPositions}
+                sampleTexts={sampleTexts}
+                layoutScale={currentElementScale}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
-};
 
-export default ElementCardDesigner; 
+  const renderVectorTable = () => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-gray-700 rounded-lg overflow-hidden">
+        <thead className="bg-gray-600">
+          <tr>
+            <th className="px-4 py-2 text-left text-white">Name</th>
+            <th className="px-4 py-2 text-left text-white">Layer</th>
+            <th className="px-4 py-2 text-left text-white">Rarity</th>
+            <th className="px-4 py-2 text-left text-white">Character</th>
+            <th className="px-4 py-2 text-left text-white">Genes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredAssets.map((asset, index) => (
+            <tr key={`${asset.filename}-${index}`} className="border-b border-gray-600 hover:bg-gray-600">
+              <td className="px-4 py-2 text-white">{asset.name}</td>
+              <td className="px-4 py-2 text-gray-300">{selectedLayer}</td>
+              <td className="px-4 py-2">
+                {asset.rarity && (
+                  <span 
+                    className="px-2 py-1 rounded text-xs font-medium"
+                    style={{ backgroundColor: getRarityColor(asset.rarity), color: 'white' }}
+                  >
+                    {asset.rarity}
+                  </span>
+                )}
+              </td>
+              <td className="px-4 py-2 text-gray-300">{asset.character || '-'}</td>
+              <td className="px-4 py-2 text-gray-300">{asset.genes || '-'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderVectorGrid = () => (
+    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-2">
+      {filteredAssets.map((asset, index) => (
+        <div key={`${asset.filename}-${index}`} className="flex justify-center">
+          <VectorElementCardNew
+            asset={asset}
+            layerKey={selectedLayer}
+            size="small"
+            showDetails={false}
+            // Pass layout designer props for integration
+            interfaceTemplate={selectedElementInterface}
+            elementPositions={elementPositions}
+            sampleTexts={sampleTexts}
+            layoutScale={currentElementScale}
+          />
+        </div>
+      ))}
+    </div>
+  );
+
+  // --- JSX ---
+  return (
+    <div className={`${className} p-4 bg-gray-800/50 text-white rounded-lg shadow-inner flex flex-col gap-4 min-w-0`}>
+      {/* Header with Tabs */}
+      <div className="text-center mb-4">
+        <h2 className="text-2xl font-semibold text-cyan-400 mb-4">
+          Element Card Designer - Rebuild Your Series
+        </h2>
+        
+        {/* Tab Navigation */}
+        <div className="flex justify-center space-x-2 mb-4">
+          <button
+            onClick={() => setActiveTab('layout')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === 'layout'
+                ? 'bg-cyan-600 text-white'
+                : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+            }`}
+          >
+            Layout Designer
+          </button>
+          <button
+            onClick={() => setActiveTab('vector')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === 'vector'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+            }`}
+          >
+            Vector Element Cards
+          </button>
+        </div>
+
+        {/* Integration Toggle */}
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={() => setShowIntegration(!showIntegration)}
+            className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+              showIntegration
+                ? 'bg-green-600 text-white hover:bg-green-700'
+                : 'bg-purple-600 text-white hover:bg-purple-700'
+            }`}
+          >
+            {showIntegration ? '🔄 Hide Integration View' : '🔗 Show Integration View'}
+          </button>
+        </div>
+
+        {/* Integration View - Side by Side */}
+        {showIntegration && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Left: Layout Designer */}
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-cyan-400 mb-4">Layout Designer</h3>
+              {/* Layout Designer Content */}
+              <div className="space-y-4">
+                {/* Interface Selection & Upload */}
+                <div className="flex flex-col sm:flex-row gap-2 items-center bg-gray-900/30 p-3 rounded-md">
+                  <select
+                    value={selectedElementInterface}
+                    onChange={(e) => setSelectedElementInterface(e.target.value)}
+                    className="flex-1 bg-gray-700 text-white rounded px-3 py-2 border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="">Select Interface Template</option>
+                    {availableInterfaces.map(interfaceFile => (
+                      <option key={interfaceFile.filename} value={interfaceFile.filename}>
+                        {interfaceFile.filename} ({interfaceFile.width}x{interfaceFile.height})
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    id="integration-interface-upload"
+                    type="file"
+                    accept=".png,.jpg,.jpeg"
+                    onChange={handleInterfaceUpload}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => document.getElementById('integration-interface-upload')?.click()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  >
+                    Upload New
+                  </button>
+                </div>
+
+                {/* Quick Text Controls */}
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder="Element Name"
+                    value={sampleTexts.elementName || ''}
+                    onChange={(e) => handleSampleTextChange('elementName', e.target.value)}
+                    className="bg-gray-700 text-white rounded px-3 py-2 border border-gray-600 focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Series Number"
+                    value={sampleTexts.seriesNumber || ''}
+                    onChange={(e) => handleSampleTextChange('seriesNumber', e.target.value)}
+                    className="bg-gray-700 text-white rounded px-3 py-2 border border-gray-600 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Vector Card Preview */}
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-blue-400 mb-4">Live Vector Card Preview</h3>
+              <div className="flex justify-center">
+                {filteredAssets[0] ? (
+                  <VectorElementCardNew
+                    asset={filteredAssets[0]}
+                    layerKey={selectedLayer}
+                    size="medium"
+                    showDetails={false}
+                    interfaceTemplate={selectedElementInterface}
+                    elementPositions={elementPositions}
+                    sampleTexts={sampleTexts}
+                    layoutScale={currentElementScale}
+                  />
+                ) : (
+                  <div className="text-gray-400 text-center py-8">
+                    <div className="text-2xl mb-2">🎴</div>
+                    <div>Select a layer to see preview</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Layout Designer Tab Content */}
+      {activeTab === 'layout' && (
+        <div className="space-y-6">
+          {/* Integration Notice */}
+          <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-blue-300 mb-2">🎨 Layout Designer Integration</h3>
+            <p className="text-blue-200 text-sm">
+              Changes made here will automatically apply to all Vector Element Cards in the Vector Element Cards tab. 
+              Position text elements, upload interface templates, and see your design applied in real-time to your element cards.
+            </p>
+          </div>
+          {/* Interface Selection & Upload */}
+          <div className="flex flex-col sm:flex-row gap-2 items-center bg-gray-900/30 p-3 rounded-md">
+            <label htmlFor="element-interface-upload" className={cn(
+                "px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded cursor-pointer transition-colors",
+                { 'opacity-50 cursor-not-allowed': isUploading }
+            )}>
+                {isUploading ? 'Uploading...' : 'Upload Interface Template'}
+            </label>
+            <input
+               id="element-interface-upload"
+               type="file"
+               accept=".png,.jpg,.jpeg"
+               onChange={handleInterfaceUpload}
+               className="hidden"
+               disabled={isUploading}
+             />
+
+            <select
+              value={selectedElementInterface}
+              onChange={handleElementInterfaceChange}
+              className="bg-gray-700 text-white rounded px-3 py-1.5 text-sm border border-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              disabled={isLoadingInterfaces}
+            >
+              {isLoadingInterfaces ? (
+                <option>Loading interfaces...</option>
+              ) : availableInterfaces.length === 0 ? (
+                <option>No interfaces available</option>
+              ) : (
+                availableInterfaces.map(interfaceFile => (
+                  <option key={interfaceFile.filename} value={interfaceFile.filename}>
+                    {interfaceFile.filename} ({interfaceFile.width}x{interfaceFile.height})
+                  </option>
+                ))
+              )}
+            </select>
+
+            {uploadError && (
+              <div className="text-red-400 text-sm bg-red-900/20 px-2 py-1 rounded">
+                {uploadError}
+              </div>
+            )}
+          </div>
+
+          {/* Main Layout Designer */}
+          <div className="flex flex-col xl:flex-row gap-4">
+            {/* Left: Preview Canvas */}
+            <div className="flex-1 bg-gray-900/50 rounded-lg p-4">
+              <h3 className="text-lg font-semibold mb-3 text-gray-300">Element Layout Preview</h3>
+              <div 
+                ref={elementPreviewContainerRef}
+                className="relative mx-auto border border-gray-600 rounded overflow-hidden"
+                style={{ 
+                  width: elementCanvasDimensions.width * currentElementScale, 
+                  height: elementCanvasDimensions.height * currentElementScale 
+                }}
+              >
+                {/* Background Interface */}
+                {selectedElementInterface && (
+                  <Image
+                    src={`/api/interface-files/${encodeURIComponent(selectedElementInterface)}`}
+                    alt="Element interface background"
+                    width={elementCanvasDimensions.width}
+                    height={elementCanvasDimensions.height}
+                    className="w-full h-full object-contain"
+                    style={{ opacity: 0.9, pointerEvents: 'none' }} 
+                    onError={(e) => { console.error(`Error loading Element interface: ${selectedElementInterface}`); e.currentTarget.style.display='none'; }} 
+                 />
+                )}
+                {/* Draggable Elements */}
+                {Object.entries(elementPositions).map(([key, pos]) => {
+                   const k = key as ElementPositionKeys;
+                   const textContent = sampleTexts[k] || k; 
+                   const isArea = k === 'elementImage';
+                   const isText = !isArea;
+
+                   const hasContainer = isText && pos.width !== undefined && pos.height !== undefined;
+                   
+                   const containerStyle: React.CSSProperties = {
+                        position: 'absolute',
+                        top: `${pos.y * currentElementScale}px`,
+                        left: `${pos.x * currentElementScale}px`,
+                        width: `${(pos.width || 0) * currentElementScale}px`,
+                        height: `${(pos.height || 0) * currentElementScale}px`,
+                        backgroundColor: pos.backgroundColor, 
+                        borderRadius: pos.borderRadius !== undefined ? `${pos.borderRadius * currentElementScale}px` : undefined,
+                        display: 'flex',
+                        padding: '2px 4px',
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                   };
+                   
+                   let justifyContent = 'flex-start';
+                   if (pos.textAlign === 'center') justifyContent = 'center';
+                   else if (pos.textAlign === 'right') justifyContent = 'flex-end';
+                   containerStyle.justifyContent = justifyContent;
+                   containerStyle.alignItems = 'center';
+                   
+                   const textStyle: React.CSSProperties = {
+                       fontSize: `${pos.fontSize * currentElementScale}px`,
+                       color: 'white',
+                       fontFamily: '"Cyberpunks Italic", sans-serif',
+                       whiteSpace: 'nowrap',
+                   };
+
+                   if (isArea) {
+                      return (
+                        <DraggableCore key={`element-drag-${k}`} onDrag={handlePreviewDrag(k)} >
+                          <div style={{ ...containerStyle, border: '1px dashed cyan', cursor: 'grab', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{fontSize: '10px', color: 'cyan'}}>{textContent}</span>
+                          </div>
+                        </DraggableCore>
+                      );
+                   } else if (hasContainer) {
+                       return (
+                        <DraggableCore key={`element-drag-${k}`} onDrag={handlePreviewDrag(k)} >
+                          <div style={{ ...containerStyle, cursor: 'grab' }}>
+                             <span style={textStyle}>{textContent}</span>
+                          </div>
+                        </DraggableCore>
+                       );
+                   } else {
+                       return (
+                          <DraggableCore key={`element-drag-${k}`} onDrag={handlePreviewDrag(k)} >
+                             <div style={{ 
+                                 position: 'absolute', 
+                                 top: `${pos.y * currentElementScale}px`, 
+                                 left: `${pos.x * currentElementScale}px`, 
+                                 ...textStyle,
+                                 padding: '2px', 
+                                 border: '1px dotted rgba(100,200,255,0.3)', 
+                                 cursor: 'grab' 
+                              }}>
+                               {textContent}
+                             </div>
+                          </DraggableCore>
+                       );
+                   }
+                })}
+              </div>
+            </div>
+
+            {/* Right: Controls */}
+            <div className="w-full xl:w-1/3 overflow-hidden bg-gray-900/50 p-4 rounded-md shadow-inner flex flex-col">
+                <h3 className="text-lg font-semibold mb-3 text-gray-300">Element Position Controls</h3>
+                <button onClick={handleSaveLayout} className="mb-3 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow-md">
+                   Save Element Layout
+                </button>
+                <div className="flex-grow space-y-1 overflow-y-auto pr-2">
+                  {controlOrder.map((key) => {
+                    const k = key as ElementPositionKeys;
+                    const pos = elementPositions[k];
+                    if (!pos) return null;
+                    const isTextElement = k !== 'elementImage';
+                    
+                    return (
+                        <PositionControl<ElementPositionKeys>
+                          key={`element-ctrl-${k}`}
+                          label={elementLabelMap[k] || k}
+                          pos={pos}
+                          setPos={updatePosition}
+                          itemKey={k}
+                          isTextElement={isTextElement}
+                          isAreaElement={k === 'elementImage'}
+                          sampleText={sampleTexts[k]}
+                          onSampleTextChange={isTextElement ? (newText) => handleSampleTextChange(k, newText) : undefined}
+                        />
+                    );
+                  })}
+                </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Vector Element Cards Tab */}
+      {activeTab === 'vector' && (
+        <div className="space-y-6">
+          {!isInitialized ? (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-white">Loading Vector Element Cards...</h3>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${assetLoadingProgress}%` }}
+                  ></div>
+                </div>
+                <div className="text-center text-gray-400">
+                  Loading assets... {assetLoadingProgress}%
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Controls */}
+              <div className="bg-gray-700 rounded-lg p-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Layer Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">Layer</label>
+                    <select
+                      value={selectedLayer}
+                      onChange={(e) => setSelectedLayer(e.target.value)}
+                      className="w-full bg-gray-600 text-white rounded-lg px-3 py-2 border border-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    >
+                      {layerOptions.map(layer => (
+                        <option key={layer} value={layer}>
+                          {layer} ({availableAssets[layer]?.length || 0})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* View Mode */}
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">View Mode</label>
+                    <div className="flex space-x-2">
+                      {(['cards', 'table', 'grid'] as const).map(mode => (
+                        <button
+                          key={mode}
+                          onClick={() => setViewMode(mode)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            viewMode === mode
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                          }`}
+                        >
+                          {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card Size (for cards view) */}
+                  {viewMode === 'cards' && (
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">Card Size</label>
+                      <div className="flex space-x-2">
+                        {(['small', 'medium', 'large'] as const).map(size => (
+                          <button
+                            key={size}
+                            onClick={() => setCardSize(size)}
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              cardSize === size
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                            }`}
+                          >
+                            {size.charAt(0).toUpperCase() + size.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Filters */}
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">Search</label>
+                    <input
+                      type="text"
+                      placeholder="Search assets..."
+                      value={filters.search}
+                      onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                      className="w-full bg-gray-600 text-white rounded-lg px-3 py-2 border border-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">Rarity</label>
+                    <select
+                      value={filters.rarity}
+                      onChange={(e) => setFilters(prev => ({ ...prev, rarity: e.target.value }))}
+                      className="w-full bg-gray-600 text-white rounded-lg px-3 py-2 border border-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">All Rarities</option>
+                      {uniqueRarities.map(rarity => (
+                        <option key={rarity} value={rarity}>{rarity}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">Character</label>
+                    <select
+                      value={filters.character}
+                      onChange={(e) => setFilters(prev => ({ ...prev, character: e.target.value }))}
+                      className="w-full bg-gray-600 text-white rounded-lg px-3 py-2 border border-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">All Characters</option>
+                      {uniqueCharacters.map(character => (
+                        <option key={character} value={character}>{character}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">Genes</label>
+                    <select
+                      value={filters.rarity}
+                      onChange={(e) => setFilters(prev => ({ ...prev, genes: e.target.value }))}
+                      className="w-full bg-gray-600 text-white rounded-lg px-3 py-2 border border-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">All Genes</option>
+                      {uniqueGenes.map(genes => (
+                        <option key={genes} value={genes}>{genes}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Active Filters Display */}
+                {(filters.search || filters.rarity || filters.character || filters.genes) && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <span className="text-sm text-gray-300">Active filters:</span>
+                    {Object.entries(filters).map(([key, value]) => 
+                      value && (
+                        <span
+                          key={key}
+                          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-600 text-white"
+                        >
+                          {key}: {value}
+                          <button
+                            onClick={() => setFilters(prev => ({ ...prev, [key]: '' }))}
+                            className="ml-1 hover:bg-blue-700 rounded-full w-4 h-4 flex items-center justify-center"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      )
+                    )}
+                    <button
+                      onClick={() => setFilters({ rarity: '', character: '', genes: '', search: '' })}
+                      className="text-sm text-blue-400 hover:text-blue-300 underline"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="space-y-6">
+                {viewMode === 'cards' && renderVectorCards()}
+                {viewMode === 'table' && renderVectorTable()}
+                {viewMode === 'grid' && renderVectorGrid()}
+              </div>
+
+              {/* Layer Overview */}
+              <div className="mt-8 bg-gray-700 rounded-lg p-4">
+                <h4 className="text-lg font-semibold text-white mb-4">Layer Overview</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {layerOptions.map(layer => (
+                    <div
+                      key={layer}
+                      onClick={() => setSelectedLayer(layer)}
+                      className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                        selectedLayer === layer
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{layer}</div>
+                      <div className="text-xs opacity-75">
+                        {availableAssets[layer]?.length || 0} assets
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+} 
