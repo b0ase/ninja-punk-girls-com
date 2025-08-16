@@ -196,9 +196,9 @@ const PeriodicTable: React.FC<PeriodicTableProps> = ({
             .map((apiAsset: AssetDetail) => ({
               layer: apiAsset.layer,
               filename: apiAsset.filename,
-              name: apiAsset.name || apiAsset.item_name || 'Unknown',
-              assetNumber: apiAsset.assetNumber,
-              type: apiAsset.category,
+              name: apiAsset.name || 'Unknown',
+              assetNumber: apiAsset.filename,
+              type: apiAsset.layer,
               character: apiAsset.character,
               genes: apiAsset.genes,
               rarity: apiAsset.rarity,

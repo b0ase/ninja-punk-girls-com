@@ -78,14 +78,10 @@ export interface AssetDetail {
   layer: string;
   filename: string;
   name: string;
-  assetNumber: string;
-  folder_number: string;
-  category: string;
-  item_name: string;
-  character?: string;
-  team?: string;
-  genes?: string;
   rarity?: string;
+  character?: string;
+  genes?: string;
+  team?: string;
   stats: {
     strength: number;
     speed: number;
@@ -94,10 +90,6 @@ export interface AssetDetail {
     stealth: number;
     style: number;
   };
-  original_filename?: string;
-  simplified_filename?: string;
-  layerKey?: string; // Added for reference in UI components
-  // Legacy fields for backward compatibility
   type?: string;
   series?: string;
 }

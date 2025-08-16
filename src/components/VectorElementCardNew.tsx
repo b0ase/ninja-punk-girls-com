@@ -363,9 +363,9 @@ export default function VectorElementCardNew({
           <div className="text-xs text-gray-300 mb-1">
             {layerKey.replace(/_/g, ' ')}
           </div>
-          {asset.assetNumber && (
+          {asset.filename && (
             <div className="text-xs text-gray-300 mb-1">
-              #{asset.assetNumber}
+              #{asset.filename}
             </div>
           )}
           {asset.character && (

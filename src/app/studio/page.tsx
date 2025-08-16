@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import dynamic from 'next/dynamic';
 import { createBrowserClient } from '@supabase/ssr';
 import { useAuth } from '@/context/AuthContext'; 
 import BackgroundDesigner from '@/components/BackgroundDesigner';
 import NftCardDesigner from '@/components/NftCardDesigner'; 
 import ElementCardDesigner from '@/components/ElementCardDesigner';
-// import Studio3DTab from '@/components/Studio3DTab'; // Commented out or removed
 import { LayerManagerProvider, useLayerManager } from '@/context/LayerManagerContext';
 import { ParsedFileInfo } from '@/app/api/asset-files/route'; 
 import type { PositionState } from '@/components/ElementCardDesigner'; // Ensure this is correctly typed
@@ -19,7 +17,7 @@ interface SeriesListItem {
   name: string;
 }
 
-type StudioTab = 'npgAi' | 'seriesMaker' | 'backgroundDesigner' | 'layerManager' | 'nftCardDesign' | 'elementCardDesign' | 'elementBuilder' | 'assetFiles' | '3d' | 'aiInteraction';
+type StudioTab = 'npgAi' | 'seriesMaker' | 'backgroundDesigner' | 'layerManager' | 'nftCardDesign' | 'elementCardDesign' | 'elementBuilder' | 'assetFiles' | 'aiInteraction';
 
 // Props for the TabButton component
 interface TabButtonProps {
@@ -28,12 +26,6 @@ interface TabButtonProps {
   activeTab: StudioTab;
   setActiveTab: (tab: StudioTab) => void;
 }
-
-// Dynamically import Studio3DTab
-const DynamicStudio3DTab = dynamic(() => import('@/components/Studio3DTab'), {
-  ssr: false,
-  loading: () => <div className="p-4 text-center">Loading 3D Studio...</div>,
-});
 
 const StudioPage = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -67,7 +59,6 @@ const StudioPage = () => {
   const [checkedFiles, setCheckedFiles] = useState<Set<string>>(new Set());
 
   // New state for the selected asset in Element Builder
-  const [selectedPngFor3D, setSelectedPngFor3D] = useState<string | null>(null);
   const [selectedPngForAIArt, setSelectedPngForAIArt] = useState<string | null>(null); // Holds path if selected from dropdown, or File object if uploaded
   const [uploadedAiArtFile, setUploadedAiArtFile] = useState<File | null>(null); // New state for uploaded file object
 
@@ -78,21 +69,6 @@ const StudioPage = () => {
   const [generatedArtImage, setGeneratedArtImage] = useState<string | null>(null); // To store base64 result
   const [isGeneratingArt, setIsGeneratingArt] = useState<boolean>(false);
   const [aiArtError, setAiArtError] = useState<string | null>(null);
-
-  // States for 3D Studio .glb file selection
-  const [availableGlbFiles, setAvailableGlbFiles] = useState<string[]>([]);
-  const [selectedGlbFile, setSelectedGlbFile] = useState<string | null>(null);
-  const [isLoadingGlbFiles, setIsLoadingGlbFiles] = useState<boolean>(false);
-  const [fetchGlbError, setFetchGlbError] = useState<string | null>(null);
-  const [selected3DAssetCategory, setSelected3DAssetCategory] = useState<string>('10 Hair'); // Default category
-
-  // States for Anything World 3D Generation
-  const [anythingWorldModelId, setAnythingWorldModelId] = useState<string | null>(null);
-  const [isGeneratingAnythingWorld3D, setIsGeneratingAnythingWorld3D] = useState<boolean>(false);
-  const [anythingWorldStatus, setAnythingWorldStatus] = useState<string | null>(null);
-  const [anythingWorldGeneratedModelData, setAnythingWorldGeneratedModelData] = useState<any | null>(null); // Stores the successful poll response data
-  const [anythingWorldError, setAnythingWorldError] = useState<string | null>(null);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // === COMMENTED OUT LayerManager state/functions (no longer in context) ===
   // const { 
@@ -162,7 +138,6 @@ const StudioPage = () => {
     elementCardDesign: { title: 'Element Card Design', description: 'Design individual element cards.', color: 'bg-pink-700/70 hover:bg-pink-600/90' },
     elementBuilder: { title: 'Element Builder & AI Tools', description: 'Construct elements, use AI for background removal.', color: 'bg-teal-700/70 hover:bg-teal-600/90' },
     assetFiles: { title: 'Asset Files Manager', description: 'View, manage, and share your uploaded asset files.', color: 'bg-green-700/70 hover:bg-green-600/90' },
-    '3d': { title: '3D Studio & Rigging', description: 'Work with 3D models and character rigging.', color: 'bg-red-700/70 hover:bg-red-600/90' },
     aiInteraction: { title: 'AI Interaction Center', description: 'Chat with NPG AI for brainstorming and assistance.', color: 'bg-orange-700/70 hover:bg-orange-600/90' },
   };
   // Define the order of tabs for rendering the cards
@@ -174,8 +149,7 @@ const StudioPage = () => {
     'elementCardDesign',
     'elementBuilder',
     'assetFiles',
-    '3d',
-    // 'aiInteraction' // Keep AI Interaction separate or integrate differently
+    'aiInteraction',
   ];
 
   // Fetch available series for the dropdown
@@ -223,8 +197,7 @@ const StudioPage = () => {
     const fetchAssetFilesForBuilder = async () => {
         if (!selectedSeriesId) { // Only fetch if a series is selected, otherwise dropdown is empty
             setAssetFiles([]); // Clear asset files if no series is selected
-            setSelectedPngFor3D(null); // Clear selection
-            setSelectedPngForAIArt(null); // Clear selection for AI tool
+            setSelectedPngForAIArt(null); // Clear selection
             return;
         }
         // This logic is similar to the one for 'assetFiles' tab, but always runs if series changes
@@ -252,7 +225,6 @@ const StudioPage = () => {
         // Let's modify the existing fetchAssetFiles to also run if elementBuilder is active.
     } else {
         setAssetFiles([]); // Clear if no series selected
-        setSelectedPngFor3D(null);
         setSelectedPngForAIArt(null);
     }
   }, [selectedSeriesId]); // React to series changes for Element Builder assets
@@ -262,8 +234,7 @@ const StudioPage = () => {
     const fetchAssetFiles = async () => {
         if (!selectedSeriesId) {
             setAssetFiles([]);
-            setSelectedPngFor3D(null); 
-            setSelectedPngForAIArt(null); // Clear path selection
+            setSelectedPngForAIArt(null); 
             setUploadedAiArtFile(null); // Clear uploaded file
             setGeneratedArtImage(null); // Clear previous results
             setAiArtError(null);
@@ -288,8 +259,7 @@ const StudioPage = () => {
                 throw new Error(data.error || "API returned unsuccessful status for asset files.");
             }
             setAssetFiles(data.data || []);
-            setSelectedPngFor3D(null); 
-            setSelectedPngForAIArt(null); // Clear path selection
+            setSelectedPngForAIArt(null); 
             setUploadedAiArtFile(null); // Clear uploaded file
             setGeneratedArtImage(null); // Clear previous results
             setAiArtError(null);
@@ -306,7 +276,6 @@ const StudioPage = () => {
         fetchAssetFiles();
     } else if (!selectedSeriesId) {
       setAssetFiles([]);
-      setSelectedPngFor3D(null);
       setSelectedPngForAIArt(null);
       setUploadedAiArtFile(null);
       setGeneratedArtImage(null);
@@ -315,158 +284,9 @@ const StudioPage = () => {
   // Depend on activeTab as well, so if user switches to elementBuilder and series is selected, files are fetched.
   }, [activeTab, selectedSeriesId, isAuthenticated]); 
 
-  // Effect to fetch .glb files for the 3D Studio
-  useEffect(() => {
-    const fetchGlbFiles = async () => {
-      if (!selected3DAssetCategory) {
-        setAvailableGlbFiles([]);
-        setSelectedGlbFile(null);
-        setFetchGlbError(null);
-        return;
-      }
-      setIsLoadingGlbFiles(true);
-      setFetchGlbError(null);
-      try {
-        const response = await fetch(`/api/list-3d-assets?category=${encodeURIComponent(selected3DAssetCategory)}`);
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: "Failed to parse error response" }));
-          throw new Error(errorData.error || `Failed to fetch .glb files: ${response.statusText}`);
-        }
-        const data = await response.json();
-        if (!data.success) {
-          throw new Error(data.error || "API returned unsuccessful status for .glb files.");
-        }
-        setAvailableGlbFiles(data.files || []);
-        setSelectedGlbFile(null); // Reset selection when category changes or files reload
-      } catch (error: any) {
-        console.error("Error fetching .glb files:", error);
-        setFetchGlbError(error.message);
-        setAvailableGlbFiles([]);
-      } finally {
-        setIsLoadingGlbFiles(false);
-      }
-    };
 
-    // Fetch when 3D tab is active and a category is selected
-    if (activeTab === '3d' && selected3DAssetCategory) {
-      fetchGlbFiles();
-    } else if (activeTab !== '3d' || !selected3DAssetCategory) {
-      // Clear GLB files and selection if not on 3D tab or no category
-      setAvailableGlbFiles([]);
-      setSelectedGlbFile(null);
-      setFetchGlbError(null); // Clear error too
-    }
-  }, [activeTab, selected3DAssetCategory]);
 
-  // Cleanup polling on component unmount
-  useEffect(() => {
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
-    };
-  }, []);
 
-  const pollAnythingWorldModel = useCallback(async (modelId: string) => {
-    console.log("[StudioPage] Polling Anything World for model_id:", modelId);
-    setAnythingWorldStatus("Polling status...");
-    try {
-      const response = await fetch(`/api/anything-world/get-model-status?model_id=${modelId}`);
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        const errorMsg = result.error || result.details?.message || result.details?.detail || "Polling failed.";
-        throw new Error(errorMsg);
-      }
-
-      const { data: statusData } = result;
-      setAnythingWorldStatus(`Status: ${statusData?.status || 'Unknown'}, Stage: ${statusData?.stage || 'N/A'}, Progress: ${statusData?.progress !== undefined ? (statusData.progress * 100).toFixed(0) + '%' : 'N/A'}`);
-
-      // Example completion check - this needs to be adapted to the actual API response structure for completion.
-      // Common statuses: "complete", "completed", "processed", "succeeded", "available"
-      const isComplete = ["complete", "completed", "processed", "succeeded", "available"].includes(statusData?.status?.toLowerCase());
-      const hasGlb = statusData?.files?.glb;
-
-      if (isComplete && hasGlb) {
-        console.log("[StudioPage] Anything World model generation complete:", statusData);
-        setAnythingWorldGeneratedModelData(statusData);
-        setAnythingWorldModelId(null); // Clear model ID as it's processed
-        if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-        setAnythingWorldStatus(`Completed! Model ready. GLB: ${statusData.files.glb}`);
-        setIsGeneratingAnythingWorld3D(false);
-      } else if (statusData?.status?.toLowerCase() === 'failed' || statusData?.error) {
-        throw new Error(statusData?.error || statusData?.message || "Model generation failed.");
-      }
-      // If not complete and not failed, polling continues via setInterval
-
-    } catch (error: any) {
-      console.error("[StudioPage] Error polling Anything World status:", error);
-      setAnythingWorldError(error.message);
-      setAnythingWorldStatus(`Error: ${error.message}`);
-      setIsGeneratingAnythingWorld3D(false);
-      setAnythingWorldModelId(null);
-      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
-    }
-  }, []); // Removed anythingWorldModelId from dependencies to avoid re-creating interval on status update
-
-  const handleStartAnythingWorldGeneration = useCallback(async () => {
-    if (!selectedPngFor3D) {
-      setAnythingWorldError("Please select a PNG image from your series assets first.");
-      return;
-    }
-
-    setIsGeneratingAnythingWorld3D(true);
-    setAnythingWorldError(null);
-    setAnythingWorldStatus("Initiating 3D model generation...");
-    setAnythingWorldGeneratedModelData(null);
-    if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); // Clear previous interval
-
-    const formData = new FormData();
-    // The backend API for Anything World expects 'imagePath' to be relative to 'public'
-    // selectedPngFor3D is already like '/assets/seriesX/image.png' which is correct.
-    formData.append('imagePath', selectedPngFor3D);
-
-    try {
-      const response = await fetch('/api/anything-world/generate-3d-from-image', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        const errorMsg = result.error || result.details?.message || result.details?.detail || "Failed to start generation.";
-        throw new Error(errorMsg);
-      }
-
-      const modelId = result.modelId;
-      if (!modelId) {
-        throw new Error("API did not return a model_id.");
-      }
-      
-      setAnythingWorldModelId(modelId);
-      setAnythingWorldStatus("Generation started. Polling for status...");
-      console.log("[StudioPage] Anything World generation started. Model ID:", modelId);
-      
-      // Start polling
-      // Initial poll, then set interval
-      await pollAnythingWorldModel(modelId); 
-      pollingIntervalRef.current = setInterval(() => {
-        // Check if modelId is still active before polling, could have been cleared by completion/error
-        // This requires getting the latest anythingWorldModelId, not the one captured by useCallback closure.
-        // A ref or direct state check might be better here if issues arise, but for now, direct call.
-        // For simplicity, the pollAnythingWorldModel itself now clears the interval on completion/error.
-        // The main concern is if modelId changes externally while an interval for an old one is running.
-        // The clearing of interval at the start of this function should handle most cases.
-         pollAnythingWorldModel(modelId); // modelId from the initial call is used.
-      }, 10000); // Poll every 10 seconds
-
-    } catch (error: any) {
-      console.error("[StudioPage] Error starting Anything World generation:", error);
-      setAnythingWorldError(error.message);
-      setAnythingWorldStatus(`Error: ${error.message}`);
-      setIsGeneratingAnythingWorld3D(false);
-    }
-  }, [selectedPngFor3D, pollAnythingWorldModel]);
 
   const handleFileCheckChange = (filename: string, isChecked: boolean) => {
     setCheckedFiles(prev => {
@@ -1016,50 +836,7 @@ const StudioPage = () => {
         return <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
           <h2 className="text-xl text-cyan-400 mb-4">Element Builder & AI Tools</h2>
           
-          {/* Section 1: Select PNG for 3D Conversion */}
-          <div className="mb-8 p-4 border border-gray-700 rounded-md">
-            <h3 className="text-lg text-teal-400 mb-3">1. Select Asset for 3D Conversion</h3>
-            {isLoadingFiles && <p className="text-sm text-gray-400">Loading assets...</p>}
-            {fetchFilesError && <p className="text-sm text-red-500">Error loading assets: {fetchFilesError}</p>}
-            {!isLoadingFiles && !fetchFilesError && !selectedSeriesId && (
-              <p className="text-sm text-yellow-500">Please select a series first.</p>
-            )}
-            {!isLoadingFiles && !fetchFilesError && selectedSeriesId && pngAssetFiles.length === 0 && (
-              <p className="text-sm text-gray-500">No PNG assets found in the selected series.</p>
-            )}
-            {!isLoadingFiles && !fetchFilesError && selectedSeriesId && pngAssetFiles.length > 0 && (
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="pngFor3DSelect" className="text-sm font-medium text-gray-300">
-                  Select PNG from Series '{availableSeriesList.find(s => s.id === selectedSeriesId)?.name || 'Current'}':
-                </label>
-                <select
-                  id="pngFor3DSelect"
-                  value={selectedPngFor3D || ''}
-                  onChange={(e) => setSelectedPngFor3D(e.target.value || null)}
-                  className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:ring-teal-500 focus:border-teal-500"
-                >
-                  <option value="" disabled>-- Select a PNG --</option>
-                  {pngAssetFiles.map(file => (
-                    <option key={file.filename} value={`/assets/${file.directory}/${file.filename}`}>
-                      {file.filename}
-                    </option>
-                  ))}
-                </select>
-                {selectedPngFor3D && (
-                  <p className="text-xs text-gray-400 mt-1">Selected for 3D: {selectedPngFor3D.split('/').pop()}</p>
-                )}
-              </div>
-            )}
-            {/* Placeholder for triggering 3D conversion process */}
-            {selectedPngFor3D && (
-              <button 
-                onClick={() => console.log('Trigger 3D conversion for:', selectedPngFor3D)}
-                className="mt-3 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-md text-sm"
-              >
-                Proceed to 3D Studio with Selected PNG
-              </button>
-            )}
-          </div>
+
 
           {/* Section 2: AI PNG Art Generator (Stability AI) */}
           <div className="mb-6 p-4 border border-gray-700 rounded-md">
@@ -1243,72 +1020,7 @@ const StudioPage = () => {
                <p className="text-center text-yellow-500 py-4">Please select a series from the dropdown above.</p>
           )}
         </div>;
-      case '3d':
-        return (
-          <div className="bg-gray-900 p-6 rounded-lg shadow-lg h-full flex flex-col">
-            <h2 className="text-xl text-red-400 mb-4">3D Studio & Rigging</h2>
-            
-            {/* Optional: Dropdown for selecting 3D asset category. Keeping it simple for now, defaulting to '10 Hair'.
-            <div className="mb-4">
-              <label htmlFor="glbCategorySelect" className="block text-sm font-medium text-gray-300 mb-1">Select 3D Asset Category:</label>
-              <select
-                id="glbCategorySelect"
-                value={selected3DAssetCategory || ''}
-                onChange={(e) => {
-                  setSelected3DAssetCategory(e.target.value || '10 Hair'); // Ensure a default or handle null
-                  setSelectedGlbFile(null); // Reset selection on category change
-                }}
-                className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:ring-red-500 focus:border-red-500"
-              >
-                <option value="10 Hair">10 Hair</option>
-                {/* Add other categories from your list, e.g.:
-                <option value="01 Logo">01 Logo</option>
-                <option value="07 Right-Weapon">07 Right-Weapon</option>
-                *\/}
-              </select>
-            </div>
-            */}
-      
-            {isLoadingGlbFiles && <p className="text-sm text-gray-400 animate-pulse">Loading 3D models for '{selected3DAssetCategory}'...</p>}
-            {fetchGlbError && <p className="text-sm text-red-500">Error loading 3D models: {fetchGlbError}</p>}
-            
-            {!isLoadingGlbFiles && !fetchGlbError && selected3DAssetCategory && availableGlbFiles.length === 0 && (
-              <p className="text-sm text-gray-500">No .glb models found in category '{selected3DAssetCategory}'. Check `public/3D_assets/{selected3DAssetCategory}`.</p>
-            )}
-      
-            {!isLoadingGlbFiles && !fetchGlbError && availableGlbFiles.length > 0 && (
-              <div className="mb-4">
-                <label htmlFor="glbFileSelect" className="block text-sm font-medium text-gray-300 mb-1">Select .glb Model from '{selected3DAssetCategory}':</label>
-                <select
-                  id="glbFileSelect"
-                  value={selectedGlbFile || ''}
-                  onChange={(e) => setSelectedGlbFile(e.target.value || null)}
-                  className="w-full p-2 rounded bg-gray-800 border border-gray-600 text-white focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="" disabled={!!selectedGlbFile}>-- Select a .glb file --</option>
-                  {availableGlbFiles.map(filePath => {
-                    const fileName = filePath.split('/').pop();
-                    return (
-                      <option key={filePath} value={filePath}>
-                        {fileName}
-                      </option>
-                    );
-                  })}
-                </select>
-                {selectedGlbFile && (
-                  <p className="text-xs text-gray-400 mt-1">Selected model: {selectedGlbFile.split('/').pop()}</p>
-                )}
-              </div>
-            )}
-            
-            <div className="flex-grow min-h-0"> {/* Crucial for flex child to take remaining space and allow internal scrolling if any */}
-              <DynamicStudio3DTab 
-                selectedSeriesId={selectedSeriesId} 
-                modelToLoad={selectedGlbFile} // Pass the selected .glb file path using the new prop name
-              />
-            </div>
-          </div>
-        );
+
       case 'aiInteraction':
         return <div className="bg-gray-900 p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold text-red-400 mb-6 text-center">NPG AI Interaction Center</h2>
@@ -1346,7 +1058,7 @@ const StudioPage = () => {
              <TabButton label="Element Card Design" tabKey="elementCardDesign" activeTab={activeTab} setActiveTab={setActiveTab} />
              <TabButton label="Element Builder" tabKey="elementBuilder" activeTab={activeTab} setActiveTab={setActiveTab} />
              <TabButton label="Asset Files" tabKey="assetFiles" activeTab={activeTab} setActiveTab={setActiveTab} />
-             <TabButton label="3D Studio" tabKey="3d" activeTab={activeTab} setActiveTab={setActiveTab} />
+
              {/* <TabButton label="AI Interaction" tabKey="aiInteraction" activeTab={activeTab} setActiveTab={setActiveTab} /> */}
            </nav>
            {/* --- Series Management Section can stay here OR move to the new middle column --- */}

@@ -94,7 +94,7 @@ function CharactersPageContent() {
         layer: layerKey,
         name: asset.name || '',
         filename: asset.filename,
-        assetNumber: asset.assetNumber?.toString() || undefined,
+        assetNumber: asset.filename,
         rarity: asset.rarity || undefined,
         type: layerKey, // Use the layerKey from the Object.entries destructuring
         character: asset.character || undefined,

@@ -292,7 +292,7 @@ const ElementsCatalogueTable: React.FC<ElementsCatalogueTableProps> = ({ assets 
                       return (
                         <tr key={`${asset.filename || `missing-filename-${index}`}-${index}`} className="hover:bg-gray-700/50 transition-colors">
                           <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-400">{toTitleCase(categoryKey)}</td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-300">{asset.assetNumber || 'N/A'}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-300">{asset.filename || 'N/A'}</td>
                           <td className="px-4 py-1">
                              {/* Use the safety-checked imageUrl */}
                              <Image src={imageUrl} alt={asset.name || 'Unknown Asset'} width={40} height={60} objectFit="contain" unoptimized className="rounded" onError={(e) => e.currentTarget.src = '/placeholder.png'} />

@@ -341,7 +341,7 @@ export default function NewElementCardsSystemPage() {
                             </div>
                           </td>
                           <td className="px-4 py-3 text-sm font-medium text-gray-200">{asset.name}</td>
-                          <td className="px-4 py-3 text-sm text-gray-300">{asset.assetNumber || 'N/A'}</td>
+                          <td className="px-4 py-3 text-sm text-gray-300">{asset.filename || 'N/A'}</td>
                           <td className="px-4 py-3 text-sm text-gray-300">
                             {asset.rarity && (
                               <span className={`px-2 py-1 rounded-full text-xs font-bold text-white`}
@@ -397,7 +397,7 @@ export default function NewElementCardsSystemPage() {
                       </div>
                       <div className="space-y-2 text-sm">
                         <div className="font-bold text-white">{asset.name}</div>
-                        <div className="text-gray-300">#{asset.assetNumber || 'N/A'}</div>
+                        <div className="text-gray-300">#{asset.filename || 'N/A'}</div>
                         {asset.rarity && (
                           <div className="text-gray-400">Rarity: {asset.rarity}</div>
                         )}

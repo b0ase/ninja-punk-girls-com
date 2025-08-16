@@ -31,7 +31,7 @@ export default function AllElementCardsPage() {
             if (asset && typeof asset === 'object') {
               allAssets.push({
                 ...asset,
-                layerKey: layerKey // Add layer key to each asset for reference
+
               });
             }
           }
@@ -57,7 +57,7 @@ export default function AllElementCardsPage() {
     if (filters.rarity && asset.rarity?.toLowerCase() !== filters.rarity.toLowerCase()) return false;
     if (filters.character && asset.character?.toLowerCase() !== filters.character.toLowerCase()) return false;
     if (filters.genes && asset.genes?.toLowerCase() !== filters.genes.toLowerCase()) return false;
-    if (filters.layer && asset.layerKey !== filters.layer) return false;
+    if (filters.layer && asset.layer !== filters.layer) return false;
     if (filters.search && !asset.name?.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
@@ -303,10 +303,10 @@ export default function AllElementCardsPage() {
             <div className="bg-gray-800 rounded-lg p-6">
               <div className="flex flex-wrap gap-4 justify-center">
                 {filteredAssets.map((asset, index) => (
-                  <div key={`${asset.layerKey}-${asset.filename || index}`} className="flex justify-center">
+                  <div key={`${asset.layer}-${asset.filename || index}`} className="flex justify-center">
                     <VectorElementCardNew
                       asset={asset}
-                      layerKey={asset.layerKey || 'UNKNOWN'}
+                      layerKey={asset.layer || 'UNKNOWN'}
                       showDetails={true}
                       size={cardSize}
                     />
@@ -347,22 +347,22 @@ export default function AllElementCardsPage() {
                   </thead>
                   <tbody className="bg-gray-800 divide-y divide-gray-700">
                     {filteredAssets.map((asset, index) => (
-                      <tr key={`${asset.layerKey}-${asset.filename || index}`} className="hover:bg-gray-700/50 transition-colors">
+                      <tr key={`${asset.layer}-${asset.filename || index}`} className="hover:bg-gray-700/50 transition-colors">
                         <td className="px-4 py-3">
                           <div className="w-16 h-24">
                             <VectorElementCardNew
                               asset={asset}
-                              layerKey={asset.layerKey || 'UNKNOWN'}
+                              layerKey={asset.layer || 'UNKNOWN'}
                               showDetails={false}
                               size="small"
                             />
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm font-medium text-gray-200">
-                          {asset.layerKey?.replace(/_/g, ' ')}
+                          {asset.layer?.replace(/_/g, ' ')}
                         </td>
                         <td className="px-4 py-3 text-sm font-medium text-gray-200">{asset.name}</td>
-                        <td className="px-4 py-3 text-sm text-gray-300">{asset.assetNumber || 'N/A'}</td>
+                                                  <td className="px-4 py-3 text-sm text-gray-300">{asset.filename || 'N/A'}</td>
                         <td className="px-4 py-3 text-sm text-gray-300">
                           {asset.rarity && (
                             <span className={`px-2 py-1 rounded-full text-xs font-bold text-white`}
