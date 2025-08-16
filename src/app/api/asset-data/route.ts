@@ -5,7 +5,7 @@ import path from 'path';
 // === TYPES ===
 export interface AssetDetail {
   layer: string;
-  filename: string;
+  filename: string; // This will now be the full blob URL
   name: string;
   rarity?: string;
   character?: string;
@@ -21,77 +21,29 @@ export interface AssetDetail {
   };
 }
 
+export interface BlobAsset {
+  path: string; // Relative path within assets-source, e.g., "01-Logo/logo.png"
+  url: string;  // Full Vercel Blob URL
+  size: number;
+  contentType: string;
+}
+
+export interface BlobAssetManifest {
+  generated: string;
+  totalFiles: number;
+  uploadedFiles: number;
+  failedFiles: number;
+  assets: BlobAsset[];
+}
+
 // === CACHING ===
 let assetCache: AssetDetail[] | null = null;
-
-// === HELPER FUNCTIONS ===
-async function loadAssetsFromDirectory(): Promise<AssetDetail[]> {
-  const assetsDir = path.join(process.cwd(), 'public', 'assets', 'assets-source');
-  const allAssets: AssetDetail[] = [];
-
-  try {
-    // Read all subdirectories (layers)
-    const layerDirs = await fs.readdir(assetsDir);
-    
-    for (const layerDir of layerDirs) {
-      const layerPath = path.join(assetsDir, layerDir);
-      const layerStat = await fs.stat(layerPath);
-      
-      if (layerStat.isDirectory()) {
-        // Read files in this layer directory
-        const files = await fs.readdir(layerPath);
-        
-        for (const file of files) {
-          if (file.endsWith('.png')) {
-            // Try to find corresponding JSON file for metadata
-            const jsonFile = file.replace('.png', '.json');
-            const jsonPath = path.join(layerPath, jsonFile);
-            
-            let assetData: Partial<AssetDetail> = {
-              layer: layerDir,
-              filename: file,
-              name: file.replace('.png', '').replace(/_/g, ' '),
-              rarity: 'Common',
-              stats: { strength: 0, speed: 0, skill: 0, stamina: 0, stealth: 0, style: 0 }
-            };
-
-            try {
-              // Try to load JSON metadata if it exists
-              const jsonContent = await fs.readFile(jsonPath, 'utf-8');
-              const metadata = JSON.parse(jsonContent);
-              
-              // Extract metadata from JSON
-              if (metadata.rarity) assetData.rarity = metadata.rarity;
-              if (metadata.character) assetData.character = metadata.character;
-              if (metadata.genes) assetData.genes = metadata.genes;
-              if (metadata.team) assetData.team = metadata.team;
-              if (metadata.stats) assetData.stats = metadata.stats;
-              if (metadata.name) assetData.name = metadata.name;
-            } catch (jsonError) {
-              // JSON file doesn't exist or is invalid, use defaults
-              console.log(`[API] No JSON metadata for ${file}, using defaults`);
-            }
-
-            allAssets.push(assetData as AssetDetail);
-          }
-        }
-      }
-    }
-
-    console.log(`[API] Successfully loaded ${allAssets.length} assets from local directory`);
-    return allAssets;
-
-  } catch (error) {
-    console.error('[API] Error reading assets directory:', error);
-    throw error;
-  }
-}
 
 // === API HANDLER ===
 export async function GET() {
   try {
     if (assetCache) {
-      console.log('[API] Returning cached asset data');
+      console.log('[API] Returning cached asset data from Blob Manifest');
       return NextResponse.json({
         success: true,
         data: assetCache,
@@ -99,9 +51,39 @@ export async function GET() {
       });
     }
 
-    console.log('[API] Loading asset data from local assets directory...');
+    console.log('[API] Loading asset data from Blob Manifest...');
     
-    const allAssets = await loadAssetsFromDirectory();
+    const manifestPath = path.join(process.cwd(), 'src', 'data', 'asset-manifest.json');
+    const manifestContent = await fs.readFile(manifestPath, 'utf-8');
+    const manifest: BlobAssetManifest = JSON.parse(manifestContent);
+
+    const allAssets: AssetDetail[] = manifest.assets.map(blobAsset => {
+      const pathParts = blobAsset.path.split('/');
+      const layer = pathParts[0]; // e.g., "01-Logo"
+      const filename = pathParts[pathParts.length - 1]; // e.g., "01_001_logo_NPG-logo_x_NPG_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png"
+
+      // Extract name from filename (assuming it's the 4th part after splitting by '_')
+      const filenameParts = filename.split('_');
+      let name = filename; // Default to full filename
+      if (filenameParts.length > 3) {
+        name = filenameParts[3]; 
+      }
+      name = name.replace(/\.png$/, ''); // Remove .png extension
+
+      // Placeholder for rarity and stats, as they are not in the current manifest
+      // In a real scenario, these would come from metadata files or a database
+      const rarity = 'Common'; 
+      const stats = { strength: 0, speed: 0, skill: 0, stamina: 0, stealth: 0, style: 0 };
+
+      return {
+        layer: layer,
+        filename: blobAsset.url, // Use the full blob URL
+        name: name,
+        rarity: rarity,
+        stats: stats,
+      } as AssetDetail;
+    });
+
     assetCache = allAssets;
 
     return NextResponse.json({

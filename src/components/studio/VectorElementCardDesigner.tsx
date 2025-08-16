@@ -8,6 +8,7 @@ import VectorElementCardNew from '@/components/VectorElementCardNew';
 
 interface VectorElementCardDesignerProps {
   className?: string;
+  selectedSeriesId?: string | null;
 }
 
 export default function VectorElementCardDesigner({ className }: VectorElementCardDesignerProps) {
