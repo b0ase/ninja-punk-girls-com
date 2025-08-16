@@ -1,0 +1,13 @@
+# Vercel Blob Storage Configuration
+# Copy this content to .env.local and fill in your actual values
+
+# Your Vercel Blob Store ID
+# Find this in your Vercel dashboard: Storage > Blob > Store ID
+BLOB_STORE_ID=your-blob-store-id-here
+
+# Vercel Blob Token (if needed for server-side operations)
+# This is usually automatically handled by Vercel
+BLOB_READ_WRITE_TOKEN=your-blob-token-here
+
+# Optional: Custom domain for blob URLs (if you have one configured)
+# BLOB_CUSTOM_DOMAIN=your-custom-domain.com
