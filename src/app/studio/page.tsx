@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { useAuth } from '@/context/AuthContext'; 
 import BackgroundDesigner from '@/components/BackgroundDesigner';
 import NftCardDesigner from '@/components/NftCardDesigner'; 
@@ -135,7 +135,10 @@ const StudioPage = () => {
       console.error("No series selected to save layout for.");
       return;
     }
-    const supabase = createClientComponentClient();
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     const { error } = await supabase
       .from('series_element_layouts') // Assuming a table named 'series_element_layouts'
       .update({ layout_config: newLayout })
@@ -181,7 +184,10 @@ const StudioPage = () => {
       if (!user) return; // Only fetch if user data is loaded
       setIsLoadingSeriesList(true);
       try {
-        const supabase = createClientComponentClient();
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
         const { data, error } = await supabase
           .from('series_concepts')
           .select('id, name')
@@ -603,7 +609,10 @@ const StudioPage = () => {
       setIsLoadingConcept(true); setLoadConceptError(null);
       console.log(`Fetching concept: ${selectedSeriesId}`);
       try {
-        const supabase = createClientComponentClient();
+        const supabase = createBrowserClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("User not authenticated.");
 
@@ -664,7 +673,10 @@ const StudioPage = () => {
 
   // <<< Add handler for Creating Series Concept >>>
   const handleCreateSeriesConcept = useCallback(async () => {
-    const supabase = createClientComponentClient();
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
     const { data: { user: currentUser } } = await supabase.auth.getUser();
 
     if (!currentUser) {

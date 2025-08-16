@@ -1,0 +1,20 @@
+{
+  "folder_number": "09",
+  "asset_number": "003",
+  "category": "Horns",
+  "item_name": "Small",
+  "character": null,
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "09_003_Horns_Small_x_Erobot_x_Rare_Strength_2_Speed_2_Skill_1_Stamina_2_Stealth_1_Style_0_.png",
+  "simplified_filename": "09_003_Horns_Small.png"
+}

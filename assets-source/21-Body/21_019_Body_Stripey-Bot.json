@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "019",
+  "category": "Body",
+  "item_name": "Stripey-Bot",
+  "character": null,
+  "team": "NPG",
+  "genes": "RGB",
+  "rarity": "Rare",
+  "stats": {
+    "strength": 0,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "21_019_Body_Stripey-Bot_x_NPG_RGB_Rare_Strength_0_Speed_1_Skill_0_Stamina_1_Stealth_2_Style_0_.png",
+  "simplified_filename": "21_019_Body_Stripey-Bot.png"
+}

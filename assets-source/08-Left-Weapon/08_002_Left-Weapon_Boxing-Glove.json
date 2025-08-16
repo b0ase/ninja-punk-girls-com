@@ -1,0 +1,20 @@
+{
+  "folder_number": "08",
+  "asset_number": "002",
+  "category": "Left-Weapon",
+  "item_name": "Boxing-Glove",
+  "character": "Yamarashii",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 2,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "08_002_Left-Weapon_Boxing-Glove_Yamarashii_Erobot_x_Mythical_Strength_2_Speed_0_Skill_2_Stamina_0_Stealth_1_Style_0_.png",
+  "simplified_filename": "08_002_Left-Weapon_Boxing-Glove.png"
+}

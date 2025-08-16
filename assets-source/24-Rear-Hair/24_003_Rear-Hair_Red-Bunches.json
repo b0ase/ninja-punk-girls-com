@@ -1,0 +1,20 @@
+{
+  "folder_number": "24",
+  "asset_number": "003",
+  "category": "Rear-Hair",
+  "item_name": "Red-Bunches",
+  "character": "Phi-Phi",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 1,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "24_003_Rear-Hair_Red-Bunches_Phi-Phi_Erobot_x_Common_Strength_0_Speed_1_Skill_1_Stamina_0_Stealth_2_Style_2_.png",
+  "simplified_filename": "24_003_Rear-Hair_Red-Bunches.png"
+}

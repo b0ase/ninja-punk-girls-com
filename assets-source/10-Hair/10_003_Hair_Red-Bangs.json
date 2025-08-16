@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "003",
+  "category": "Hair",
+  "item_name": "Red-Bangs",
+  "character": "Hikaru",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 1,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "10_003_Hair_Red-Bangs_Hikaru_Erobot_x_Rare_Strength_1_Speed_1_Skill_0_Stamina_1_Stealth_2_Style_1_.png",
+  "simplified_filename": "10_003_Hair_Red-Bangs.png"
+}

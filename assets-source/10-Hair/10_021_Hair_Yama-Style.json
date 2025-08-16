@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "021",
+  "category": "Hair",
+  "item_name": "Yama-Style",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 1,
+    "speed": 1,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "10_021_Hair_Yama-Style_x_x_x_Uncommon_Strength_1_Speed_1_Skill_2_Stamina_0_Stealth_1_Style_0_.png",
+  "simplified_filename": "10_021_Hair_Yama-Style.png"
+}

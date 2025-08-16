@@ -1,0 +1,20 @@
+{
+  "folder_number": "07",
+  "asset_number": "032",
+  "category": "Right-Weapon",
+  "item_name": "Small-Knife",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "07_032_Right-Weapon_Small-Knife_x_x_x_Rare_Strength_2_Speed_0_Skill_2_Stamina_2_Stealth_2_Style_2_.png",
+  "simplified_filename": "07_032_Right-Weapon_Small-Knife.png"
+}

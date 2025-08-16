@@ -1,0 +1,20 @@
+{
+  "folder_number": "19",
+  "asset_number": "026",
+  "category": "Underwear",
+  "item_name": "Kinky-Straps",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Epic",
+  "stats": {
+    "strength": 0,
+    "speed": 1,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 2
+  },
+  "original_filename": "19_026_Underwear_Kinky-Straps_x_x_x_Epic_Strength_0_Speed_1_Skill_2_Stamina_2_Stealth_2_Style_2_.png",
+  "simplified_filename": "19_026_Underwear_Kinky-Straps.png"
+}

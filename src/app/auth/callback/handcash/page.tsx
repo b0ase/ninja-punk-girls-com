@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 
 // Simple Loading Component
 const LoadingSpinner = () => (
@@ -21,7 +21,10 @@ export default function HandCashCallback() {
   const [status, setStatus] = useState<string>('Initializing...');
   const [debugInfo, setDebugInfo] = useState<string>('');
 
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   useEffect(() => {
     console.log('[HandCashCallback] Page component mounted');

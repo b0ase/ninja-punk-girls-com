@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "027",
+  "category": "Hair",
+  "item_name": "Cute",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "10_027_Hair_Cute_x_x_x_Rare_Strength_2_Speed_2_Skill_1_Stamina_0_Stealth_1_Style_0_.png",
+  "simplified_filename": "10_027_Hair_Cute.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "24",
+  "asset_number": "006",
+  "category": "Rear-Hair",
+  "item_name": "Half-Falls",
+  "character": "Payne",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 1,
+    "stealth": 0,
+    "style": 1
+  },
+  "original_filename": "24_006_Rear-Hair_Half-Falls_Payne_Erobot_x_Uncommon_Strength_2_Speed_2_Skill_1_Stamina_1_Stealth_0_Style_1_.png",
+  "simplified_filename": "24_006_Rear-Hair_Half-Falls.png"
+}

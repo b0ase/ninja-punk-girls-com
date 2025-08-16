@@ -1,0 +1,20 @@
+{
+  "folder_number": "07",
+  "asset_number": "035",
+  "category": "Right-Weapon",
+  "item_name": "Doggy",
+  "character": null,
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 1,
+    "style": 2
+  },
+  "original_filename": "07_035_Right-Weapon_Doggy_x_NPG_x_Legendary_Strength_2_Speed_1_Skill_0_Stamina_2_Stealth_1_Style_2_.png",
+  "simplified_filename": "07_035_Right-Weapon_Doggy.png"
+}

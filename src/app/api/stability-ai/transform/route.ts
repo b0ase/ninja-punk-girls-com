@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
         const apiUrl = `${STABILITY_API_HOST}/v1/generation/${engineId}/image-to-image`;
 
         const stabilityFormData = new FormData();
-        stabilityFormData.append('init_image', new Blob([finalImageBuffer]), imageFile?.name || 'init_image.png');
+        stabilityFormData.append('init_image', new Blob([new Uint8Array(finalImageBuffer)], { type: 'image/png' }), imageFile?.name || 'init_image.png');
         stabilityFormData.append('init_image_mode', 'IMAGE_STRENGTH');
         stabilityFormData.append('image_strength', imageStrength.toString()); // Use the received or default imageStrength
         stabilityFormData.append('text_prompts[0][text]', prompt);

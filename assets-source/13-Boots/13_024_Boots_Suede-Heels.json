@@ -1,0 +1,20 @@
+{
+  "folder_number": "13",
+  "asset_number": "024",
+  "category": "Boots",
+  "item_name": "Suede-Heels",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "13_024_Boots_Suede-Heels_x_x_x_Legendary_Strength_1_Speed_0_Skill_1_Stamina_2_Stealth_2_Style_1_.png",
+  "simplified_filename": "13_024_Boots_Suede-Heels.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "27",
+  "asset_number": "002",
+  "category": "Banner",
+  "item_name": "Erobot-2",
+  "character": null,
+  "team": "Erobot",
+  "genes": "RGB",
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "27_002_Banner_Erobot-2_x_Erobot_RGB_Uncommon__x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png",
+  "simplified_filename": "27_002_Banner_Erobot-2.png"
+}

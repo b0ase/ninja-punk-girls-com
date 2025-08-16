@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "017",
+  "category": "Hair",
+  "item_name": "Mohawk",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 1,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "10_017_Hair_Mohawk_x_x_x_Uncommon_Strength_1_Speed_2_Skill_2_Stamina_0_Stealth_1_Style_1_.png",
+  "simplified_filename": "10_017_Hair_Mohawk.png"
+}

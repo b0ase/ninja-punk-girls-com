@@ -1,0 +1,20 @@
+{
+  "folder_number": "08",
+  "asset_number": "022",
+  "category": "Left-Weapon",
+  "item_name": "Bondage-Handcuffs",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "08_022_Left-Weapon_Bondage-Handcuffs_x_x_x_Rare_Strength_0_Speed_0_Skill_1_Stamina_2_Stealth_2_Style_0_.png",
+  "simplified_filename": "08_022_Left-Weapon_Bondage-Handcuffs.png"
+}

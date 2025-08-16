@@ -1,0 +1,20 @@
+{
+  "folder_number": "15",
+  "asset_number": "003",
+  "category": "Accessories",
+  "item_name": "Gold-Chain",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 0,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "15_003_Accessories_Gold-Chain_x_x_x_Rare_Strength_0_Speed_2_Skill_1_Stamina_0_Stealth_1_Style_0_.png",
+  "simplified_filename": "15_003_Accessories_Gold-Chain.png"
+}

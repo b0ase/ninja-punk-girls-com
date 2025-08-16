@@ -31,7 +31,7 @@ export default function AllElementCardsPage() {
             if (asset && typeof asset === 'object') {
               allAssets.push({
                 ...asset,
-                layerKey // Add layer key to each asset for reference
+                layerKey: layerKey // Add layer key to each asset for reference
               });
             }
           }

@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "022",
+  "category": "Hair",
+  "item_name": "Alt-Hawk",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 1,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "10_022_Hair_Alt-Hawk_x_x_x_Common_Strength_1_Speed_2_Skill_2_Stamina_1_Stealth_2_Style_1_.png",
+  "simplified_filename": "10_022_Hair_Alt-Hawk.png"
+}

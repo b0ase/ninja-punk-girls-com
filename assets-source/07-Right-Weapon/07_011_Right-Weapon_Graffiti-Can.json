@@ -1,0 +1,20 @@
+{
+  "folder_number": "07",
+  "asset_number": "011",
+  "category": "Right-Weapon",
+  "item_name": "Graffiti-Can",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 1
+  },
+  "original_filename": "07_011_Right-Weapon_Graffiti-Can_x_x_x_Mythical_Strength_1_Speed_0_Skill_1_Stamina_2_Stealth_0_Style_1_.png",
+  "simplified_filename": "07_011_Right-Weapon_Graffiti-Can.png"
+}

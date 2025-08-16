@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "022",
+  "category": "Body",
+  "item_name": "Human",
+  "character": "Doctor",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "21_022_Body_Human_Doctor_NPG_x_Common_Strength_0_Speed_1_Skill_0_Stamina_2_Stealth_2_Style_0_ copy.png",
+  "simplified_filename": "21_022_Body_Human.png"
+}

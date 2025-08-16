@@ -285,7 +285,7 @@ const ElementsCatalogueTable: React.FC<ElementsCatalogueTableProps> = ({ assets 
                       if (isCollapsed) return null;
 
                       const imageUrl = asset.filename ? `/assets/${folderName}/${asset.filename}` : '/placeholder.png'; // Safety check for image URL
-                      const stats = { strength: 0, speed: 0, skill: 0, stamina: 0, stealth: 0, style: 0, ...asset.stats };
+                      const stats = { ...asset.stats, strength: asset.stats?.strength || 0, speed: asset.stats?.speed || 0, skill: asset.stats?.skill || 0, stamina: asset.stats?.stamina || 0, stealth: asset.stats?.stealth || 0, style: asset.stats?.style || 0 };
                       // Add safety check for asset.filename before calling .includes()
                       const isRgb = !!asset.filename?.includes('_RGB_');
                       

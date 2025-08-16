@@ -1,0 +1,20 @@
+{
+  "folder_number": "20",
+  "asset_number": "014",
+  "category": "Arms",
+  "item_name": "Ninja-Gloves",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 1,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "20_014_Arms_Ninja-Gloves_x_x_x_Mythical_Strength_1_Speed_0_Skill_0_Stamina_0_Stealth_2_Style_1_.png",
+  "simplified_filename": "20_014_Arms_Ninja-Gloves.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "17",
+  "asset_number": "007",
+  "category": "Bottom",
+  "item_name": "Shorts",
+  "character": "Ayumi",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 1,
+    "speed": 2,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "17_007_Bottom_Shorts_Ayumi_NPG_x_Rare_Strength_1_Speed_2_Skill_0_Stamina_0_Stealth_2_Style_0_.png",
+  "simplified_filename": "17_007_Bottom_Shorts.png"
+}

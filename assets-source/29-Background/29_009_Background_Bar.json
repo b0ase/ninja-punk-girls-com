@@ -1,0 +1,20 @@
+{
+  "folder_number": "29",
+  "asset_number": "009",
+  "category": "Background",
+  "item_name": "Bar",
+  "character": null,
+  "team": null,
+  "genes": "RGB",
+  "rarity": "Rare",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "29_009_Background_Bar_x_x_RGB_Rare__x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x_x.png",
+  "simplified_filename": "29_009_Background_Bar.png"
+}

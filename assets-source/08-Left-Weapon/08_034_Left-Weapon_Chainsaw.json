@@ -1,0 +1,20 @@
+{
+  "folder_number": "08",
+  "asset_number": "034",
+  "category": "Left-Weapon",
+  "item_name": "Chainsaw",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "08_034_Left-Weapon_Chainsaw_x_x_x_Rare_Strength_2_Speed_1_Skill_0_Stamina_1_Stealth_2_Style_0_.png",
+  "simplified_filename": "08_034_Left-Weapon_Chainsaw.png"
+}

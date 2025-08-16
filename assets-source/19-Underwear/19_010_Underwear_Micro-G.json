@@ -1,0 +1,20 @@
+{
+  "folder_number": "19",
+  "asset_number": "010",
+  "category": "Underwear",
+  "item_name": "Micro-G",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 1,
+    "stamina": 1,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "19_010_Underwear_Micro-G_x_x_x_Mythical_Strength_2_Speed_1_Skill_1_Stamina_1_Stealth_1_Style_1_.png",
+  "simplified_filename": "19_010_Underwear_Micro-G.png"
+}

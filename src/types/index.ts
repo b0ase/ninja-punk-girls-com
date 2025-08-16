@@ -96,6 +96,7 @@ export interface AssetDetail {
   };
   original_filename?: string;
   simplified_filename?: string;
+  layerKey?: string; // Added for reference in UI components
   // Legacy fields for backward compatibility
   type?: string;
   series?: string;

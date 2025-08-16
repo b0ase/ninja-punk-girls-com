@@ -46,7 +46,7 @@ const CompositedElementCard: React.FC<CompositedElementCardProps> = ({
                 {/* Foreground Asset PNG Image */}
                 <Image
                     src={elementUrl}
-                    alt={`${attribute.layer} element: ${attribute.metadata?.elementName || attribute.elementNameForAssetField || 'Unknown Element'}`}
+                    alt={`${attribute.layer} element: ${attribute.metadata?.elementName || attribute.name || 'Unknown Element'}`}
                     layout="fill"
                     objectFit="contain" // Contain within the bounds
                     unoptimized
@@ -60,8 +60,8 @@ const CompositedElementCard: React.FC<CompositedElementCardProps> = ({
             </div>
              {/* Optional: Add minimal info below the card */}
             <div className="p-1.5 bg-gray-800/80 text-center absolute bottom-0 left-0 right-0 z-20">
-                <p className="text-gray-300 font-semibold truncate text-[10px]" title={attribute.metadata?.elementName || attribute.elementNameForAssetField || 'Unknown'}>
-                    {attribute.metadata?.elementName || attribute.elementNameForAssetField || 'Unnamed'}
+                <p className="text-gray-300 font-semibold truncate text-[10px]" title={attribute.metadata?.elementName || attribute.name || 'Unknown'}>
+                    {attribute.metadata?.elementName || attribute.name || 'Unnamed'}
                 </p>
                  <p className="text-gray-400 text-[9px] truncate" title={attribute.layer}>
                     {/* Attempt to clean up layer name, might need adjustment */}

@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "004",
+  "category": "Hair",
+  "item_name": "Pink-Bob",
+  "character": "Joy",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "10_004_Hair_Pink-Bob_Joy_Erobot_x_Common_Strength_2_Speed_2_Skill_1_Stamina_2_Stealth_2_Style_0_.png",
+  "simplified_filename": "10_004_Hair_Pink-Bob.png"
+}

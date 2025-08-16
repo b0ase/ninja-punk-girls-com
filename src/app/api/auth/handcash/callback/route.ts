@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { HandCashConnect, Environments } from '@handcash/handcash-connect';
 import jwt from 'jsonwebtoken';
@@ -46,7 +46,22 @@ console.log(`HandCash API Route Initialized for Env: ${hcEnvironment.apiEndpoint
 export async function POST(request: NextRequest) {
   console.log("--- API Route /api/auth/handcash/callback POST request received ---");
   const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
 
   try {
     const body = await request.json();

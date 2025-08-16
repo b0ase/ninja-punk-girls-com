@@ -1,0 +1,20 @@
+{
+  "folder_number": "24",
+  "asset_number": "013",
+  "category": "Rear-Hair",
+  "item_name": "Alt-Falls",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "24_013_Rear-Hair_Alt-Falls_x_x_x_Legendary_Strength_2_Speed_1_Skill_0_Stamina_2_Stealth_2_Style_1_.png",
+  "simplified_filename": "24_013_Rear-Hair_Alt-Falls.png"
+}

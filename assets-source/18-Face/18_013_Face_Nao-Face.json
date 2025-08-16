@@ -1,0 +1,20 @@
+{
+  "folder_number": "18",
+  "asset_number": "013",
+  "category": "Face",
+  "item_name": "Nao-Face",
+  "character": "Nao",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "18_013_Face_Nao-Face_Nao_NPG_x_Rare_Strength_0_Speed_0_Skill_2_Stamina_2_Stealth_2_Style_1_.png",
+  "simplified_filename": "18_013_Face_Nao-Face.png"
+}

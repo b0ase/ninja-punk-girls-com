@@ -1,5 +1,6 @@
 public/assets/**/*.png
 public/assets/**/*.jpg
+public/assets/**/*.json
 public/assets/**/*.glb
 public/assets/**/*.gltf
 public/3D_assets/

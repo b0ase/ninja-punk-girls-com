@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "035",
+  "category": "Hair",
+  "item_name": "Matoko-Hair",
+  "character": "Matoko",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Rare",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "10_035_Hair_Matoko-Hair_Matoko_Erobot_x_Rare_Strength_2_Speed_2_Skill_1_Stamina_2_Stealth_2_Style_1_.png",
+  "simplified_filename": "10_035_Hair_Matoko-Hair.png"
+}

@@ -1,0 +1,20 @@
+{
+  "folder_number": null,
+  "asset_number": null,
+  "category": null,
+  "item_name": null,
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": null,
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "00_Character_Card.png",
+  "simplified_filename": "None_None_None_unknown.png"
+}

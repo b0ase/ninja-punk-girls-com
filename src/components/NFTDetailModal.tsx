@@ -170,8 +170,8 @@ const NFTDetailModal: React.FC<NFTDetailModalProps> = ({
         // Check if the layer should be displayed
         const shouldDisplayLayer = !NON_DISPLAY_LAYERS.has(attr.layer);
         // Check if we have enough data to display the element
-        const hasImageData = !!(attr.fullFilename || attr.imageUrl || (attr.layer && attr.metadata?.elementName)); // Explicit boolean conversion
-        const hasName = !!(attr.metadata?.elementName || attr.elementNameForAssetField); // Explicit boolean conversion
+        const hasImageData = !!(attr.fullFilename || attr.asset || (attr.layer && attr.metadata?.elementName)); // Explicit boolean conversion
+        const hasName = !!(attr.metadata?.elementName || attr.name); // Explicit boolean conversion
 
         // <<< ADDED DEBUG LOGGING INSIDE FILTER >>>
         console.log(`[NFTDetailModal Filter] Processing Layer: ${attr.layer}, ` +
@@ -237,13 +237,7 @@ const NFTDetailModal: React.FC<NFTDetailModalProps> = ({
 
   // Helper function to get element asset URL
   const getElementAssetUrl = (attr: NFTAttribute): string => {
-    // 1. Prioritize direct imageUrl if available
-    if (attr.imageUrl) {
-        console.log(`[getElementAssetUrl] Using direct imageUrl: ${attr.imageUrl}`);
-        return attr.imageUrl;
-    }
-
-    // 2. Use fullFilename and construct path with layer folder
+    // Use fullFilename and construct path with layer folder
     if (attr.fullFilename && attr.layer) {
         const layerDetails = LAYER_DETAILS[attr.layer];
         if (layerDetails && layerDetails.folderName) {
@@ -260,7 +254,7 @@ const NFTDetailModal: React.FC<NFTDetailModalProps> = ({
         }
     }
 
-    // 3. Fallback if no imageUrl or fullFilename (should ideally not happen)
+    // Fallback if no fullFilename (should ideally not happen)
     console.error(`[getElementAssetUrl] Could not determine URL for attribute:`, attr);
     return '/placeholder-element.png'; // Fallback PNG
   };

@@ -78,4 +78,7 @@ temp/
 
 # Supabase
 supabase/.branches
-supabase/.temp 
+supabase/.temp
+
+# Assets
+public/assets

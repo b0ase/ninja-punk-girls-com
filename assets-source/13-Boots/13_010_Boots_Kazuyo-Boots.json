@@ -1,0 +1,20 @@
+{
+  "folder_number": "13",
+  "asset_number": "010",
+  "category": "Boots",
+  "item_name": "Kazuyo-Boots",
+  "character": "Kazuyo",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "13_010_Boots_Kazuyo-Boots_Kazuyo_NPG_x_Common_Strength_2_Speed_2_Skill_0_Stamina_2_Stealth_1_Style_1_.png",
+  "simplified_filename": "13_010_Boots_Kazuyo-Boots.png"
+}

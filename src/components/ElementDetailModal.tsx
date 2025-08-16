@@ -42,7 +42,7 @@ const ElementDetailModal: React.FC<ElementDetailModalProps> = ({ elementData, is
   
   const stats: StatsType = elementData.stats || { strength: 0, speed: 0, skill: 0, stamina: 0, stealth: 0, style: 0 };
   const metadata = elementData.metadata;
-  const assetName = elementData.metadata?.elementName || elementData.elementNameForAssetField || 'Unknown';
+  const assetName = elementData.metadata?.elementName || elementData.name || 'Unknown';
 
   return (
     <div 

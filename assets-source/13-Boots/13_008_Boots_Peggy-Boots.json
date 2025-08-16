@@ -1,0 +1,20 @@
+{
+  "folder_number": "13",
+  "asset_number": "008",
+  "category": "Boots",
+  "item_name": "Peggy-Boots",
+  "character": "Peggy",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "13_008_Boots_Peggy-Boots_Peggy_Erobot_x_Legendary_Strength_2_Speed_1_Skill_2_Stamina_2_Stealth_2_Style_1_.png",
+  "simplified_filename": "13_008_Boots_Peggy-Boots.png"
+}

@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         const apiUrl = `${ANYTHING_WORLD_API_HOST}/image-to-3d`;
         
         const anythingWorldFormData = new FormData();
-        anythingWorldFormData.append('image', new Blob([imageBuffer]), sourceFilename); // The API likely expects a file named 'image'
+        anythingWorldFormData.append('image', new Blob([imageBuffer as unknown as ArrayBuffer]), sourceFilename); // The API likely expects a file named 'image'
         // anythingWorldFormData.append('name', imageName); // Optional: if the API supports naming the model upon creation
         // Add any other required parameters by Anything World API, e.g., output format if configurable.
 

@@ -1,0 +1,20 @@
+{
+  "folder_number": "20",
+  "asset_number": "019",
+  "category": "Arms",
+  "item_name": "Cyber-Gloves",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "20_019_Arms_Cyber-Gloves_x_x_x_Legendary_Strength_2_Speed_2_Skill_2_Stamina_0_Stealth_2_Style_1_.png",
+  "simplified_filename": "20_019_Arms_Cyber-Gloves.png"
+}

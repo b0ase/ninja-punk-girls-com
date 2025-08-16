@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "001",
+  "category": "Hair",
+  "item_name": "Red-Stripe",
+  "character": "Miyuki",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Uncommon",
+  "stats": {
+    "strength": 1,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 2,
+    "style": 1
+  },
+  "original_filename": "10_001_Hair_Red-Stripe_Miyuki_Erobot_x_Uncommon_Strength_1_Speed_2_Skill_1_Stamina_2_Stealth_2_Style_1_.png",
+  "simplified_filename": "10_001_Hair_Red-Stripe.png"
+}

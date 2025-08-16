@@ -1,0 +1,20 @@
+{
+  "folder_number": "11",
+  "asset_number": "004",
+  "category": "Mask",
+  "item_name": "Kimi-Mask",
+  "character": "Kimiko",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "11_004_Mask_Kimi-Mask_Kimiko_NPG_x_Common_Strength_0_Speed_0_Skill_2_Stamina_2_Stealth_0_Style_0_.png",
+  "simplified_filename": "11_004_Mask_Kimi-Mask.png"
+}

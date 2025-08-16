@@ -1,0 +1,20 @@
+{
+  "folder_number": "13",
+  "asset_number": "006",
+  "category": "Boots",
+  "item_name": "Scarlet-Boots",
+  "character": "Scarlet",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 1,
+    "stamina": 1,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "13_006_Boots_Scarlet-Boots_Scarlet_Erobot_x_Common_Strength_0_Speed_0_Skill_1_Stamina_1_Stealth_1_Style_1_.png",
+  "simplified_filename": "13_006_Boots_Scarlet-Boots.png"
+}

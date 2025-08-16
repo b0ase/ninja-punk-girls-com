@@ -1,0 +1,20 @@
+{
+  "folder_number": "26",
+  "asset_number": "002",
+  "category": "Decals",
+  "item_name": "Cyber-Skull",
+  "character": null,
+  "team": "Erobot",
+  "genes": "RGB",
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 0,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "26_002_Decals_Cyber-Skull_x_Erobot_RGB_Common_x_x_x_x_x_x_x_x_x_x_x_x.png",
+  "simplified_filename": "26_002_Decals_Cyber-Skull.png"
+}

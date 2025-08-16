@@ -2481,13 +2481,15 @@ function WalletPageContent(): JSX.Element {
                     // Create an attribute object that CompositedElementCard can use
                     const elementAttribute: NFTAttribute = {
                       layer: element.layer,
+                      name: element.name,
+                      asset: element.imageUrl.split('/').pop() || '',
                       fullFilename: element.imageUrl.split('/').pop() || '',
-                      elementNameForAssetField: element.name,
-                      imageUrl: element.imageUrl,
                       metadata: {
                         rarity: element.rarity,
                         elementName: element.name,
-                        genes: element.elementType.toLowerCase() // Use genes field for elementType
+                        characterName: 'Unknown', // ExtractedElement doesn't have character property
+                        genes: element.elementType.toLowerCase(), // Use genes field for elementType
+                        hasRGB: false // Default value
                       },
                       // Add required stats property with default values
                       stats: {

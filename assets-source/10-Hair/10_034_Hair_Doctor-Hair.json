@@ -1,0 +1,20 @@
+{
+  "folder_number": "10",
+  "asset_number": "034",
+  "category": "Hair",
+  "item_name": "Doctor-Hair",
+  "character": "Doctor",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 1,
+    "style": 0
+  },
+  "original_filename": "10_034_Hair_Doctor-Hair_Doctor_NPG_x_Common_Strength_0_Speed_0_Skill_2_Stamina_2_Stealth_1_Style_0_.png",
+  "simplified_filename": "10_034_Hair_Doctor-Hair.png"
+}

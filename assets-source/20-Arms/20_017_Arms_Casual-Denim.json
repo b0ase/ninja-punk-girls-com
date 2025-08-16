@@ -1,0 +1,20 @@
+{
+  "folder_number": "20",
+  "asset_number": "017",
+  "category": "Arms",
+  "item_name": "Casual-Denim",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 1,
+    "speed": 1,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 2,
+    "style": 0
+  },
+  "original_filename": "20_017_Arms_Casual-Denim_x_x_x_Common_Strength_1_Speed_1_Skill_2_Stamina_0_Stealth_2_Style_0_.png",
+  "simplified_filename": "20_017_Arms_Casual-Denim.png"
+}

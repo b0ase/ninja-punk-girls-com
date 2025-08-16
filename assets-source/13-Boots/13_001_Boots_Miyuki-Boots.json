@@ -1,0 +1,20 @@
+{
+  "folder_number": "13",
+  "asset_number": "001",
+  "category": "Boots",
+  "item_name": "Miyuki-Boots",
+  "character": "Miyuki",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 2
+  },
+  "original_filename": "13_001_Boots_Miyuki-Boots_Miyuki_Erobot_x_Legendary_Strength_2_Speed_0_Skill_2_Stamina_2_Stealth_0_Style_2_.png",
+  "simplified_filename": "13_001_Boots_Miyuki-Boots.png"
+}

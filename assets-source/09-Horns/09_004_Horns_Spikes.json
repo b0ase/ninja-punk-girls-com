@@ -1,0 +1,20 @@
+{
+  "folder_number": "09",
+  "asset_number": "004",
+  "category": "Horns",
+  "item_name": "Spikes",
+  "character": "Yamarashii",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 0,
+    "speed": 0,
+    "skill": 2,
+    "stamina": 0,
+    "stealth": 0,
+    "style": 1
+  },
+  "original_filename": "09_004_Horns_Spikes_Yamarashii_Erobot_x_Mythical_Strength_0_Speed_0_Skill_2_Stamina_0_Stealth_0_Style_1_.png",
+  "simplified_filename": "09_004_Horns_Spikes.png"
+}

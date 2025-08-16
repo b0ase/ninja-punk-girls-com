@@ -1,0 +1,20 @@
+{
+  "folder_number": "15",
+  "asset_number": "001",
+  "category": "Accessories",
+  "item_name": "Neck-Corset",
+  "character": "Joy",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Legendary",
+  "stats": {
+    "strength": 2,
+    "speed": 2,
+    "skill": 1,
+    "stamina": 2,
+    "stealth": 0,
+    "style": 0
+  },
+  "original_filename": "15_001_Accessories_Neck-Corset_Joy_Erobot_x_Legendary_Strength_2_Speed_2_Skill_1_Stamina_2_Stealth_0_Style_0_.png",
+  "simplified_filename": "15_001_Accessories_Neck-Corset.png"
+}

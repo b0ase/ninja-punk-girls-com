@@ -84,7 +84,7 @@ const NftAttributesTable: React.FC<NftAttributesTableProps> = ({
                         </td>
                         {!isCollapsed && (
                           <>
-                            <td className="p-2 border border-gray-700">{attr.assetNumber || ''}</td>
+                            <td className="p-2 border border-gray-700">{attr.asset || ''}</td>
                             <td className="p-2 border border-gray-700">{(attr.metadata?.elementName && attr.metadata.elementName.toLowerCase() !== 'x') ? attr.metadata.elementName : ''}</td>
                             <td className="p-2 border border-gray-700">{(attr.metadata?.characterName && attr.metadata.characterName !== 'Unknown Character') ? attr.metadata.characterName : ''}</td>
                             <td className="p-2 border border-gray-700">{(attr.metadata?.genes && attr.metadata.genes.toLowerCase() !== 'unknown genes') ? attr.metadata.genes : ''}</td>

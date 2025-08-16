@@ -1,0 +1,20 @@
+{
+  "folder_number": "21",
+  "asset_number": "020",
+  "category": "Body",
+  "item_name": "Graf-Bot",
+  "character": null,
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 2,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 1,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "21_020_Body_Graf-Bot_x_Erobot_x_Common_Strength_2_Speed_1_Skill_0_Stamina_1_Stealth_1_Style_1_.png",
+  "simplified_filename": "21_020_Body_Graf-Bot.png"
+}

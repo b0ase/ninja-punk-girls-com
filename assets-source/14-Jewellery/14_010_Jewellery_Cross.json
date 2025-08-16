@@ -1,0 +1,20 @@
+{
+  "folder_number": "14",
+  "asset_number": "010",
+  "category": "Jewellery",
+  "item_name": "Cross",
+  "character": null,
+  "team": null,
+  "genes": null,
+  "rarity": "Common",
+  "stats": {
+    "strength": 1,
+    "speed": 1,
+    "skill": 1,
+    "stamina": 0,
+    "stealth": 1,
+    "style": 2
+  },
+  "original_filename": "14_010_Jewellery_Cross_x_x_x_Common_Strength_1_Speed_1_Skill_1_Stamina_0_Stealth_1_Style_2_.png",
+  "simplified_filename": "14_010_Jewellery_Cross.png"
+}

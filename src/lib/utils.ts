@@ -88,8 +88,15 @@ export const getCardBackgroundPath = (layerName: string, backgroundMap: Record<s
  * @returns The relative URL to the asset image.
  */
 export const getElementAssetUrl = (attribute: NFTAttribute): string => {
-  if (!attribute || !attribute.layer || !attribute.fullFilename) {
+  console.log('[getElementAssetUrl] Called with attribute:', attribute);
+  if (!attribute || !attribute.layer) {
     console.warn('[utils] getElementAssetUrl called with invalid attribute:', attribute);
+    return '/placeholder.png';
+  }
+  
+  // Check if we have any filename information
+  if (!attribute.fullFilename && !attribute.asset) {
+    console.warn('[utils] getElementAssetUrl: No filename information found in attribute:', attribute);
     return '/placeholder.png';
   }
 
@@ -98,13 +105,15 @@ export const getElementAssetUrl = (attribute: NFTAttribute): string => {
 
   if (!layerDetail || !layerDetail.folderName) {
     console.warn(`[utils] Layer detail or folderName not found for layer key: ${attribute.layer}. Using layer key as directory.`);
-    return `/assets/${attribute.layer}/${attribute.fullFilename}`;
+    const filename = attribute.fullFilename || attribute.asset;
+    return `/assets/${attribute.layer}/${filename}`;
   }
 
   // Construct the path using the folderName from LAYER_DETAILS
   // Example: layerDetail.folderName = "07-Right-Weapon", attribute.fullFilename = "07_001_Right-Weapon_Short-Whip.png"
   // Returns: "/assets/07-Right-Weapon/07_001_Right-Weapon_Short-Whip.png"
-  const assetUrl = `/assets/${layerDetail.folderName}/${attribute.fullFilename}`;
-  console.log(`[getElementAssetUrl] Constructed URL: ${assetUrl} for layer: ${attribute.layer}, filename: ${attribute.fullFilename}`);
+  const filename = attribute.fullFilename || attribute.asset;
+  const assetUrl = `/assets/${layerDetail.folderName}/${filename}`;
+  console.log(`[getElementAssetUrl] Constructed URL: ${assetUrl} for layer: ${attribute.layer}, filename: ${filename}, folderName: ${layerDetail.folderName}`);
   return assetUrl;
 }; 

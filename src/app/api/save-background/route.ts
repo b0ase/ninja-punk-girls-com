@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Buffer } from 'buffer';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 // Define expected request body structure
@@ -48,7 +48,22 @@ export async function POST(request: Request) {
   console.log('[API /save-background] Received POST request');
 
   const cookieStore = cookies();
-  const supabaseUserClient = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabaseUserClient = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
   const { data: { user }, error: userError } = await supabaseUserClient.auth.getUser();
 
   if (userError || !user) {
@@ -179,7 +194,22 @@ export async function GET(request: Request) {
     console.log('[API /save-background] Received GET request');
 
     const cookieStore = cookies();
-    const supabaseUserClient = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabaseUserClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
     const { data: { user }, error: userError } = await supabaseUserClient.auth.getUser();
 
     if (userError || !user) {

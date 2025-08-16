@@ -75,7 +75,7 @@ export default function AttributesTable({ nft }: AttributesTableProps) {
               // const imagePath = `/assets/${folderName}/${imageName}`; 
               
               // *** Use Correct Fields from NFTAttribute ***
-              const assetNumberToDisplay = attr.assetNumber || '000'; // Use the new field
+              const assetNumberToDisplay = attr.asset || '000'; // Use the asset field
               const elementNameToDisplay = attr.metadata?.elementName || 'Unknown';
               const characterNameToDisplay = attr.metadata?.characterName || '';
               const genesToDisplay = attr.metadata?.genes || '';

@@ -1,0 +1,20 @@
+{
+  "folder_number": "15",
+  "asset_number": "008",
+  "category": "Accessories",
+  "item_name": "Collar",
+  "character": "Matoko",
+  "team": "Erobot",
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 1,
+    "speed": 2,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 1,
+    "style": 2
+  },
+  "original_filename": "15_008_Accessories_Collar_Matoko_Erobot_x_Mythical_Strength_1_Speed_2_Skill_0_Stamina_2_Stealth_1_Style_2_.png",
+  "simplified_filename": "15_008_Accessories_Collar.png"
+}

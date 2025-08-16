@@ -1,0 +1,20 @@
+{
+  "folder_number": "11",
+  "asset_number": "020",
+  "category": "Mask",
+  "item_name": "Glasses",
+  "character": "Doctor",
+  "team": "NPG",
+  "genes": null,
+  "rarity": "Mythical",
+  "stats": {
+    "strength": 0,
+    "speed": 1,
+    "skill": 0,
+    "stamina": 2,
+    "stealth": 1,
+    "style": 1
+  },
+  "original_filename": "11_020_Mask_Glasses_Doctor_NPG_x_Mythical_Strength_0_Speed_1_Skill_0_Stamina_2_Stealth_1_Style_1_.png",
+  "simplified_filename": "11_020_Mask_Glasses.png"
+}

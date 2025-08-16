@@ -136,10 +136,10 @@ export default function NFTSummary({ nft }: NFTSummaryProps) {
             {getCategoryAttributes(categories.bodyParts).map((attr, index) => (
               <div key={index} className="relative group bg-gray-800 p-2 flex justify-between items-center">
                 <span className="text-gray-400 uppercase text-[10px] tracking-wider">{attr.layer}:</span>
-                <span className="font-mono text-white truncate" title={attr.elementNameForAssetField}>{attr.elementNameForAssetField || 'N/A'}</span>
+                <span className="font-mono text-white truncate" title={attr.name}>{attr.name || 'N/A'}</span>
                 
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 w-max max-w-xs bg-black text-white text-xs rounded py-1 px-2 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 ease-in-out z-20 whitespace-normal text-center">
-                  <p className="font-bold">{attr.layer}: {attr.elementNameForAssetField}</p>
+                  <p className="font-bold">{attr.layer}: {attr.name}</p>
                   {attr.stats && (
                     <p className="mt-1">(STR: {attr.stats.strength}, SPD: {attr.stats.speed}, SKL: {attr.stats.skill}, STM: {attr.stats.stamina}, STL: {attr.stats.stealth}, STY: {attr.stats.style})</p>
                   )}
@@ -158,10 +158,10 @@ export default function NFTSummary({ nft }: NFTSummaryProps) {
             {getCategoryAttributes(categories.clothing).map((attr, index) => (
               <div key={index} className="relative group bg-gray-800 p-2 flex justify-between items-center">
                 <span className="text-gray-400 uppercase text-[10px] tracking-wider">{attr.layer}:</span>
-                <span className="font-mono text-white truncate" title={attr.elementNameForAssetField}>{attr.elementNameForAssetField || 'N/A'}</span>
+                <span className="font-mono text-white truncate" title={attr.name}>{attr.name || 'N/A'}</span>
                 
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 w-max max-w-xs bg-black text-white text-xs rounded py-1 px-2 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 ease-in-out z-20 whitespace-normal text-center">
-                  <p className="font-bold">{attr.layer}: {attr.elementNameForAssetField}</p>
+                  <p className="font-bold">{attr.layer}: {attr.name}</p>
                   {attr.stats && (
                     <p className="mt-1">(STR: {attr.stats.strength}, SPD: {attr.stats.speed}, SKL: {attr.stats.skill}, STM: {attr.stats.stamina}, STL: {attr.stats.stealth}, STY: {attr.stats.style})</p>
                   )}
@@ -180,10 +180,10 @@ export default function NFTSummary({ nft }: NFTSummaryProps) {
             {getCategoryAttributes(categories.weapons).map((attr, index) => (
               <div key={index} className="relative group bg-gray-800 p-2 flex justify-between items-center">
                 <span className="text-gray-400 uppercase text-[10px] tracking-wider">{attr.layer}:</span>
-                <span className="font-mono text-white truncate" title={attr.elementNameForAssetField}>{attr.elementNameForAssetField || 'N/A'}</span>
+                <span className="font-mono text-white truncate" title={attr.name}>{attr.name || 'N/A'}</span>
                 
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 w-max max-w-xs bg-black text-white text-xs rounded py-1 px-2 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 ease-in-out z-20 whitespace-normal text-center">
-                  <p className="font-bold">{attr.layer}: {attr.elementNameForAssetField}</p>
+                  <p className="font-bold">{attr.layer}: {attr.name}</p>
                   {attr.stats && (
                     <p className="mt-1">(STR: {attr.stats.strength}, SPD: {attr.stats.speed}, SKL: {attr.stats.skill}, STM: {attr.stats.stamina}, STL: {attr.stats.stealth}, STY: {attr.stats.style})</p>
                   )}
@@ -202,10 +202,10 @@ export default function NFTSummary({ nft }: NFTSummaryProps) {
             {getCategoryAttributes(categories.accessories).map((attr, index) => (
               <div key={index} className="relative group bg-gray-800 p-2 flex justify-between items-center">
                 <span className="text-gray-400 uppercase text-[10px] tracking-wider">{attr.layer}:</span>
-                <span className="font-mono text-white truncate" title={attr.elementNameForAssetField}>{attr.elementNameForAssetField || 'N/A'}</span>
+                <span className="font-mono text-white truncate" title={attr.name}>{attr.name || 'N/A'}</span>
                 
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 w-max max-w-xs bg-black text-white text-xs rounded py-1 px-2 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 ease-in-out z-20 whitespace-normal text-center">
-                  <p className="font-bold">{attr.layer}: {attr.elementNameForAssetField}</p>
+                  <p className="font-bold">{attr.layer}: {attr.name}</p>
                   {attr.stats && (
                     <p className="mt-1">(STR: {attr.stats.strength}, SPD: {attr.stats.speed}, SKL: {attr.stats.skill}, STM: {attr.stats.stamina}, STL: {attr.stats.stealth}, STY: {attr.stats.style})</p>
                   )}

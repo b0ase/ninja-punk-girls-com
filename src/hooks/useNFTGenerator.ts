@@ -192,8 +192,8 @@ export const generateNewNFTData = (
            attributes.push({
              // Map from AssetDetail to NFTAttribute
              layer: selectedAssetDetail.layer || 'UNKNOWN_LAYER',
-             elementNameForAssetField: selectedAssetDetail.name,
-             assetNumber: String(selectedAssetDetail.assetNumber || ''),
+             name: selectedAssetDetail.name || 'Unknown',
+             asset: selectedAssetDetail.filename || '',
              fullFilename: selectedAssetDetail.filename, // <<< Map filename to fullFilename
              metadata: {
                  // Map relevant fields from AssetDetail if needed, else empty
