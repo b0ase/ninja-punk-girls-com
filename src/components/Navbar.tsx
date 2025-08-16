@@ -49,7 +49,7 @@ export default function Navbar() {
     { href: '/characters', label: 'Characters', colorClass: 'text-cyan-400' },
     { href: '/token', label: 'Token', colorClass: 'text-blue-400' },
     { href: '/game', label: 'Game', colorClass: 'text-indigo-400' },
-    { href: '/build', label: 'Build', colorClass: 'text-purple-400' },
+    { href: '/forge', label: 'Forge', colorClass: 'text-purple-400' },
     { href: '/studio', label: 'Studio', colorClass: 'text-pink-400' },
   ];
 
