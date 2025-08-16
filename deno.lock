@@ -1,0 +1,72 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@supabase/functions-js@*": "2.4.5"
+  },
+  "jsr": {
+    "@supabase/functions-js@2.4.5": {
+      "integrity": "ead2df253fe0c3b0b682c5f25076978ab62c10afff4d04222451a90ba512c394"
+    }
+  },
+  "remote": {
+    "https://deno.land/std@0.161.0/encoding/base64.ts": "c57868ca7fa2fbe919f57f88a623ad34e3d970d675bdc1ff3a9d02bba7409db2",
+    "https://deno.land/std@0.161.0/encoding/base64url.ts": "a5f82a9fa703bd85a5eb8e7c1296bc6529e601ebd9642cc2b5eaa6b38fa9e05a",
+    "https://deno.land/x/djwt@v2.8/algorithm.ts": "fa4c7354ab9f4808d38104fdc6f21c8270f65f109ed84136d4fe31a4504426d4",
+    "https://deno.land/x/djwt@v2.8/deps.ts": "261b7b6bfe2602329d8f9de2938c2a898cd6dfa746b3454ae415df2c53e6ae4d",
+    "https://deno.land/x/djwt@v2.8/mod.ts": "7abba8518688e88648882a95161b42391ac6043c142b1ab491b36f712189e1e1",
+    "https://deno.land/x/djwt@v2.8/signature.ts": "a5649368a4b433b2810e7d47f53661fe3b0f7fe1778cb49234ceae3d6e861185",
+    "https://deno.land/x/djwt@v2.8/util.ts": "0d78272bd23a4656ceabe137d496fcca37cf3de36212477642aa5d85a880d87a"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@emotion/react@^11.14.0",
+        "npm:@emotion/styled@^11.14.0",
+        "npm:@handcash/handcash-connect@~0.8.11",
+        "npm:@mui/icons-material@^7.1.0",
+        "npm:@mui/material@^7.1.0",
+        "npm:@react-three/drei@^9.122.0",
+        "npm:@react-three/fiber@^8.18.0",
+        "npm:@supabase/ssr@~0.6.1",
+        "npm:@supabase/supabase-js@^2.55.0",
+        "npm:@types/classnames@^2.3.0",
+        "npm:@types/jsonwebtoken@^9.0.9",
+        "npm:@types/node@20",
+        "npm:@types/qrcode.react@^1.0.5",
+        "npm:@types/qrcode@^1.5.5",
+        "npm:@types/react-dom@18",
+        "npm:@types/react@18",
+        "npm:@vercel/blob@1",
+        "npm:autoprefixer@^10.0.1",
+        "npm:bidi-js@^1.0.3",
+        "npm:canvas@^3.1.0",
+        "npm:chart.js@^4.4.9",
+        "npm:classnames@^2.5.1",
+        "npm:depcheck@^1.4.7",
+        "npm:djwt@2",
+        "npm:eslint-config-next@14.0.3",
+        "npm:eslint@8",
+        "npm:image-size@^2.0.2",
+        "npm:jsonwebtoken@^9.0.2",
+        "npm:next@14.0.3",
+        "npm:node-fetch@^3.3.2",
+        "npm:pino-pretty@13",
+        "npm:postcss@8",
+        "npm:qrcode.react@^4.2.0",
+        "npm:qrcode@^1.5.4",
+        "npm:react-chartjs-2@^5.3.0",
+        "npm:react-dom@^18.2.0",
+        "npm:react-draggable@^4.4.6",
+        "npm:react-hot-toast@^2.5.2",
+        "npm:react-icons@^5.5.0",
+        "npm:react@^18.2.0",
+        "npm:sharp@~0.34.1",
+        "npm:tailwindcss@^3.3.0",
+        "npm:three-stdlib@^2.36.0",
+        "npm:three@0.175",
+        "npm:typescript@5",
+        "npm:webgl-sdf-generator@^1.1.1"
+      ]
+    }
+  }
+}
