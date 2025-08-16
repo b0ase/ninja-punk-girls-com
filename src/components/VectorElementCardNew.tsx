@@ -17,11 +17,11 @@ const getVectorBackground = (layerKey: string, size: 'small' | 'medium' | 'large
   const layerDetail = LAYER_DETAILS[layerKey];
   if (!layerDetail) return null;
 
-  // Use scaled dimensions that match the display size while maintaining 961:1441 proportions
+  // Fixed dimensions that match PNG card sizes exactly
   const dimensions = {
-    small: { width: 128, height: 192 },   // 128:192 = 961:1441 ratio
-    medium: { width: 192, height: 288 },  // 192:288 = 961:1441 ratio
-    large: { width: 256, height: 384 }    // 256:384 = 961:1441 ratio
+    small: { width: 120, height: 180 },   // Fixed small size
+    medium: { width: 160, height: 240 },  // Fixed medium size  
+    large: { width: 200, height: 300 }    // Fixed large size
   };
 
   const { width, height } = dimensions[size];
